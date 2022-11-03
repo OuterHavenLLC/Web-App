@@ -1,0 +1,13 @@
+2022-10-21 15:28:57	ERROR	[DST 154.89.5.204:52300 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-10-21 16:27:31	ERROR	[SRC 137.220.131.98:40606 sid=1] SHOUTcast 1 source connection denied. Empty password not allowed.
+2022-10-21 16:27:32	ERROR	[DST 137.220.131.98:40978 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-10-21 16:27:37	ERROR	[DST 137.220.131.98:42480 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Go-http-client/1.1'
+2022-10-21 18:50:26	ERROR	[DST 176.58.124.134:55844 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-10-21 22:07:29	ERROR	[SRC 162.142.125.212:55518 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-10-21 22:07:30	ERROR	[SRC 167.94.138.46:42422 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-10-21 22:07:30	ERROR	[SRC 167.248.133.46:40490 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-10-22 03:56:19	ERROR	[DST 20.52.4.134:58885 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-10-22 08:29:50	ERROR	[DST 162.142.125.7:52800 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-10-22 08:29:50	ERROR	[SRC 162.142.125.7:58066 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-10-22 09:24:39	ERROR	[SRC 192.241.219.186:43350 sid=1] SHOUTcast 1 source connection denied. Bad password: MGLNDD_174.138.58.184_8000
+2022-10-22 10:54:39	ERROR	[DST 198.235.24.176:64200 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
