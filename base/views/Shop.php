@@ -85,8 +85,10 @@
     "[Error.Message]" => "The Shop Identifier is missing."
    ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    $y = $this->you;
+   $you = $y["Login"]["Username"];
    if(!empty($id)) {
     $id = base64_decode($id);
+    $shop = $this->system->Data("Get", ["shop", $id]) ?? [];
     $atinput = ".Shop$id-CoverPhoto";
     $at = base64_encode("Set as the Shop's Cover Photo:$atinput");
     $at2 = base64_encode("All done! Feel free to close this card.");
@@ -95,7 +97,7 @@
     $back = $this->system->Change([
      [
       "[CP.ContentType]" => "Shop",
-      "[CP.Files]" => base64_encode("v=$search&st=XFS&AddTo=$at&Added=$at2&ftype=".base64_encode(json_encode(["Photo"]))."&UN=".$y["Login"]["Username"]),
+      "[CP.Files]" => base64_encode("v=$search&st=XFS&AddTo=$at&Added=$at2&ftype=".base64_encode(json_encode(["Photo"]))."&UN=$you"),
       "[CP.ID]" => $id
      ], $this->system->Page("dc027b0a1f21d65d64d539e764f4340a")
     ]).$this->view(base64_encode("Language:Edit"), ["Data" => [
@@ -106,8 +108,7 @@
      "data-form" => ".Shop$id",
      "data-processor" => base64_encode("v=".base64_encode("Shop:Save"))
     ]]);
-    $coverPhoto = $shop["CoverPhoto"] ?? "";
-    $shop = $this->system->Data("Get", ["shop", $id]) ?? [];
+    $coverPhoto = $shop["CoverPhotoSource"] ?? "";
     $shop = $this->system->FixMissing($shop, [
      "Description",
      "Live",
@@ -375,7 +376,7 @@
        }
       }
       $ck = ($active == 1 || $id == md5($you)) ? 1 : 0;
-      $coverPhoto = $shop["ICO"] ?? $this->system->PlainText([
+      $coverPhoto = $shop["CoverPhoto"] ?? $this->system->PlainText([
        "Data" => "[sIMG:MiNY]",
        "Display" => 1
       ]);
@@ -580,7 +581,8 @@
     } else {
      $accessCode = "Accepted";
      $shop = $this->system->Data("Get", ["shop", $id]) ?? [];
-     $coverPhoto = $shop["CoverPhoto"] ?? "";
+     $coverPhoto = "";
+     $coverPhotoSource = "";
      foreach($data as $key => $value) {
       if(strpos($key, "Processing_") !== false) {
        $key = explode("_", $key);
@@ -590,7 +592,7 @@
       $dlc = array_filter(explode(";", base64_decode($data["CoverPhoto"])));
       $dlc = array_reverse($dlc);
       foreach($dlc as $dlc) {
-       if($i == 0 && !empty($dlc)) {
+       if(!empty($dlc) && $i == 0) {
         $f = explode("-", base64_decode($dlc));
         if(!empty($f[0]) && !empty($f[1])) {
          $t = $this->system->Member($f[0]);
@@ -599,6 +601,7 @@
           md5($t["Login"]["Username"])
          ]) ?? [];
          $coverPhoto = $f[0]."/".$efs["Files"][$f[1]]["Name"];
+         $coverPhotoSource = base64_encode($f[0]."-".$f[1]);
          $i++;
         }
        }
@@ -618,6 +621,9 @@
     $shop = [
      "Contributors" => $contributors,
      "CoverPhoto" => $coverPhoto,
+     #CoverPhoto" => "",//TEMP
+     "CoverPhotoSource" => base64_encode($coverPhotoSource),
+     #"CoverPhotoSource" => "",//TEMP
      "Description" => $description,
      "Live" => $live,
      "Modified" => $this->system->timestamp,

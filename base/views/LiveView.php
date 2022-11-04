@@ -33,11 +33,12 @@
    $data = $this->system->FixMissing($data, ["AddTo", "ID"]);
    $i = 0;
    $id = $data["ID"];
-   $r = $this->system->Element(["div", NULL, ["class" => "NONAME"]]);
+   $r = "";
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if(!empty($id)) {
     $attachments = array_filter(explode(";", base64_decode($id)));
+    $attachments = array_reverse($attachments);
     foreach($attachments as $dlc) {
      if(!empty($dlc) && $i == 0) {
       $f = explode("-", base64_decode($dlc));

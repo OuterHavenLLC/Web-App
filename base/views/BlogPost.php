@@ -298,7 +298,7 @@
      if(!empty($data["rATTI"])) {
       $dlc = array_reverse(explode(";", base64_decode($data["rATTI"])));
       foreach($dlc as $dlc) {
-       if($i == 0 && !empty($dlc)) {
+       if(!empty($dlc) && $i == 0) {
         $f = explode("-", base64_decode($dlc));
         if(!empty($f[0]) && !empty($f[1])) {
          $t = $this->system->Member($f[0]);

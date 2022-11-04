@@ -424,7 +424,12 @@
    $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
-   $data = $this->system->FixMissing($data, ["ID", "Title", "new", "pgCat"]);
+   $data = $this->system->FixMissing($data, [
+    "ID",
+    "PageCategory",
+    "Title",
+    "new"
+   ]);
    $new = $data["new"] ?? 0;
    $id = $data["ID"];
    $r = $this->system->Dialog([
@@ -443,7 +448,7 @@
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
-    $category = base64_decode($data["pgCat"]);
+    $category = base64_decode($data["PageCategory"]);
     $category = ($y["Rank"] != md5("High Command") && $category == "EXT") ? "CA" : $category;
     $i = 0;
     $isPublic = (in_array($category, ["CA", "JE"])) ? 1 : 0;
