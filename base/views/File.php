@@ -84,7 +84,7 @@
    if(!empty($efs[$id])) {
     $at = (!empty($at[1])) ? $this->system->Element(["button", $at[0], [
      "class" => "AddTo LI",
-     "data-a" =>$atf,
+     "data-a" => $atf,
      "data-c" => $data["Added"],
      "data-f" => base64_encode($at[1]),
      "data-m" => $dm

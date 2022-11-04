@@ -87,11 +87,10 @@
    $y = $this->you;
    if(!empty($id)) {
     $id = base64_decode($id);
-    $atinput = ".Shop_$id-CoverPhoto";
+    $atinput = ".Shop$id-CoverPhoto";
     $at = base64_encode("Set as the Shop's Cover Photo:$atinput");
-    $atinput = "$atinput .rATT";
     $at2 = base64_encode("All done! Feel free to close this card.");
-    $availabilityCheck = base64_encode("Common:AvailabilityCheck");
+    $atinput = "$atinput .rATT";
     $search = base64_encode("Search:Containers");
     $back = $this->system->Change([
      [
@@ -107,6 +106,7 @@
      "data-form" => ".Shop$id",
      "data-processor" => base64_encode("v=".base64_encode("Shop:Save"))
     ]]);
+    $coverPhoto = $shop["ICO-SRC"] ?? "";
     $shop = $this->system->Data("Get", ["shop", $id]) ?? [];
     $shop = $this->system->FixMissing($shop, [
      "Description",
@@ -120,6 +120,8 @@
     $processing = $shop["Processing"] ?? [];
     $tax = $shop["Tax"] ?? 10.00;
     $r = $this->system->Change([[
+     "[Shop.CoverPhoto]" => $coverPhoto,
+     "[Shop.CoverPhoto.LiveView]" => base64_encode("v=".base64_encode("LiveView:EditorSingle")."&AddTo=$atinput&ID="),
      "[Shop.Description]" => $shop["Description"],
      "[Shop.ID]" => $id,
      "[Shop.Live]" => $this->system->Select("Live", "LI v2w", $shop["Live"]),
@@ -350,8 +352,7 @@
      $r = $this->system->Change([[
       "[Commission.AddToCart]" => $this->view(base64_encode("Pay:Commission"), ["Data" => [
        "ID" => $id,
-       "T" => $t["Login"]["Username"],
-       "pubP" => $pub
+       "T" => $t["Login"]["Username"]
       ]])
      ], $this->system->Page("f844c17ae6ce15c373c2bd2a691d0a9a")]);
     } elseif($ck == 1 || $ck2 == 1) {
@@ -597,7 +598,6 @@
           md5($t["Login"]["Username"])
          ]) ?? [];
          $coverPhoto = $f[0]."/".$efs["Files"][$f[1]]["Name"];
-         $src = base64_encode($f[0]."-".$f[1]);
          $i++;
         }
        }

@@ -37,6 +37,7 @@
   function AttachmentPreview(array $a) {
    $s = $this->efs."/".$a["T"]."/".$a["DLL"]["Name"];
    $t = $a["DLL"]["Type"] ?? "";
+   $r = "";
    if($t == "Audio") {
     $cover = $this->efs."/A.jpg";
     $r = $this->Element([

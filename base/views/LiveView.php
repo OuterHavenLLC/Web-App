@@ -31,36 +31,34 @@
   function EditorSingle(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["AddTo", "ID"]);
-   $attachments = explode(";", base64_decode($data["ID"]));
-   $count = count($attachments);
-   $i2 = 0;
-   $r = "";
+   $i = 0;
+   $id = $data["ID"];
+   $r = $this->system->Element(["div", NULL, ["class" => "NONAME"]]);
    $y = $this->you;
-   for($i = 0; $i < $count; $i++) {
-    if(!empty($attachments[$i])) {
-     $f = explode("-", base64_decode($attachments[$i]));
-     if(!empty($f[0]) && !empty($f[1])) {
-      $t = $this->system->Member($f[0]);
-      $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
-      $efs = ($t["Login"]["Username"] != $this->system->ID) ? $this->system->Data("Get", [
-       "fs",
-       md5($t["Login"]["Username"])
-      ])["Files"] : $efs;
-      $r = $this->system->Change([[
-       "[Attachment.CodeProcessor]" => "v=".base64_encode("LiveView:GetCode")."&Code=".$attachments[$i]."&Type=ATT",
-       "[Attachment.ID]" => $attachments[$i],
-       "[Attachment.Input]" => $data["AddTo"],
-       "[Attachment.Preview]" => $this->system->AttachmentPreview([
-        "DLL" => $efs[$f[1]],
-        "T" => $t["Login"]["Username"],
-        "Y" => $y["Login"]["Username"]
-       ])
-      ], $this->system->Page("8d25bf64ec06d4600180aa5881215a73")]);
-      $i2++;
+   $you = $y["Login"]["Username"];
+   if(!empty($id)) {
+    $attachments = array_filter(explode(";", base64_decode($id)));
+    foreach($attachments as $dlc) {
+     if(!empty($dlc) && $i == 0) {
+      $f = explode("-", base64_decode($dlc));
+      if(!empty($f[0]) && !empty($f[1])) {
+       $efs = $this->system->Data("Get", ["fs", md5($f[0])])["Files"] ?? [];
+       $i++;
+       $r = $this->system->Change([[
+        "[Attachment.CodeProcessor]" => "v=".base64_encode("LiveView:GetCode")."&Code=$dlc&Type=ATT",
+        "[Attachment.ID]" => $f[1],
+        "[Attachment.Input]" => $data["AddTo"],
+        "[Attachment.Preview]" => $this->system->AttachmentPreview([
+         "DLL" => $efs[$f[1]],
+         "T" => $f[0],
+         "Y" => $you
+        ])
+       ], $this->system->Page("8d25bf64ec06d4600180aa5881215a73")]);
+      }
      }
     }
    }
-   $r = ($i2 == 0) ? $this->NoResults : $r;
+   $r = ($i == 0) ? $this->NoResults : $r;
    return $r;
   }
   function EditorMossaic(array $a) {
@@ -69,6 +67,7 @@
    $i2 = 0;
    $r = "";
    $y = $this->you;
+   $you = $y["Login"]["Username"];
    if(!empty($data["ID"])) {
     $attachments = explode(";", base64_decode($data["ID"]));
     $fl = base64_encode("File:Home");
@@ -78,11 +77,7 @@
      if(!empty($attachments[$i])) {
       $f = explode("-", base64_decode($attachments[$i]));
       $t = $this->system->Member($f[0]);
-      $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
-      $efs = ($t["Login"]["Username"] != $this->system->ID) ? $this->system->Data("Get", [
-       "fs",
-       md5($t["Login"]["Username"])
-      ])["Files"] : $efs;
+      $efs = $this->system->Data("Get", ["fs", md5($f[0])])["Files"] ?? [];
       $r .= $this->system->Change([[
        "[Attachment.CodeProcessor]" => "v=".base64_encode("LiveView:GetCode")."&Code=".$attachments[$i]."&Type=ATT",
        "[Attachment.Description]" => $efs[$f[1]]["Description"],
@@ -91,11 +86,11 @@
        "[Attachment.Input]" => $data["AddTo"],
        "[Attachment.Preview]" => $this->system->AttachmentPreview([
         "DLL" => $efs[$f[1]],
-        "T" => $t["Login"]["Username"],
-        "Y" => $y["Login"]["Username"]
+        "T" => $f[0],
+        "Y" => $you
        ]),
        "[Attachment.Title]" => $efs[$f[1]]["Title"],
-       "[Attachment.View]" => base64_encode("v=$fl&ID=".$f[1]."&UN=".$t["Login"]["Username"])
+       "[Attachment.View]" => base64_encode("v=$fl&ID=".$f[1]."&UN=".$f[0])
       ], $this->system->Page("63668c4c623066fa275830696fda5b4a")]);
       $i2++;
      }
@@ -161,7 +156,7 @@
         $r .= $this->system->Element([
          "button", $this->system->ProfilePicture($t, "margin:5%;width:90%"), [
           "class" => "Small dB2O",
-          "data-e" => base64_encode("v=".base64_encode("Shop:Home")."&CARD=1&UN=".base64_encode($t["Login"]["Username"]))
+          "data-e" => base64_encode("v=".base64_encode("Shop:Home")."&CARD=1&UN=".base64_encode($f[0]))
          ]
         ]);
        }
@@ -177,12 +172,7 @@
       if(!empty($dlc)) {
        $f = explode("-", base64_decode($dlc));
        if(!empty($f[0]) && !empty($f[1])) {
-        $t = ($f[0] == $you) ? $y : $this->system->Member($f[0]);
-        $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
-        $efs = ($t["Login"]["Username"] != $this->system->ID) ? $this->system->Data("Get", [
-         "fs",
-         md5($t["Login"]["Username"])
-        ])["Files"] : $efs;
+        $efs = $this->system->Data("Get", ["fs", md5($f[0])])["Files"] ?? [];
         $r .= $this->system->Element([
          "button", $this->system->AttachmentPreview([
           "DLL" => $efs[$f[1]],
@@ -241,7 +231,7 @@
         $r .= $this->system->Element([
          "button", $this->system->ProfilePicture($t, "margin:5%;width:90%"), [
           "class" => "Small dB2O",
-          "data-e" => base64_encode("v=".base64_encode("Profile:Home")."&CARD=1&UN=".base64_encode($t["Login"]["Username"]))
+          "data-e" => base64_encode("v=".base64_encode("Profile:Home")."&CARD=1&UN=".base64_encode($f[0]))
          ]
         ]);
        }
