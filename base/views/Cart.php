@@ -267,7 +267,7 @@
    $continue = ($cartCount > 0) ? $this->system->Element([
     "button", "Continue", [
      "class" => "BB BBB v2 v2w",
-     "onclick" => "FST('N/A', 'v=".base64_encode("Pay:CartCheckout")."&UN=".$data["UN"]."', '".md5("ShoppingCart$username-Checkout")."');"
+     "onclick" => "FST('N/A', 'v=".base64_encode("Pay:Checkout")."&UN=".$data["UN"]."', '".md5("ShoppingCart$username-Checkout")."');"
     ]
    ]) : "";
    $credits = $y["Shopping"]["Cart"][md5($username)]["Credits"] ?? 0;
@@ -283,10 +283,7 @@
     if($ck == 1) {
      $price = str_replace(",", "", $product["Cost"]);
      $price = $price + str_replace(",", "", $product["Profit"]);
-     $quantity = number_format($product["Quantity"]);
-     $quantity = $product["Quantity"] == "-1") ? 1 : $quantity;
-     $product = $price * $quantity;
-     $subtotal = $subtotal + $product;
+     $subtotal = $subtotal + $price;
     }
    } if($discountCode != 0) {
     $discountCode = $discountCode ?? [];
