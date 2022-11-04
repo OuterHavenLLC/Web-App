@@ -106,7 +106,7 @@
      "data-form" => ".Shop$id",
      "data-processor" => base64_encode("v=".base64_encode("Shop:Save"))
     ]]);
-    $coverPhoto = $shop["ICO-SRC"] ?? "";
+    $coverPhoto = $shop["CoverPhoto"] ?? "";
     $shop = $this->system->Data("Get", ["shop", $id]) ?? [];
     $shop = $this->system->FixMissing($shop, [
      "Description",
@@ -587,7 +587,8 @@
        $shop["Processing"][$key[1]] = base64_encode($value);
       }
      } if(!empty($data["CoverPhoto"])) {
-      $dlc = array_reverse(explode(";", base64_decode($data["CoverPhoto"])));
+      $dlc = array_filter(explode(";", base64_decode($data["CoverPhoto"])));
+      $dlc = array_reverse($dlc);
       foreach($dlc as $dlc) {
        if($i == 0 && !empty($dlc)) {
         $f = explode("-", base64_decode($dlc));
