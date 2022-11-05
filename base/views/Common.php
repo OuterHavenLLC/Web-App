@@ -206,76 +206,89 @@
   }
   function Income(array $a) {
    $data = $a["Data"] ?? [];
-   $idt = "";
    $pub = $data["pub"] ?? 0;
-   $tpl = $this->system->Page("676193c49001e041751a458c0392191f");
-   $tpl2 = $this->system->Page("2044776cf5f8b7307b3c4f4771589111");
-   $tpl3 = $this->system->Page("a2adc6269f67244fc703a6f3269c9dfe");
-   $tpl4 = $this->system->Page("a10a03f2d169f34450792c146c40d96d");
+   $username = $data["UN"] ?? "";
    $y = $this->you;
-   $un = $data["UN"] ?? base64_encode($y["Login"]["Username"]);
-   $un = base64_decode($un);
-   $id = $this->system->Data("Get", ["id", md5($un)]) ?? [];
-   $t = ($un == $y["Login"]["Username"]) ? $y : $this->system->Member($un);
-   $shop = $this->system->Data("Get", [
-    "shop",
-    md5($t["Login"]["Username"])
-   ]) ?? [];
-   foreach($id as $k => $v) {
-    if(is_array($v)) {
-     $idtk = "";
-     if($k != "UN") {
-      foreach($v as $k2 => $v2) {
-       $kp = "";
-       $ks = "";
-       $kt = 0;
-       $partners = $v2["Partners"] ?? [];
-       $sales = $v2["Sales"] ?? [];
-       $salesCount = count($sales);
-       for($i = 0; $i < $salesCount; $i++) {
-        $sale = $sales[$i] ?? [];
-        foreach($sale as $k3 => $v3) {
-         $prc = $v3["CostOfProduct"] + $v3["CostToProduce"];
-         $prc = $prc * $v3["Quantity"];
-         $kt = $kt + $prc;
-         $prc = number_format($prc, 2);
-         $ks .= $this->system->Change([[
-          "[IncomeDisclosure.Sale.Price]" => $prc,
-          "[IncomeDisclosure.Sale.Title]" => $v3["Title"]
-         ], $tpl3]);
+   $you = $y["Login"]["Username"];
+   if(!empty($username)) {
+    $_Day = $this->system->Page("ca72b0ed3686a52f7db1ae3b2f2a7c84");
+    $_Month = $this->system->Page("2044776cf5f8b7307b3c4f4771589111");
+    $_Partner = $this->system->Page("a10a03f2d169f34450792c146c40d96d");
+    $_Sale = $this->system->Page("a2adc6269f67244fc703a6f3269c9dfe");
+    $_Year = $this->system->Page("676193c49001e041751a458c0392191f");
+    $username = base64_decode($username);
+    $id = $this->system->Data("Get", ["id", md5($username)]) ?? [];
+    $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
+    $t = ($username == $you) ? $y : $this->system->member($username);
+    $yearTable = "";
+    foreach($id as $year => $yearData) {
+     if(is_array($yearData)) {
+      $monthTable = "";
+      if($year != "UN") {
+       foreach($yearData as $month => $monthData) {
+        $dayTable = "";
+        $partnerTable = "";
+        $partners = $monthData["Partners"] ?? [];
+        $sales = $monthData["Sales"] ?? [];
+        $subtotal = 0;
+        $tax = 0;
+        $total = 0;
+        foreach($partners as $partner => $info) {
+         $partnerTable .= $this->system->Change([[
+          "[IncomeDisclosure.Partner.Company]" => $info["Company"],
+          "[IncomeDisclosure.Partner.Description]" => $info["Description"],
+          "[IncomeDisclosure.Partner.DisplayName]" => $partner,
+          "[IncomeDisclosure.Partner.Hired]" => $this->system->TimeAgo($info["Hired"]),
+          "[IncomeDisclosure.Partner.Title]" => $info["Title"]
+         ], $_Partner]);
+        } foreach($sales as $day => $salesGroup) {
+         $saleTable = "";
+         foreach($salesGroup as $daySales => $daySale) {
+          foreach($daySale as $id => $product) {
+           $price = $product["Cost"] + $product["Profit"];
+           $price = $price * $product["Quantity"];
+           $price = number_format($price, 2);
+           $subtotal = $subtotal + $price;
+           $saleTable .= $this->system->Change([[
+            "[IncomeDisclosure.Sale.Price]" => $price,
+            "[IncomeDisclosure.Sale.Title]" => $product["Title"]
+           ], $_Sale]);
+          }
+         }
+         $dayTable .= $this->system->Change([[
+          "[IncomeDisclosure.Day]" => $day,
+          "[IncomeDisclosure.Day.Sales]" => $saleTable
+         ], $_Day]);
         }
-       } foreach($partners as $pk => $pv) {
-        $kp .= $this->system->Change([[
-         "[IncomeDisclosure.Partner.Company]" => $pv["Company"],
-         "[IncomeDisclosure.Partner.Description]" => $pv["Description"],
-         "[IncomeDisclosure.Partner.DisplayName]" => $pk,
-         "[IncomeDisclosure.Partner.Hired]" => $this->system->TimeAgo($pv["Hired"]),
-         "[IncomeDisclosure.Partner.Title]" => $pv["Title"]
-        ], $tpl4]);
+        $subtotal = number_format($subtotal, 2);
+        $tax = $shop["Tax"] ?? 10.00;
+        $tax = number_format($subtotal * ($tax / 100), 2);
+        $total = number_format($tax + $subtotal, 2);
+        $monthTable .= $this->system->Change([[
+         "[IncomeDisclosure.Table.Month]" => $this->ConvertCalendarMonths($month),
+         "[IncomeDisclosure.Table.Month.Partners]" => $partnerTable,
+         "[IncomeDisclosure.Table.Month.Sales]" => $dayTable,
+         "[IncomeDisclosure.Table.Month.Subtotal]" => $subtotal,
+         "[IncomeDisclosure.Table.Month.Tax]" => $tax,
+         "[IncomeDisclosure.Table.Month.Total]" => $total
+        ], $_Month]);
        }
-       $kt = number_format($kt, 2);
-       $idtk .= $this->system->Change([[
-        "[IncomeDisclosure.Table.Month]" => $this->ConvertCalendarMonths($k2),
-        "[IncomeDisclosure.Table.Month.Sales]" => $ks,
-        "[IncomeDisclosure.Table.Month.Partners]" => $kp,
-        "[IncomeDisclosure.Table.Month.Total]" => $kt
-       ], $tpl2]);
+       $yearTable .= $this->system->Change([[
+        "[IncomeDisclosure.Table.Year]" => $year,
+        "[IncomeDisclosure.Table.Year.Lists]" => $monthTable
+       ], $_Year]);
       }
-      $idt .= $this->system->Change([[
-       "[IncomeDisclosure.Table.Year]" => $k,
-       "[IncomeDisclosure.Table.Year.Lists]" => $idtk
-      ], $tpl]);
      }
     }
+    $yearTable = (empty($id)) ? $this->system->Element([
+     "p", "No Earnings", ["class" => "CenterText", "style" => "margin:0.5em"]
+    ]) : $yearTable;
+    $r = $this->system->Change([[
+     "[IncomeDisclosure.DisplayName]" => $t["Personal"]["DisplayName"],
+     "[IncomeDisclosure.Gallery.Title]" => $shop["Title"],
+     "[IncomeDisclosure.Table]" => $yearTable
+    ], $this->system->Page("4ab1c6f35d284a6eae66ebd46bb88d5d")]);
    }
-   $idt = (empty($id)) ? $this->system->Element([
-    "p", "No Results", ["class" => "CenterText", "style" => "margin:0.5em"]
-   ]) : $idt;
-   $r = $this->system->Change([[
-    "[IncomeDisclosure.DisplayName]" => $t["Personal"]["DisplayName"],
-    "[IncomeDisclosure.Gallery.Title]" => $shop["Title"],
-    "[IncomeDisclosure.Table]" => $idt
-   ], $this->system->Page("4ab1c6f35d284a6eae66ebd46bb88d5d")]);
    $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
     "Data" => ["Content" => $r]
    ]) : $r;
