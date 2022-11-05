@@ -120,7 +120,7 @@
      ["class" => "CenterText"]
     ]);
     $r = $this->system->Change([[
-     "[Cart.CreditExchange]" => $this->system->Select("CE", NULL, md5($t["Login"]["Username"])),
+     "[Cart.CreditExchange]" => $this->system->Select("CE", NULL, $id),
      "[Cart.DiscountCodes]" => $discountCodes,
      "[Cart.List]" => $this->view(base64_encode("Search:Containers"), [
       "Data" => [

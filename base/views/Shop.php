@@ -621,9 +621,7 @@
     $shop = [
      "Contributors" => $contributors,
      "CoverPhoto" => $coverPhoto,
-     #CoverPhoto" => "",//TEMP
      "CoverPhotoSource" => base64_encode($coverPhotoSource),
-     #"CoverPhotoSource" => "",//TEMP
      "Description" => $description,
      "Live" => $live,
      "Modified" => $this->system->timestamp,

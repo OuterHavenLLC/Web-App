@@ -159,11 +159,8 @@
    $data = $this->system->FixMissing($data, ["Month", "UN", "Year"]);
    $sp = base64_encode("Pay:PartnerComplete");
    $username = base64_decode($data["UN"]);
+   $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
    $t = $this->system->Member($username);
-   $shop = $this->system->Data("Get", [
-    "shop",
-    md5($t["Login"]["Username"])
-   ]) ?? [];
    $braintree = $shop["Processing"] ?? [];
    $ck = $this->system->CheckBraintreeKeys($bt);
    $r = $this->system->Change([[
@@ -236,7 +233,6 @@
     "amount",
     "payment_method_nonce"
    ]);
-   $y = $this->you;
    $paymentNonce = $data["payment_method_nonce"];
    $r = $this->system->Change([[
     "[Error.Back]" => "",
@@ -244,6 +240,8 @@
     "[Error.Message]" => "The Member Identifier or Payment Type are missing."
    ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    $username = $data["UN"];
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
    if(!empty($data["Month"]) && !empty($data["Year"]) && !empty($paymentNonce) && !empty($username)) {
     $username = base64_decode($username);
     $t = $this->system->Member($username);
@@ -269,7 +267,7 @@
      $order = $braintree->transaction()->sale([
       "amount" => str_replace(",", "", $amount),
        "customer" => [
-       "firstName" => $y["firstName"]
+       "firstName" => $y["Personal"]["FirstName"]
       ],
       "options" => [
        "submitForSettlement" => true
@@ -277,12 +275,9 @@
       "paymentMethodNonce" => $paymentNonce
      ]);
      if($order->success) {
-      $id = $this->system->Data("Get", [
-       "id",
-       md5($y["Login"]["Username"])
-      ]) ?? [];
+      $id = $this->system->Data("Get", ["id", md5($you)]) ?? [];
       $pc = number_format(0, 2);
-      $pid = "DISBURSEMENT*$username";
+      $pid = "DISBURSEMENTS*$username";
       $this->system->Revenue([$username, [
        "Cost" => $amount,
        "ID" => $pid,
@@ -291,7 +286,7 @@
        "Quantity" => 1,
        "Title" => $pid
       ]]);
-      $this->system->Revenue([$y["Login"]["Username"], [
+      $this->system->Revenue([$you, [
        "Cost" => $amount,
        "ID" => $pid,
        "Partners" => $shop["Contributors"],
@@ -300,7 +295,7 @@
        "Title" => $pid
       ]]);
       $id[$data["Year"]][$data["Month"]]["Partners"][$username]["Paid"] = 1;
-      $this->system->Data("Save", ["id", md5($y["Login"]["Username"]), $id]);
+      $this->system->Data("Save", ["id", md5($you), $id]);
       $r = $this->system->Change([[
        "[Partner.Amount]" => $amount,
        "[Partner.ProfilePicture]" => $this->system->ProfilePicture($t, "margin:12.5% 25%;width:50%"),
@@ -322,16 +317,16 @@
    $physicalOrders = $a["PhysicalOrders"] ?? [];
    $purchaseQuantity = $a["Product"]["Quantity"] ?? 1;
    $r = "";
-   $username = $a["UN"] ?? $a["Member"]["Login"]["Username"];
-   $shopID = md5($username);
-   $y = $a["Member"] ?? $this->you;
+   $shopOwner = $a["UN"] ?? "";
+   $shopID = md5($shopOwner);
+   $y = $a["You"] ?? $this->you;
    $you = $y["Login"]["Username"];
-   if(!empty($a["Member"]) && is_array($a["Product"])) {
+   if(!empty($shopOwner) && is_array($a["Product"])) {
     $history = $y["Shopping"]["History"][$shopID] ?? [];
     $id = $a["Product"]["ID"] ?? "";
     $product = $this->system->Data("Get", ["miny", $id]) ?? [];
     $shop = $this->system->Data("Get", ["shop", $shopID]) ?? [];
-    $t = ($username == $you) ? $y : $this->system->Member($username);
+    $t = ($shopOwner == $you) ? $y : $this->system->Member($shopOwner);
     if(!empty($product)) {
      $bundledProducts = $product["Bundled"] ?? [];
      $contributors = $shop["Contributors"] ?? [];
@@ -360,11 +355,11 @@
        $opt = $this->system->Element(["button", "Contact the Seller", [
         "class" => "BB BBB v2 v2w"
        ]]);
-       $physicalorders[md5($this->system->timestamp.rand(0, 9999))] = [
+       $physicalOrders[md5($this->system->timestamp.rand(0, 9999))] = [
         "Complete" => 0,
         "Instructions" => base64_encode($a["Product"]["Instructions"]),
         "ProductID" => $id,
-        "Quantity" => $a["Product"]["Quantity"],
+        "Quantity" => $purchaseQuantity,
         "UN" => $you
        ];
       } elseif($category == "SUB") {
@@ -429,34 +424,38 @@
       $y["Shopping"]["History"][$shopID] = $history;
       $y["Points"] = $y["Points"] + $points[$category];
       if($bundle == 0) {
-       /*$this->system->Revenue([$you, [
+       $this->system->Revenue([$shopOwner, [
         "Cost" => $product["Cost"],
         "ID" => $id,
         "Partners" => $contributors,
         "Profit" => $product["Profit"],
         "Quantity" => $purchaseQuantity,
         "Title" => $product["Title"]
-       ]]);*/
+       ]]);
       } if($product["Quantity"] > 0) {
-       #$this->system->Data("Save", ["miny", $id, $p]);
+       $this->system->Data("Save", ["miny", $id, $product]);
       }
      } foreach($bundledProducts as $bundled) {
       $bundled = explode("-", base64_decode($bundled));
-      $cartOrder = $this->ProcessCartOrder([
-       "Member" => $y,
-       "PhysicalOrders" => $physicalOrders,
-       "Product" => [
-        "DiscountCode" => 0,
-        "DiscountCredit" => 0,
-        "ID" => $bundled[1],
-        "Instructions" => "",
-        "Quantity" => 1
-       ],
-       "UN" => $bundled[0]
-      ]);
-      $physicalOrders = ($cartOrder["ERR"] == 0) ? $cartOrder["PhysicalOrders"] : $physicalOrders;
-      $r .= $cartOrder["Response"];
-      $y = $cartOrder["Member"];
+      $bundledProduct = $bundled[1] ?? "";
+      $bundledProductShopOwner = $bundled[0] ?? "";
+      if(!empty($bundledProduct) && !empty($bundledProductShopOwner)) {
+       $cartOrder = $this->ProcessCartOrder([
+        "PhysicalOrders" => $physicalOrders,
+        "Product" => [
+         "DiscountCode" => 0,
+         "DiscountCredit" => 0,
+         "ID" => $bundledProduct,
+         "Instructions" => "",
+         "Quantity" => 1
+        ],
+        "UN" => $bundledProductShopOwner,
+        "You" => $y
+       ]);
+       $physicalOrders = ($cartOrder["ERR"] == 0) ? $cartOrder["PhysicalOrders"] : $physicalOrders;
+       $r .= $cartOrder["Response"];
+       $y = $cartOrder["Member"];
+      }
      }
     }
     $r = [
@@ -557,10 +556,10 @@
       $value["Quantity"] = $value["Quantity"] ?? 1;
       $cartOrder = $this->ProcessCartOrder([
        "Bundled" => $bundle,
-       "Member" => $y,
        "PhysicalOrders" => $physicalOrders,
        "Product" => $value,
-       "UN" => $username
+       "UN" => $username,
+       "You" => $y
       ]);
       $physicalOrders = ($cartOrder["ERR"] == 0) ? $cartOrder["PhysicalOrders"] : $physicalOrders;
       $r .= $cartOrder["Response"];
@@ -574,6 +573,7 @@
       "[Checkout.Title]" => $shop["Title"],
       "[Checkout.Total]" => $t
      ], $this->system->Page("83d6fedaa3fa042d53722ec0a757e910")]);
+     //UNCOMMENT WHEN INCOME DISCLOSURES HAVE BEEN TESTED
      #$this->system->Data("Save", ["mbr", md5($you), $y]);
      #$this->system->Data("Save", ["po", $shopID, $physicalOrders]);
     } else {
