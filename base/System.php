@@ -840,25 +840,25 @@
   function Revenue(array $a) {
    if(!empty($a[0]) && is_array($a[1])) {
     $id = $a[1]["ID"] ?? md5($this->timestamp.rand(0, 9999));
-    $r = $this->Data("Get", ["id", md5($a[0])]) ?? [];
-    $m = date("m");
-    $yr = date("Y");
-    $r2 = [];
-    $r2["UN"] = $a[0];
-    $r2[$yr] = $r[$yr] ?? [];
-    $r2[$yr][$m] = $r[$yr][$m] ?? [];
-    $r2[$yr][$m]["Partners"] = $a[1]["Partners"] ?? [];
-    $r2[$yr][$m]["Sales"] = $r[$yr][$m]["Sales"] ?? [];
-    if(!empty($a[1]["CostOfProduct"]) && !empty($a[1]["CostToProduce"])) {
-     array_push($r2[$yr][$m]["Sales"], [$id => [
+    $revenue = $this->Data("Get", ["id", md5($a[0])]) ?? [];
+    $month = date("m");
+    $year = date("Y");
+    $newRevenue = [];
+    $newRevenue["UN"] = $a[0];
+    $newRevenue[$year] = $revenue[$year] ?? [];
+    $newRevenue[$year][$month] = $revenue[$year][$month] ?? [];
+    $newRevenue[$year][$month]["Partners"] = $a[1]["Partners"] ?? [];
+    $newRevenue[$year][$month]["Sales"][$day] = $revenue[$year][$month]["Sales"][$day] ?? [];
+    if(!empty($a[1]["Cost"]) && !empty($a[1]["Profit"])) {
+     array_push($newRevenue[$year][$month]["Sales"][$day], [$id => [
       "Cost" => $a[1]["Cost"],
       "Profit" => $a[1]["Profit"],
       "Quantity" => $a[1]["Quantity"],
       "Title" => $a[1]["Title"]
      ]]);
     }
-    $r = $r2;
-    #$this->Data("Save", ["id", md5($a[0]), $r]);
+    $revenue = $newRevenue;
+    #$this->Data("Save", ["id", md5($a[0]), $revenue]);
    }
   }
   function SendBulletin(array $a) {

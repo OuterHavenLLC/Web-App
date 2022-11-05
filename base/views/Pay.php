@@ -320,6 +320,7 @@
   function ProcessCartOrder(array $a) {
    $bundle = $a["Bundled"] ?? 0;
    $physicalOrders = $a["PhysicalOrders"] ?? [];
+   $purchaseQuantity = $a["Product"]["Quantity"] ?? 1;
    $r = "";
    $username = $a["UN"] ?? $a["Member"]["Login"]["Username"];
    $shopID = md5($username);
@@ -331,13 +332,13 @@
     $product = $this->system->Data("Get", ["miny", $id]) ?? [];
     $shop = $this->system->Data("Get", ["shop", $shopID]) ?? [];
     $t = ($username == $you) ? $y : $this->system->Member($username);
-    if(!empty($product["Title"])) {
+    if(!empty($product)) {
      $bundledProducts = $product["Bundled"] ?? [];
      $contributors = $shop["Contributors"] ?? [];
      $now = $this->system->timestamp;
      $opt = "";
-     if(!empty($product) && $now < $product["Expires"]) {
-      $base = $this->system->efs;
+     $productExpires = $product["Expires"] ?? $now;
+     if(strtotime($now) < $productExpires) {
       $category = $product["Category"];
       $coverPhoto = $product["ICO"] ?? $this->system->PlainText([
        "Data" => "[sIMG:MiNY]",
@@ -345,7 +346,7 @@
       ]);
       $coverPhoto = base64_encode($coverPhoto);
       $points = $this->system->core["PTS"]["Products"];
-      $quantity = $product["Quantity"] ?? 0;
+      $quantity = $product["Quantity"] ?? 1;
       $subscriptionTerm = $product["SubscriptionTerm"] ?? "month";
       if($category == "ARCH") {
        # Architecture
@@ -364,7 +365,7 @@
         "Instructions" => base64_encode($a["Product"]["Instructions"]),
         "ProductID" => $id,
         "Quantity" => $a["Product"]["Quantity"],
-        "UN" => $y["Login"]["Username"]
+        "UN" => $you
        ];
       } elseif($category == "SUB") {
        $opt = $this->system->Element(["button", "Go to Subscription", [
@@ -410,10 +411,10 @@
       $history[md5($id.$now.rand(0, 1776))] = [
        "ID" => $id,
        "Instructions" => $a["Product"]["Instructions"],
-       "Quantity" => $a["Product"]["Quantity"],
+       "Quantity" => $purchaseQuantity,
        "Timestamp" => $now
       ];
-      $product["Quantity"] = ($quantity > 0) ? $quantity - $a["Product"]["Quantity"] : $quantity;
+      $product["Quantity"] = ($quantity > 0) ? $quantity - $purchaseQuantity : $quantity;
       $r .= $this->system->Change([[
        "[Product.Added]" => $this->system->TimeAgo($now),
        "[Product.ICO]" => $coverPhoto,
@@ -422,7 +423,7 @@
         "Display" => 1
        ]),
        "[Product.Options]" => $opt,
-       "[Product.Quantity]" => $a["Product"]["Quantity"],
+       "[Product.Quantity]" => $purchaseQuantity,
        "[Product.Title]" => $product["Title"]
       ], $this->system->Page("4c304af9fcf2153e354e147e4744eab6")]);
       $y["Shopping"]["History"][$shopID] = $history;
@@ -433,14 +434,13 @@
         "ID" => $id,
         "Partners" => $contributors,
         "Profit" => $product["Profit"],
-        "Quantity" => $a["Product"]["Quantity"],
+        "Quantity" => $purchaseQuantity,
         "Title" => $product["Title"]
        ]]);*/
       } if($product["Quantity"] > 0) {
        #$this->system->Data("Save", ["miny", $id, $p]);
       }
-     }
-     foreach($bundledProducts as $bundled) {
+     } foreach($bundledProducts as $bundled) {
       $bundled = explode("-", base64_decode($bundled));
       $cartOrder = $this->ProcessCartOrder([
        "Member" => $y,
@@ -548,16 +548,13 @@
      "paymentMethodNonce" => $paymentNonce
     ]);
     if($order->success) {
-     $y["Shopping"]["Cart"][$shopID]["DiscountCode"] = 0;
+     $physicalOrders = $this->system->Data("Get", ["po", $shopID]) ?? [];
      $r = "";
-     $physicalOrders = $this->system->Data("Get", [
-      "po",
-      md5($username)
-     ]) ?? [];
      foreach($cart as $key => $value) {
-      $value["ID"] = $value["ID"] ?? $key;
       $bundle = $value["Bundled"] ?? [];
       $bundle = (!empty($bundle)) ? 1 : 0;
+      $value["ID"] = $value["ID"] ?? $key;
+      $value["Quantity"] = $value["Quantity"] ?? 1;
       $cartOrder = $this->ProcessCartOrder([
        "Bundled" => $bundle,
        "Member" => $y,
@@ -570,9 +567,10 @@
       $y = $cartOrder["Member"];
      }
      $y["Shopping"]["Cart"][$shopID]["Credits"] = 0;
+     $y["Shopping"]["Cart"][$shopID]["DiscountCode"] = 0;
      $y["Shopping"]["Cart"][$shopID]["Products"] = [];
      $r = $this->system->Change([[
-      "[Checkout.Order]" => $r."<br/>".json_encode($y["Shopping"]["Cart"][$shopID], true),
+      "[Checkout.Order]" => $r,
       "[Checkout.Title]" => $shop["Title"],
       "[Checkout.Total]" => $t
      ], $this->system->Page("83d6fedaa3fa042d53722ec0a757e910")]);
