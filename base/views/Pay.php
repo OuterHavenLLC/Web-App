@@ -328,28 +328,25 @@
    if(!empty($a["Member"]) && is_array($a["Product"])) {
     $h2 = $y["Shopping"]["History"][$usernamee] ?? [];
     $id = $a["Product"]["ID"] ?? "";
-    $p = $this->system->Data("Get", ["miny", $id]) ?? [];
     $t = ($username == $you) ? $y : $this->system->Member($username);
-    $shop = $this->system->Data("Get", [
-     "shop",
-     md5($t["Login"]["Username"])
-    ]) ?? [];
-    $contributors = $shop["Contributors"] ?? [];
-    if(!empty($p["Title"])) {
+    $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
+    $product = $this->system->Data("Get", ["miny", $id]) ?? [];
+    if(!empty($product["Title"])) {
+     $bundledProducts = $product["Bundled"] ?? [];
+     $contributors = $shop["Contributors"] ?? [];
      $now = $this->system->timestamp;
      $opt = "";
-     $ck = ($now < $p["Expires"]) ? 1 : 0;
-     if(!empty($p) && $ck == 1) {
+     if(!empty($product) && $now < $product["Expires"]) {
       $base = $this->system->efs;
-      $cat = $p["Category"];
+      $cat = $product["Category"];
       $coverPhoto = $product["ICO"] ?? $this->system->PlainText([
        "Data" => "[sIMG:MiNY]",
        "Display" => 1
       ]);
       $coverPhoto = base64_encode($coverPhoto);
       $pts = $this->system->core["PTS"]["Products"];
-      $quantity = $p["Quantity"] ?? 0;
-      $st = $p["SubscriptionTerm"] ?? "month";
+      $quantity = $product["Quantity"] ?? 0;
+      $st = $product["SubscriptionTerm"] ?? "month";
       if($cat == "ARCH") {
        # Architecture
       } elseif($cat == "DLC") {
@@ -415,51 +412,50 @@
        "Quantity" => $a["Product"]["Quantity"],
        "Timestamp" => $this->system->timestamp
       ];
-      $p["Quantity"] = ($quantity > 0) ? $quantity - $a["Product"]["Quantity"] : $quantity;
+      $product["Quantity"] = ($quantity > 0) ? $quantity - $a["Product"]["Quantity"] : $quantity;
       $r .= $this->system->Change([[
        "[Product.Added]" => $this->system->TimeAgo($this->system->timestamp),
        "[Product.ICO]" => $coverPhoto,
        "[Product.Description]" => $this->system->PlainText([
-        "Data" => $p["Description"],
+        "Data" => $product["Description"],
         "Display" => 1
        ]),
        "[Product.Options]" => $opt,
        "[Product.Quantity]" => $a["Product"]["Quantity"],
-       "[Product.Title]" => $p["Title"]
+       "[Product.Title]" => $product["Title"]
       ], $this->system->Page("4c304af9fcf2153e354e147e4744eab6")]);
       $y["Shopping"]["History"][$usernamee] = $h2;
       $y["Points"] = $y["Points"] + $pts[$cat];
       if($bundle == 0) {
        /*$this->system->Revenue([$you, [
-        "Cost" => $p["Cost"],
+        "Cost" => $product["Cost"],
         "ID" => $id,
         "Partners" => $contributors,
-        "Profit" => $p["Profit"],
+        "Profit" => $product["Profit"],
         "Quantity" => $a["Product"]["Quantity"],
-        "Title" => $p["Title"]
+        "Title" => $product["Title"]
        ]]);*/
-      } if($p["Quantity"] > 0) {
+      } if($product["Quantity"] > 0) {
        #$this->system->Data("Save", ["miny", $id, $p]);
       }
-     } if(!empty($p["Bundled"]) && is_array($p["Bundled"])) {
-      foreach($p["Bundled"] as $bundled) {
-       $bundled = explode("-", base64_decode($bundled));
-       $cartOrder = $this->ProcessCartOrder([
-        "Member" => $y,
-        "PhysicalOrders" => $physicalOrders,
-        "Product" => [
-         "DiscountCode" => 0,
-         "DiscountCredit" => 0,
-         "ID" => $bundled[1],
-         "Instructions" => "",
-         "Quantity" => 1
-        ],
-        "UN" => $bundled[0]
-       ]);
-       $physicalOrders = ($cartOrder["ERR"] == 0) ? $cartOrder["PhysicalOrders"] : $physicalOrders;
-       $r .= $cartOrder["Response"];
-       $y = $cartOrder["Member"];
-      }
+     }
+     foreach($bundledProducts as $bundled) {
+      $bundled = explode("-", base64_decode($bundled));
+      $cartOrder = $this->ProcessCartOrder([
+       "Member" => $y,
+       "PhysicalOrders" => $physicalOrders,
+       "Product" => [
+        "DiscountCode" => 0,
+        "DiscountCredit" => 0,
+        "ID" => $bundled[1],
+        "Instructions" => "",
+        "Quantity" => 1
+       ],
+       "UN" => $bundled[0]
+      ]);
+      $physicalOrders = ($cartOrder["ERR"] == 0) ? $cartOrder["PhysicalOrders"] : $physicalOrders;
+      $r .= $cartOrder["Response"];
+      $y = $cartOrder["Member"];
      }
     }
     $r = [
