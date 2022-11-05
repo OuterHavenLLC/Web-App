@@ -319,18 +319,18 @@
   }
   function ProcessCartOrder(array $a) {
    $bundle = $a["Bundled"] ?? 0;
-   $po = $a["PhysicalOrders"] ?? [];
-   $username = $a["UN"] ?? $a["Member"]["UN"];
-   $usernamee = md5($username);
+   $physicalOrders = $a["PhysicalOrders"] ?? [];
    $r = "";
+   $username = $a["UN"] ?? $a["Member"]["Login"]["Username"];
+   $shopID = md5($username);
    $y = $a["Member"] ?? $this->you;
    $you = $y["Login"]["Username"];
    if(!empty($a["Member"]) && is_array($a["Product"])) {
-    $h2 = $y["Shopping"]["History"][$usernamee] ?? [];
+    $history = $y["Shopping"]["History"][$shopID] ?? [];
     $id = $a["Product"]["ID"] ?? "";
-    $t = ($username == $you) ? $y : $this->system->Member($username);
-    $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
     $product = $this->system->Data("Get", ["miny", $id]) ?? [];
+    $shop = $this->system->Data("Get", ["shop", $shopID]) ?? [];
+    $t = ($username == $you) ? $y : $this->system->Member($username);
     if(!empty($product["Title"])) {
      $bundledProducts = $product["Bundled"] ?? [];
      $contributors = $shop["Contributors"] ?? [];
@@ -338,83 +338,84 @@
      $opt = "";
      if(!empty($product) && $now < $product["Expires"]) {
       $base = $this->system->efs;
-      $cat = $product["Category"];
+      $category = $product["Category"];
       $coverPhoto = $product["ICO"] ?? $this->system->PlainText([
        "Data" => "[sIMG:MiNY]",
        "Display" => 1
       ]);
       $coverPhoto = base64_encode($coverPhoto);
-      $pts = $this->system->core["PTS"]["Products"];
+      $points = $this->system->core["PTS"]["Products"];
       $quantity = $product["Quantity"] ?? 0;
-      $st = $product["SubscriptionTerm"] ?? "month";
-      if($cat == "ARCH") {
+      $subscriptionTerm = $product["SubscriptionTerm"] ?? "month";
+      if($category == "ARCH") {
        # Architecture
-      } elseif($cat == "DLC") {
+      } elseif($category == "DLC") {
        # Downloadable Content
-      } elseif($cat == "DONATE") {
+      } elseif($category == "DONATE") {
        # Donations
        $opt = $this->system->Element(["p", "Thank You for donating!"]);
-      } elseif($cat == "PHYS") {
+      } elseif($category == "PHYS") {
        # Physical Products
        $opt = $this->system->Element(["button", "Contact the Seller", [
         "class" => "BB BBB v2 v2w"
        ]]);
-       $po[md5($this->system->timestamp.rand(0, 9999))] = [
+       $physicalorders[md5($this->system->timestamp.rand(0, 9999))] = [
         "Complete" => 0,
         "Instructions" => base64_encode($a["Product"]["Instructions"]),
         "ProductID" => $id,
         "Quantity" => $a["Product"]["Quantity"],
         "UN" => $y["Login"]["Username"]
        ];
-      } elseif($cat == "SUB") {
+      } elseif($category == "SUB") {
        $opt = $this->system->Element(["button", "Go to Subscription", [
         "class" => "BB BBB v2 v2w"
        ]]);
        if($id == "355fd2f096bdb49883590b8eeef72b9c") {
+        # V.I.P. Subscription
         foreach($y["Subscriptions"] as $sk => $sv) {
          if(!in_array($sk, ["Artist", "Developer"])) {
           $y["Subscriptions"][$sk] = [
            "A" => 1,
-           "B" => $this->system->timestamp,
-           "E" => $this->system->TimePlus($this->system->timestamp, 1, $st)
+           "B" => $now,
+           "E" => $this->system->TimePlus($now, 1, $subscriptionTerm)
           ];
          }
         }
        } elseif($id == "39d05985f0667a69f3a725d5afd1265c") {
         $y["Subscriptions"]["Developer"] = [
          "A" => 1,
-         "B" => $this->system->timestamp,
-         "E" => $this->system->TimePlus($this->system->timestamp, 1, $st)
+         "B" => $now,
+         "E" => $this->system->TimePlus($now, 1, $subscriptionTerm)
         ];
        } elseif($id == "5bfb3f44cdb9d3f2cd969a23f0e37093") {
         $y["Subscriptions"]["XFS"] = [
          "A" => 1,
-         "B" => $this->system->timestamp,
-         "E" => $this->system->TimePlus($this->system->timestamp, 1, $st)
+         "B" => $now,
+         "E" => $this->system->TimePlus($now, 1, $subscriptionTerm)
         ];
        } elseif($id == "c7054e9c7955203b721d142dedc9e540") {
         $y["Subscriptions"]["Artist"] = [
          "A" => 1,
-         "B" => $this->system->timestamp,
-         "E" => $this->system->TimePlus($this->system->timestamp, 1, $st)
+         "B" => $now,
+         "E" => $this->system->TimePlus($now, 1, $subscriptionTerm)
         ];
        } elseif($id == "cc84143175d6ae2051058ee0079bd6b8") {
         $y["Subscriptions"]["Blogger"] = [
          "A" => 1,
-         "B" => $this->system->timestamp,
-         "E" => $this->system->TimePlus($this->system->timestamp, 1, $st)
+         "B" => $now,
+         "E" => $this->system->TimePlus($now, 1, $subscriptionTerm)
         ];
        }
       }
-      $h2[md5($id.$this->system->timestamp.rand(0, 1776))] = [
+      $history[md5($id.$now.rand(0, 1776))] = [
        "ID" => $id,
        "Instructions" => $a["Product"]["Instructions"],
        "Quantity" => $a["Product"]["Quantity"],
-       "Timestamp" => $this->system->timestamp
+       "Timestamp" => $now
       ];
       $product["Quantity"] = ($quantity > 0) ? $quantity - $a["Product"]["Quantity"] : $quantity;
       $r .= $this->system->Change([[
-       "[Product.Added]" => $this->system->TimeAgo($this->system->timestamp),
+       "[Product.Added]" => $this->system->TimeAgo($now),
        "[Product.ICO]" => $coverPhoto,
        "[Product.Description]" => $this->system->PlainText([
         "Data" => $product["Description"],
@@ -424,8 +425,8 @@
        "[Product.Quantity]" => $a["Product"]["Quantity"],
        "[Product.Title]" => $product["Title"]
       ], $this->system->Page("4c304af9fcf2153e354e147e4744eab6")]);
-      $y["Shopping"]["History"][$usernamee] = $h2;
-      $y["Points"] = $y["Points"] + $pts[$cat];
+      $y["Shopping"]["History"][$shopID] = $history;
+      $y["Points"] = $y["Points"] + $points[$category];
       if($bundle == 0) {
        /*$this->system->Revenue([$you, [
         "Cost" => $product["Cost"],
@@ -487,10 +488,8 @@
     require_once($this->root);
     $username = (!empty($username)) ? base64_decode($username) : $you;
     $t = ($username == $you) ? $y : $this->system->Member($username);
-    $shop = $this->system->Data("Get", [
-     "shop",
-     md5($t["Login"]["Username"])
-    ]) ?? [];
+    $shopID = md5($username);
+    $shop = $this->system->Data("Get", ["shop", $shopID]) ?? [];
     $braintree = $shop["Processing"] ?? [];
     $live = $shop["Live"] ?? 0;
     $environment = ($live == 1) ? "production" : "sandbox";
@@ -500,11 +499,11 @@
      "privateKey" => base64_decode($braintree["BraintreePrivateKey"]),
      "publicKey" => base64_decode($braintree["BraintreePublicKey"])
     ]);
-    $cart = $y["Shopping"]["Cart"][md5($username)]["Products"] ?? [];
+    $cart = $y["Shopping"]["Cart"][$shopID]["Products"] ?? [];
     $cartCount = count($cart);
-    $credits = $y["Shopping"]["Cart"][md5($username)]["Credits"] ?? 0;
+    $credits = $y["Shopping"]["Cart"][$shopID]["Credits"] ?? 0;
     $credits = number_format($credits, 2);
-    $discountCode = $y["Shopping"]["Cart"][md5($username)]["DiscountCode"] ?? 0;
+    $discountCode = $y["Shopping"]["Cart"][$shopID]["DiscountCode"] ?? 0;
     $now = $this->system->timestamp;
     $subtotal = 0;
     $total = 0;
@@ -549,7 +548,7 @@
      "paymentMethodNonce" => $paymentNonce
     ]);
     if($order->success) {
-     $y["Shopping"]["Cart"][md5($username)]["DiscountCode"] = 0;
+     $y["Shopping"]["Cart"][$shopID]["DiscountCode"] = 0;
      $r = "";
      $physicalOrders = $this->system->Data("Get", [
       "po",
@@ -570,19 +569,19 @@
       $r .= $cartOrder["Response"];
       $y = $cartOrder["Member"];
      }
-     $y["Shopping"]["Cart"][md5($username)]["Credits"] = 0;
-     $y["Shopping"]["Cart"][md5($username)]["Products"] = [];
+     $y["Shopping"]["Cart"][$shopID]["Credits"] = 0;
+     $y["Shopping"]["Cart"][$shopID]["Products"] = [];
      $r = $this->system->Change([[
-      "[Checkout.Order]" => $r."<br/>".json_encode($y["Shopping"]["Cart"][md5($username)], true),
+      "[Checkout.Order]" => $r."<br/>".json_encode($y["Shopping"]["Cart"][$shopID], true),
       "[Checkout.Title]" => $shop["Title"],
       "[Checkout.Total]" => $t
      ], $this->system->Page("83d6fedaa3fa042d53722ec0a757e910")]);
      #$this->system->Data("Save", ["mbr", md5($you), $y]);
-     #$this->system->Data("Save", ["po", md5($username), $physicalOrders]);
+     #$this->system->Data("Save", ["po", $shopID, $physicalOrders]);
     } else {
      $r = $this->system->Change([[
       "[Checkout.Order.Message]" => $order->message,
-      "[Checkout.Order.Products]" => count($y["Shopping"]["Cart"][md5($username)]["Products"]),
+      "[Checkout.Order.Products]" => count($y["Shopping"]["Cart"][$shopID]["Products"]),
       "[Checkout.Order.Success]" => json_encode($order->success)
      ], $this->system->Page("229e494ec0f0f43824913a622a46dfca")]);
     }
@@ -599,7 +598,7 @@
    $amount = base64_decode($amount);
    $amount = ($amount < 5) ? 5 : $amount;
    $amount = number_format($amount, 2);
-   $pts = $this->system->core["PTS"]["Donations"] ?? 0;
+   $points = $this->system->core["PTS"]["Donations"] ?? 0;
    $st = (!empty($data["st"])) ? base64_decode($data["st"]) : "";
    $t = $this->system->Member($this->system->ShopID);
    $shop = $this->system->Data("Get", [
@@ -635,8 +634,8 @@
       $y["Commission"] = 0;
      }
      $st2 = ($st == "Commission") ? "$$amount commission" : base64_decode($data["amount"])."$$amount donation";
-     $st3 = ($st == "Commission") ? "You may now access your Artist dashboard." : "$pts points have been added";
-     $y["Points"] = $y["Points"] + $pts;
+     $st3 = ($st == "Commission") ? "You may now access your Artist dashboard." : "$points points have been added";
+     $y["Points"] = $y["Points"] + $points;
      $r = $this->system->Change([[
       "[Commission.Message]" => $st3,
       "[Commission.Type]" => $st2
