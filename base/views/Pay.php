@@ -559,13 +559,13 @@
       $value["ID"] = $value["ID"] ?? $key;
       $bundle = $value["Bundled"] ?? [];
       $bundle = (!empty($bundle)) ? 1 : 0;
-      /*$cartOrder = $this->ProcessCartOrder([
+      $cartOrder = $this->ProcessCartOrder([
        "Bundled" => $bundle,
        "Member" => $y,
        "PhysicalOrders" => $physicalOrders,
        "Product" => $value,
        "UN" => $username
-      ]);*/
+      ]);
       $physicalOrders = ($cartOrder["ERR"] == 0) ? $cartOrder["PhysicalOrders"] : $physicalOrders;
       $r .= $cartOrder["Response"];
       $y = $cartOrder["Member"];
@@ -573,7 +573,7 @@
      $y["Shopping"]["Cart"][md5($username)]["Credits"] = 0;
      $y["Shopping"]["Cart"][md5($username)]["Products"] = [];
      $r = $this->system->Change([[
-      "[Checkout.Order]" => $r,
+      "[Checkout.Order]" => $r."<br/>".json_encode($y["Shopping"]["Cart"][md5($username)], true),
       "[Checkout.Title]" => $shop["Title"],
       "[Checkout.Total]" => $t
      ], $this->system->Page("83d6fedaa3fa042d53722ec0a757e910")]);
