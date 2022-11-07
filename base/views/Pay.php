@@ -592,7 +592,6 @@
     $saleType = (!empty($data["st"])) ? base64_decode($data["st"]) : "";
     $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
     $braintree = $shop["Processing"] ?? [];
-    $contributors = $shop["Contributors"] ?? [];
     $live = $shop["Live"] ?? 0;
     $environment = ($live == 1) ? "production" : "sandbox";
     $braintree = new Braintree_Gateway([
@@ -612,6 +611,7 @@
      "paymentMethodNonce" => $data["payment_method_nonce"]
     ]);
     if($order->success) {
+     $_MiNYContributors = $shop["Contributors"] ?? [];
      if($saleType == "Commission") {
       $_LastMonth = $this->system->LastMonth()["LastMonth"];
       $_LastMonth = explode("-", $_LastMonth);
@@ -620,21 +620,31 @@
       $now = $this->system->timestamp;
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
       $shop["Open"] = 1;
+      $this->system->Data("Save", ["id", md5($username), $income]);
+      $this->system->Data("Save", ["shop", md5($you), $shop]);
       $this->system->Revenue([$username, [
        "Cost" => $amount,
        "ID" => "COMMISSION*".$shop["Title"],
-       "Partners" => $contributors,
+       "Partners" => $_MiNYContributors,
        "Profit" => $amount,
        "Quantity" => 1,
-       "Title" => $pid
+       "Title" => "Donation*".$shop["Title"]
       ]]);
-      $this->system->Data("Save", ["id", md5($username), $income]);
-      $this->system->Data("Save", ["shop", md5($you), $shop]);
       $y["Subscriptions"]["Artist"] = [
        "A" => 1,
        "B" => $now,
        "E" => $this->TimePlus($now, 1, "month")
       ];
+     } elseif($saleType == "Donation") {
+      $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
+      $this->system->Revenue([$username, [
+       "Cost" => $amount,
+       "ID" => "Donation*".$shop["Title"],
+       "Partners" => $_MiNYContributors,
+       "Profit" => $amount,
+       "Quantity" => 1,
+       "Title" => "Donation*".$shop["Title"]
+      ]]);
      }
      $amount = "$$amount";
      $amount .= ($saleType == "Commission") ? " commission" : " donation";
