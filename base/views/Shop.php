@@ -392,12 +392,13 @@
        "Type" => 4
       ]]) : "";
       $search = base64_encode("Search:Containers");
-      $subscribe = (in_array($you, $subscribers)) ? "Unsubscribe" : "Subscribe";
-      $subscribe = ($id != md5($you)) ? $this->system->Change([[
+      $subscribe = (md5($you) != $id && $this->system->ID != $you) ? 1 : 0;
+      $subscribeText = (in_array($you, $subscribers)) ? "Unsubscribe" : "Subscribe";
+      $subscribe = ($subscribe == 1) ? $this->system->Change([[
        "[Subscribe.ContentID]" => $id,
        "[Subscribe.ID]" => md5($you),
        "[Subscribe.Processor]" => base64_encode("v=".base64_encode("Shop:Subscribe")),
-       "[Subscribe.Text]" => $subscribe,
+       "[Subscribe.Text]" => $subscribeText,
        "[Subscribe.Title]" => $shop["Title"]
       ], $this->system->Page("489a64595f3ec2ec39d1c568cd8a8597")]) : "";
       $r = $this->system->Change([[

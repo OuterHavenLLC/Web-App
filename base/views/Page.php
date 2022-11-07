@@ -334,12 +334,13 @@
       "T" => $t["Login"]["Username"],
       "Type" => 2
      ]])) : "";
-     $subscribe = (in_array($you, $subscribers)) ? "Unsubscribe" : "Subscribe";
-     $subscribe = ($Page["UN"] != $you) ? $this->system->Change([[
+      $subscribe = ($Page["UN"] != $you && $this->system->ID != $you) ? 1 : 0;
+      $subscribeText = (in_array($you, $subscribers)) ? "Unsubscribe" : "Subscribe";
+      $subscribe = ($subscribe == 1) ? $this->system->Change([[
       "[Subscribe.ContentID]" => $id,
       "[Subscribe.ID]" => md5($you),
       "[Subscribe.Processor]" => base64_encode("v=".base64_encode("Page:Subscribe")),
-      "[Subscribe.Text]" => $subscribe,
+      "[Subscribe.Text]" => $subscribeText,
       "[Subscribe.Title]" => $Page["Title"]
      ], $this->system->Page("489a64595f3ec2ec39d1c568cd8a8597")]) : "";
      $r = $this->system->Change([[
