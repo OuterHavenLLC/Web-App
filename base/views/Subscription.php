@@ -58,41 +58,39 @@
      $r = $this->system->Page("ffdcc2a6f8e1265543c190fef8e7982f");
     } else {
      if($s == "Artist") {
-      $com = 0;
-      $id = $this->system->Data("Get", ["id", md5($you)]) ?? [];
-      $lastMonth = $this->system->LastMonth()["LastMonth"];
-      $id = $id[$lastMonth[0]][$lastMonth[1]] ?? [];
+      $_LastMonth = $this->system->LastMonth()["LastMonth"];
+      $income = $this->system->Data("Get", ["id", md5($you)]) ?? [];
+      $income = $income[$_LastMonth[0]] ?? [];
+      $income = $income[$_LastMonth[1]] ?? [];
+      $paidCommission = $income["PaidCommission"] ?? 0;
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
-      $commission = $shop["Commission"] ?? 0;
-      foreach($id as $key => $value) {
-       if($key == "Sales") {
-        for($i = 0; $i < count($key); $i++) {
-         foreach($value[$i] as $k2 => $v2) {
-          $prc = $v2["CostOfProduct"] + $v2["CostToProduce"];
-          $prc = $prc * $v2["Quantity"];
-          $com = $com + $prc;
+      if($paidCommission == 0) {//TEMP
+      #} if($paidCommission != 0) {
+       $commission = 0;
+       foreach($income as $key => $value) {
+        if($key == "Sales") {
+         for($i = 0; $i < count($key); $i++) {
+          foreach($value[$i] as $k2 => $v2) {
+           $prc = $v2["CostOfProduct"] + $v2["CostToProduce"];
+           $prc = $prc * $v2["Quantity"];
+           $com = $com + $prc;
+          }
          }
         }
-       }
-      } if($com > 0 || ($com > 0 && $commission == 1)) {
-       if($commission == 0) {
-        $commission = 1;
+       } if($commission > 0) {
         $shop["Open"] = 0;
-        $this->system->Data("Save", ["shop", md5($you), $shop]);
+        #$this->system->Data("Save", ["shop", md5($you), $shop]);
        }
-       $com = (5 / 100) * $com;
-       $commission = "v=".base64_encode("Pay:Commission")."&amount=".base64_encode($com);
+       $commission = number_format($commission * (5 / 100), 2);
        $r = $this->system->Change([[
         "[Container]" => "SUB_$s",
         "[Container.List]" => $this->system->Change([[
          "[Commission.FSTID]" => md5("Commission_Pay"),
-         "[Commission.Pay]" => $commission,
-         "[Commission.Total]" => number_format($com, 2)
+         "[Commission.Pay]" => "v=".base64_encode("Pay:Commission")."&amount=".base64_encode($commission),
+         "[Commission.Total]" => $commission
         ], $this->system->Page("f844c17ae6ce15c373c2bd2a691d0a9a")])
        ], $this->system->Page("46fc25c871bbcd0203216e329db12162")]);
       } else {
-       $hire = base64_encode("Partner:Edit");
-       $revenue = base64_encode("Common:Income");
        $r = $this->system->Change([[
         "[Artist.Charts]" => "",
         "[Artist.Contributors]" => $this->view($search, ["Data" => [
@@ -104,13 +102,13 @@
          "Data" => "[sIMG:CP]",
          "Display" => 1
         ]),
-        "[Artist.Hire]" => base64_encode("v=$hire&new=1"),
+        "[Artist.Hire]" => base64_encode("v=".base64_encode("Shop:EditPartner")."&new=1"),
         "[Artist.Orders]" => $this->view($search, ["Data" => [
          "st" => "SHOP-Orders"
         ]]),
         "[Artist.ID]" => md5($you),
         "[Artist.Payroll]" => "v=".base64_encode("Shop:Payroll"),
-        "[Artist.Revenue]" => "v=$revenue&UN=".base64_encode($you)
+        "[Artist.Revenue]" => "v=".base64_encode("Common:Income")."&UN=".base64_encode($you)
        ], $this->system->Page("20820f4afd96c9e32440beabed381d36")]);
       }
      } elseif($s == "Blogger") {

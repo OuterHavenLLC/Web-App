@@ -565,7 +565,10 @@
   }
   function LastMonth() {
    $r = date_create(date("Y-m")." first day of last month");
-   return ["LastMonth" => $r->format("Y-m"), "Now" => date("Y-m")];
+   return [
+    "LastMonth" => $r->format("Y-m"),
+    "Now" => date("Y-m")
+   ];
   }
   function Member(string $username) {
    if($username == $this->ID) {
@@ -850,6 +853,7 @@
     $newRevenue["UN"] = $shopOwner;
     $newRevenue[$year] = $revenue[$year] ?? [];
     $newRevenue[$year][$month] = $revenue[$year][$month] ?? [];
+    $newRevenue[$year][$month]["PaidCommission"] = 0;
     $newRevenue[$year][$month]["Partners"] = $data["Partners"] ?? [];
     $newRevenue[$year][$month]["Sales"][$day] = $revenue[$year][$month]["Sales"][$day] ?? [];
     if(!empty($data["Cost"]) && !empty($data["Profit"])) {

@@ -481,10 +481,8 @@
    $tplPartner = $this->system->Page("210642ff063d1b3cbe0b2468aba070f2");
    $tplYear = $this->system->Page("676193c49001e041751a458c0392191f");
    $y = $this->you;
-   $payroll = $this->system->Data("Get", [
-    "id",
-    md5($y["Login"]["Username"])
-   ]) ?? [];
+   $you = $y["Login"]["Username"];
+   $payroll = $this->system->Data("Get", ["id", md5($you)]) ?? [];
    foreach($payroll as $k => $v) {
     if(is_array($v)) {
      $month = "";
@@ -499,16 +497,16 @@
        for($i = 0; $i < $salesCount; $i++) {
         $sales = $sales[$i] ?? [];
         foreach($sales as $k3 => $v3) {
-         $prc = $v3["CostOfProduct"] + $v3["CostToProduce"];
+         $prc = $v3["Cost"] + $v3["Profit"];
          $prc = $prc * $v3["Quantity"];
          $revenue = $revenue + $prc;
         }
        }
-       $revenueOverheadCosts = ($revenue * 0.2);
-       $revenueSplit = (($revenue - $revenueOverheadCosts) / $partnerCount);
+       $revenueOverheadCosts = $revenue * (5.00 / 100);
+       $revenueSplit = ($revenue - $revenueOverheadCosts) / $partnerCount;
        foreach($partners as $username => $data) {
         $paid = $v["Paid"] ?? 0;
-        $pck = ($paid == 0 && $username != $y["Login"]["Username"]) ? 1 : 0;
+        $pck = ($paid == 0 && $username != $you) ? 1 : 0;
         $pck = ($pck == 1 && $k2 != date("m")) ? 1 : 0;
         $pay = base64_encode("Pay:Partner");
         $pay = ($pck == 1) ? $this->system->Element([
