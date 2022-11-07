@@ -110,24 +110,18 @@
    ], $this->system->Page("d84203cf19a999c65a50ee01bbd984dc")]);
   }
   function Donation(array $a) {
+   require_once($this->root);
    $data = $a["Data"] ?? [];
    $amount = $data["amount"] ?? base64_encode(0);
-   $amount = base64_decode($amount);
-   $amount = ($amount < 5) ? 5 : $amount;
+   $amount = number_format(base64_decode($amount), 2);
    $username = $this->system->ShopID;
-   $t = $this->system->Member($username);
-   $shop = $this->system->Data("Get", [
-    "shop",
-    md5($t["Login"]["Username"])
-   ]) ?? [];
+   $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
    $braintree = $shop["Processing"] ?? [];
-   $env = ($shop["Live"] == 1) ? "production" : "sandbox";
-   require_once($this->root);
-   $sc = base64_encode("Pay:SaveCommissionOrDonation");
+   $environment = ($shop["Live"] == 1) ? "production" : "sandbox";
    $token = base64_decode($braintree["BraintreeToken"]);
    $btmid = base64_decode($braintree["BraintreeMerchantID"]);
    $braintree = new Braintree_Gateway([
-    "environment" => $env,
+    "environment" => $environment,
     "merchantId" => $btmid,
     "privateKey" => base64_decode($braintree["BraintreePrivateKey"]),
     "publicKey" => base64_decode($braintree["BraintreePublicKey"])
@@ -135,12 +129,11 @@
    $token = $braintree->clientToken()->generate([
     "merchantAccountId" => $btmid
    ]) ?? $token;
-   $te = base64_encode($amount);
    return $this->system->Change([[
     "[Commission.Action]" => "donate $$amount",
     "[Commission.FSTID]" => md5("Donation_$btmid"),
     "[Commission.ID]" => md5($btmid),
-    "[Commission.Processor]" => "v=$sc&amount=$te&ID=".md5($username)."&st=".base64_encode("Donation")."&payment_method_nonce=",
+    "[Commission.Processor]" => "v=".base64_encode("Pay:SaveCommissionOrDonation")."&amount=".base64_encode($amount)."&ID=".md5($username)."&st=".base64_encode("Donation")."&payment_method_nonce=",
     "[Commission.Title]" => $shop["Title"],
     "[Commission.Region]" => $this->system->region,
     "[Commission.Token]" => $token,
@@ -581,30 +574,28 @@
   function SaveCommissionOrDonation(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, [
-    "amount", "payment_method_nonce", "st"
+    "amount",
+    "payment_method_nonce",
+    "st"
    ]);
-   $y = $this->you;
-   $amount = $data["amount"] ?? base64_encode(0);
-   $amount = base64_decode($amount);
-   $amount = ($amount < 5) ? 5 : $amount;
-   $amount = number_format($amount, 2);
-   $points = $this->system->core["PTS"]["Donations"] ?? 0;
-   $st = (!empty($data["st"])) ? base64_decode($data["st"]) : "";
-   $t = $this->system->Member($this->system->ShopID);
-   $shop = $this->system->Data("Get", [
-    "shop",
-    md5($t["Login"]["Username"])
-   ]) ?? [];
-   $braintree = $shop["Processing"] ?? [];
-   $live = $shop["Live"] ?? 0;
-   $env = ($live == 1) ? "production" : "sandbox";
    $r = $this->system->Change([[
     "[Checkout.Data]" => json_encode($data)
    ], $this->system->Page("f9ee8c43d9a4710ca1cfc435037e9abd")]);
+   $username = $this->system->ShopID;
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
    if(!empty($data["payment_method_nonce"])) {
     require_once($this->root);
+    $amount = $data["amount"] ?? base64_encode(0);
+    $amount = number_format(base64_decode($amount), 2);
+    $points = $this->system->core["PTS"]["Donations"] ?? 100;
+    $saleType = (!empty($data["st"])) ? base64_decode($data["st"]) : "";
+    $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
+    $braintree = $shop["Processing"] ?? [];
+    $live = $shop["Live"] ?? 0;
+    $environment = ($live == 1) ? "production" : "sandbox";
     $braintree = new Braintree_Gateway([
-     "environment" => $env,
+     "environment" => $environment,
      "merchantId" => base64_decode($braintree["BraintreeMerchantID"]),
      "privateKey" => base64_decode($braintree["BraintreePrivateKey"]),
      "publicKey" => base64_decode($braintree["BraintreePublicKey"])
@@ -620,17 +611,31 @@
      "paymentMethodNonce" => $data["payment_method_nonce"]
     ]);
     if($order->success) {
-     if($st == "Commission") {
-      $y["Commission"] = 0;
+     if($saleType == "Commission") {
+      $_LastMonth = $this->system->LastMonth()["LastMonth"];
+      $_LastMonth = explode("-", $_LastMonth);
+      $income = $this->system->Data("Get", ["id", md5($you)]) ?? [];
+      $income[$_LastMonth[0]][$_LastMonth[1]]["PaidCommission"] = 1;
+      $now = $this->system->timestamp;
+      $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
+      $shop["Open"] = 1;
+      $this->system->Data("Save", ["id", md5($username), $income]);
+      $this->system->Data("Save", ["shop", md5($you), $shop]);
+      $y["Subscriptions"]["Artist"] = [
+       "A" => 1,
+       "B" => $now,
+       "E" => $this->TimePlus($now, 1, "month")
+      ];
      }
-     $st2 = ($st == "Commission") ? "$$amount commission" : base64_decode($data["amount"])."$$amount donation";
-     $st3 = ($st == "Commission") ? "You may now access your Artist dashboard." : "$points points have been added";
+     $amount = "$$amount";
+     $amount .= ($saleType == "Commission") ? " commission" : " donation";
+     $message = ($saleType == "Commission") ? "You may now access your Artist dashboard." : "$points points have been added";
      $y["Points"] = $y["Points"] + $points;
+     $this->system->Data("Save", ["mbr", md5($you), $y]);
      $r = $this->system->Change([[
-      "[Commission.Message]" => $st3,
-      "[Commission.Type]" => $st2
+      "[Commission.Message]" => $message,
+      "[Commission.Type]" => $amount
      ], $this->system->Page("f2bea3c1ebf2913437fcfdc0c1601ce0")]);
-     $this->system->Data("Save", ["mbr", md5($y["Login"]["Username"]), $y]);
     } else {
      $r = $this->system->Change([[
       "[Checkout.Order.Message]" => $order->message,

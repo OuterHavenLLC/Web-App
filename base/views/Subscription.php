@@ -59,17 +59,15 @@
     } else {
      if($s == "Artist") {
       $_LastMonth = $this->system->LastMonth()["LastMonth"];
+      $_LastMonth = explode("-", $_LastMonth);
+      $commission = 0;
       $income = $this->system->Data("Get", ["id", md5($you)]) ?? [];
-      $income = $income[date("Y")] ?? [];//TEMP
-      #$income = $income[$_LastMonth[0]] ?? [];
-      $income = $income[date("m")] ?? [];//TEMP
-      #$income = $income[$_LastMonth[1]] ?? [];
+      $income = $income[$_LastMonth[0]] ?? [];
+      $income = $income[$_LastMonth[1]] ?? [];
       $paidCommission = $income["PaidCommission"] ?? 0;
-      $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
-      if($paidCommission == 0) {//TEMP
-      #if($paidCommission != 0) {
-       $commission = 0;
+      if($commission > 0 && $paidCommission == 0) {
        $sales = $income["Sales"] ?? [];
+       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
        foreach($sales as $day => $salesGroup) {
         foreach($salesGroup as $daySales => $daySale) {
          foreach($daySale as $id => $product) {
@@ -79,12 +77,10 @@
           $commission = $commission + $price;
          }
         }
-       } if($commission > 0 && $paidCommission == 0) {
-        $shop["Open"] = 0;
-        #$this->system->Data("Save", ["shop", md5($you), $shop]);
        }
        $commission = number_format($commission, 2);
        $commission = number_format($commission * (5.00 / 100), 2);
+       $shop["Open"] = 0;
        $r = $this->system->Change([[
         "[Container]" => "SUB_$s",
         "[Container.List]" => $this->system->Change([[
@@ -93,6 +89,8 @@
          "[Commission.Total]" => $commission
         ], $this->system->Page("f844c17ae6ce15c373c2bd2a691d0a9a")])
        ], $this->system->Page("46fc25c871bbcd0203216e329db12162")]);
+       $this->system->Data("Save", ["shop", md5($you), $shop]);
+       $this->system->Data("Save", ["mbr", md5($you), $y]);
       } else {
        $r = $this->system->Change([[
         "[Artist.Charts]" => "",
