@@ -262,10 +262,9 @@
         }
         $subtotal = number_format($subtotal, 2);
         $commission = number_format($subtotal * (5.00 / 100), 2);
-        $commission = number_format($subtotal - $commission, 2);
         $tax = $shop["Tax"] ?? 10.00;
         $tax = number_format($subtotal * ($tax / 100), 2);
-        $total = number_format($tax + $subtotal, 2);
+        $total = number_format($subtotal - $commission - $tax, 2);
         $monthTable .= $this->system->Change([[
          "[IncomeDisclosure.Table.Month]" => $this->ConvertCalendarMonths($month),
          "[IncomeDisclosure.Table.Month.Commission]" => $commission,
