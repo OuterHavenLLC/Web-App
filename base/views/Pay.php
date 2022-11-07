@@ -573,9 +573,8 @@
       "[Checkout.Title]" => $shop["Title"],
       "[Checkout.Total]" => $t
      ], $this->system->Page("83d6fedaa3fa042d53722ec0a757e910")]);
-     //UNCOMMENT WHEN INCOME DISCLOSURES HAVE BEEN TESTED
-     #$this->system->Data("Save", ["mbr", md5($you), $y]);
-     #$this->system->Data("Save", ["po", $shopID, $physicalOrders]);
+     $this->system->Data("Save", ["mbr", md5($you), $y]);
+     $this->system->Data("Save", ["po", $shopID, $physicalOrders]);
     } else {
      $r = $this->system->Change([[
       "[Checkout.Order.Message]" => $order->message,
