@@ -79,24 +79,18 @@
    return $r;
   }
   function Commission(array $a) {
+   require_once($this->root);
    $data = $a["Data"] ?? [];
    $amount = $data["amount"] ?? base64_encode(0);
-   $amount = base64_decode($amount);
-   $amount = ($amount < 5) ? 5 : $amount;
+   $amount = number_format(base64_decode($amount), 2);
    $username = $this->system->ShopID;
-   $t = $this->system->Member($username);
-   $shop = $this->system->Data("Get", [
-    "shop",
-    md5($t["Login"]["Username"])
-   ]) ?? [];
+   $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
    $braintree = $shop["Processing"] ?? [];
-   $env = ($shop["Live"] == 1) ? "production" : "sandbox";
-   require_once($this->root);
-   $sc = base64_encode("Pay:SaveCommissionOrDonation");
+   $environment = ($shop["Live"] == 1) ? "production" : "sandbox";
    $token = base64_decode($braintree["BraintreeToken"]);
    $btmid = base64_decode($braintree["BraintreeMerchantID"]);
    $braintree = new Braintree_Gateway([
-    "environment" => $env,
+    "environment" => $environment,
     "merchantId" => $btmid,
     "privateKey" => base64_decode($braintree["BraintreePrivateKey"]),
     "publicKey" => base64_decode($braintree["BraintreePublicKey"])
@@ -104,16 +98,15 @@
    $token = $braintree->clientToken()->generate([
     "merchantAccountId" => $btmid
    ]) ?? $token;
-   $te = base64_encode($amount);
    return $this->system->Change([[
     "[Commission.Action]" => "pay your $$amount commission",
     "[Commission.FSTID]" => md5("Commission_$btmid"),
     "[Commission.ID]" => md5($btmid),
-    "[Commission.Processor]" => "v=$sc&amount=$te&ID=".md5($username)."&st=".base64_encode("Commission")."&payment_method_nonce=",
+    "[Commission.Processor]" => "v=".base64_encode("Pay:SaveCommissionOrDonation")."&amount=".base64_encode($amount)."&ID=".md5($username)."&st=".base64_encode("Commission")."&payment_method_nonce=",
     "[Commission.Title]" => $shop["Title"],
     "[Commission.Region]" => $this->system->region,
     "[Commission.Token]" => $token,
-    "[Commission.Total]" => number_format($amount, 2)
+    "[Commission.Total]" => $amount
    ], $this->system->Page("d84203cf19a999c65a50ee01bbd984dc")]);
   }
   function Donation(array $a) {

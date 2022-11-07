@@ -217,11 +217,11 @@
     $_Sale = $this->system->Page("a2adc6269f67244fc703a6f3269c9dfe");
     $_Year = $this->system->Page("676193c49001e041751a458c0392191f");
     $username = base64_decode($username);
-    $id = $this->system->Data("Get", ["id", md5($username)]) ?? [];
+    $income = $this->system->Data("Get", ["id", md5($username)]) ?? [];
     $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
     $t = ($username == $you) ? $y : $this->system->member($username);
     $yearTable = "";
-    foreach($id as $year => $yearData) {
+    foreach($income as $year => $yearData) {
      if(is_array($yearData)) {
       $monthTable = "";
       if($year != "UN") {
