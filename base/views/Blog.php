@@ -263,9 +263,9 @@
       "Type" => 4
      ]]) : "";
      $search = base64_encode("Search:Containers");
-      $subscribe = ($blog["UN"] != $you && $this->system->ID != $you) ? 1 : 0;
-      $subscribeText = (in_array($you, $subscribers)) ? "Unsubscribe" : "Subscribe";
-      $subscribe = ($subscribe == 1) ? $this->system->Change([[
+     $subscribe = ($blog["UN"] != $you && $this->system->ID != $you) ? 1 : 0;
+     $subscribeText = (in_array($you, $subscribers)) ? "Unsubscribe" : "Subscribe";
+     $subscribe = ($subscribe == 1) ? $this->system->Change([[
       "[Subscribe.ContentID]" => $id,
       "[Subscribe.ID]" => md5($you),
       "[Subscribe.Processor]" => base64_encode("v=".base64_encode("Blog:Subscribe")),

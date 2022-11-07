@@ -264,7 +264,7 @@
       $id = $this->system->Data("Get", ["id", md5($you)]) ?? [];
       $pc = number_format(0, 2);
       $pid = "DISBURSEMENTS*$username";
-      $this->system->Revenue([$username, [
+      /*$this->system->Revenue([$username, [
        "Cost" => $amount,
        "ID" => $pid,
        "Partners" => $shop["Contributors"],
@@ -279,7 +279,7 @@
        "Profit" => $pc,
        "Quantity" => 1,
        "Title" => $pid
-      ]]);
+      ]]);*/
       $id[$data["Year"]][$data["Month"]]["Partners"][$username]["Paid"] = 1;
       $this->system->Data("Save", ["id", md5($you), $id]);
       $r = $this->system->Change([[
@@ -592,6 +592,7 @@
     $saleType = (!empty($data["st"])) ? base64_decode($data["st"]) : "";
     $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
     $braintree = $shop["Processing"] ?? [];
+    $contributors = $shop["Contributors"] ?? [];
     $live = $shop["Live"] ?? 0;
     $environment = ($live == 1) ? "production" : "sandbox";
     $braintree = new Braintree_Gateway([
@@ -619,6 +620,14 @@
       $now = $this->system->timestamp;
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
       $shop["Open"] = 1;
+      $this->system->Revenue([$username, [
+       "Cost" => $amount,
+       "ID" => "COMMISSION*".$shop["Title"],
+       "Partners" => $contributors,
+       "Profit" => $amount,
+       "Quantity" => 1,
+       "Title" => $pid
+      ]]);
       $this->system->Data("Save", ["id", md5($username), $income]);
       $this->system->Data("Save", ["shop", md5($you), $shop]);
       $y["Subscriptions"]["Artist"] = [

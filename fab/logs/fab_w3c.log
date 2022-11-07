@@ -1,6 +1,20 @@
 #Software: SHOUTcast
 #Version: 2.5.5.733
 #Fields: c-ip c-dns date time cs-uri-stem c-status cs(User-Agent) sc-bytes x-duration avgbandwidth
-45.95.55.43 45.95.55.43 2022-10-27 12:12:09 /stream?title=Unknown 200 node-fetch%2F1.0%20%28%2Bhttps%3A%2F%2Fgithub.com%2Fbitinn%2Fnode-fetch%29 0 0 0
-167.248.133.44 167.248.133.44 2022-10-27 13:35:01 /stream?title=Unknown 200  0 0 0
-92.118.39.30 92.118.39.30 2022-10-27 16:37:57 /stream?title=Unknown 200 Mozilla%2F5.0%20zgrab%2F0.x 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200  0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:21 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:22 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:22 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:22 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:22 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+185.3.94.68 185.3.94.68 2022-11-07 12:58:22 /stream?title=Unknown 200 Go-http-client%2F1.1 0 0 0
+162.142.125.10 162.142.125.10 2022-11-07 19:53:42 /stream?title=Unknown 200  0 0 0
