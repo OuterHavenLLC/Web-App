@@ -247,9 +247,7 @@
       "publicKey" => base64_decode($braintree["BraintreePublicKey"])
      ]);
      $amount = $data["amount"] ?? base64_encode(0);
-     $amount = base64_decode($amount);
-     $amount = ($amount < 5) ? 5 : $amount;
-     $amount = number_format($amount, 2);
+     $amount = number_format(base64_decode($amount), 2);
      $order = $braintree->transaction()->sale([
       "amount" => str_replace(",", "", $amount),
        "customer" => [
