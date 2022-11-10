@@ -4,6 +4,20 @@
    parent::__construct();
    $this->you = $this->system->Member($this->system->Username());
   }
+  function Download(array $a) {
+   $data = $a["Data"] ?? [];
+   $filePath = $data["FilePath"] ?? "";
+   if(empty($filePath)) {
+    return "Not Found";
+   } else {
+    $filePath = $this->system->efs.$filePath;
+    header("Content-type: application/x-file-to-save");
+    header("Content-Disposition: attachment; filename=". basename($filePath));
+    ob_end_clean();
+    readfile($remoteURL):
+    exit;
+   }
+  }
   function Edit(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["ID", "UN"]);
@@ -58,10 +72,11 @@
    $cr = base64_encode("Common:Reactions");
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["AddTo", "Added", "ID", "UN"]);
-   $y = $this->you;
    $at = $data["AddTo"] ?? "";
    $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
    $id = $data["ID"] ?? "";
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
    $un = $data["UN"] ?? $y["Login"]["Username"];
    $t = ($un == $y["Login"]["Username"]) ? $y : $this->system->Member($un);
    $fs = $this->system->Data("Get", [
@@ -143,7 +158,7 @@
       "data-u" => base64_encode("v=$bl&BU=".base64_encode("this File")."&content=".base64_encode($id)."&list=".base64_encode("Files")."&BC=")
      ]
     ]) : "";
-    $bl = ($y["Login"]["Username"] != $this->system->ID) ? $bl : "";
+    $bl = ($this->system->ID != $you) ? $bl : "";
     $fr = $this->system->Change([[
      "[File.AddTo]" => $at,
      "[File.Block]" => $bl,
