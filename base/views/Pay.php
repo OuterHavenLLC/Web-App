@@ -620,15 +620,16 @@
       $now = $this->system->timestamp;
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
       $shop["Open"] = 1;
+      $shopSaleID = "COMMISSION*".$shop["Title"];
       $this->system->Data("Save", ["id", md5($username), $income]);
       $this->system->Data("Save", ["shop", md5($you), $shop]);
       $this->system->Revenue([$username, [
        "Cost" => $amount,
-       "ID" => "COMMISSION*".$shop["Title"],
+       "ID" => $shopSaleID,
        "Partners" => $_MiNYContributors,
        "Profit" => $amount,
        "Quantity" => 1,
-       "Title" => "Donation*".$shop["Title"]
+       "Title" => $shopSaleID
       ]]);
       $y["Subscriptions"]["Artist"] = [
        "A" => 1,
@@ -637,13 +638,14 @@
       ];
      } elseif($saleType == "Donation") {
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
+      $shopSaleID = "DONATION*".$shop["Title"];
       $this->system->Revenue([$username, [
        "Cost" => $amount,
-       "ID" => "Donation*".$shop["Title"],
+       "ID" => $shopSaleID,
        "Partners" => $_MiNYContributors,
        "Profit" => $amount,
        "Quantity" => 1,
-       "Title" => "Donation*".$shop["Title"]
+       "Title" => $shopSaleID
       ]]);
      }
      $amount = "$$amount";
