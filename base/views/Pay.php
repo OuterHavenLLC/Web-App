@@ -113,7 +113,7 @@
    require_once($this->root);
    $data = $a["Data"] ?? [];
    $amount = $data["amount"] ?? base64_encode(0);
-   $amount = number_format(base64_decode($amount), 2);
+   $amount = base64_decode($amount);
    $username = $this->system->ShopID;
    $shop = $this->system->Data("Get", ["shop", md5($username)]) ?? [];
    $braintree = $shop["Processing"] ?? [];
@@ -133,7 +133,7 @@
     "[Commission.Action]" => "donate $$amount",
     "[Commission.FSTID]" => md5("Donation_$btmid"),
     "[Commission.ID]" => md5($btmid),
-    "[Commission.Processor]" => "v=".base64_encode("Pay:SaveCommissionOrDonation")."&amount=".base64_encode($amount)."&ID=".md5($username)."&st=".base64_encode("Donation")."&payment_method_nonce=",
+    "[Commission.Processor]" => "v=".base64_encode("Pay:SaveCommissionOrDonation")."&amount=".$data["amount"]."&ID=".md5($username)."&st=".base64_encode("Donation")."&payment_method_nonce=",
     "[Commission.Title]" => $shop["Title"],
     "[Commission.Region]" => $this->system->region,
     "[Commission.Token]" => $token,
@@ -610,19 +610,19 @@
     ]);
     if($order->success) {
      $_MiNYContributors = $shop["Contributors"] ?? [];
+     $now = $this->system->timestamp;
      if($saleType == "Commission") {
       $_LastMonth = $this->system->LastMonth()["LastMonth"];
       $_LastMonth = explode("-", $_LastMonth);
       $income = $this->system->Data("Get", ["id", md5($you)]) ?? [];
       $income[$_LastMonth[0]][$_LastMonth[1]]["PaidCommission"] = 1;
-      $now = $this->system->timestamp;
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
       $shop["Open"] = 1;
       $shopSaleID = "COMMISSION*".$shop["Title"];
       $this->system->Data("Save", ["id", md5($username), $income]);
       $this->system->Data("Save", ["shop", md5($you), $shop]);
       $this->system->Revenue([$username, [
-       "Cost" => $amount,
+       "Cost" => 0,
        "ID" => $shopSaleID,
        "Partners" => $_MiNYContributors,
        "Profit" => $amount,
@@ -638,7 +638,7 @@
       $shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
       $shopSaleID = "DONATION*".$shop["Title"];
       $this->system->Revenue([$username, [
-       "Cost" => $amount,
+       "Cost" => 0,
        "ID" => $shopSaleID,
        "Partners" => $_MiNYContributors,
        "Profit" => $amount,

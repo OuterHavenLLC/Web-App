@@ -245,12 +245,12 @@
          $saleTable = "";
          foreach($salesGroup as $daySales => $daySale) {
           foreach($daySale as $id => $product) {
-           $price = $product["Cost"] + $product["Profit"];
+           $price = str_replace(",", "", $product["Cost"]);
+           $price = $price + str_replace(",", "", $product["Profit"]);
            $price = $price * $product["Quantity"];
-           $price = number_format($price, 2);
            $subtotal = $subtotal + $price;
            $saleTable .= $this->system->Change([[
-            "[IncomeDisclosure.Sale.Price]" => $price,
+            "[IncomeDisclosure.Sale.Price]" => number_format($price, 2),
             "[IncomeDisclosure.Sale.Title]" => $product["Title"]
            ], $_Sale]);
           }
@@ -260,7 +260,7 @@
           "[IncomeDisclosure.Day.Sales]" => $saleTable
          ], $_Day]);
         }
-        $subtotal = number_format($subtotal, 2);
+        $subtotal = str_replace(",", "", $subtotal);
         $commission = number_format($subtotal * (5.00 / 100), 2);
         $tax = $shop["Tax"] ?? 10.00;
         $tax = number_format($subtotal * ($tax / 100), 2);
@@ -270,7 +270,7 @@
          "[IncomeDisclosure.Table.Month.Commission]" => $commission,
          "[IncomeDisclosure.Table.Month.Partners]" => $partnerTable,
          "[IncomeDisclosure.Table.Month.Sales]" => $dayTable,
-         "[IncomeDisclosure.Table.Month.Subtotal]" => $subtotal,
+         "[IncomeDisclosure.Table.Month.Subtotal]" => number_format($subtotal, 2),
          "[IncomeDisclosure.Table.Month.Tax]" => $tax,
          "[IncomeDisclosure.Table.Month.Total]" => $total
         ], $_Month]);
@@ -283,13 +283,17 @@
      }
     }
     $yearTable = (empty($id)) ? $this->system->Element([
-     "p", "No Earnings", ["class" => "CenterText", "style" => "margin:0.5em"]
+     "p", "No Earnings", [
+      "class" => "CenterText",
+      "style" => "margin:0.5em"
+     ]
     ]) : $yearTable;
     $r = $this->system->Change([[
      "[IncomeDisclosure.DisplayName]" => $t["Personal"]["DisplayName"],
      "[IncomeDisclosure.Gallery.Title]" => $shop["Title"],
      "[IncomeDisclosure.Table]" => $yearTable
     ], $this->system->Page("4ab1c6f35d284a6eae66ebd46bb88d5d")]);
+    $r.="<br/>RAW DATA: ".json_encode($income, true);//TEMP
    }
    $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
     "Data" => ["Content" => $r]
