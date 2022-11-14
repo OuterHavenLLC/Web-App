@@ -386,6 +386,10 @@
        "class" => "Small dB2O v2",
        "data-type" => base64_encode("v=".base64_encode("Shop:Edit")."&ID=".base64_encode($id))
       ]]) : "";
+      $payroll = ($ck == 1) ? $this->system->Element(["button", "Payroll", [
+       "class" => "Small dB2O v2",
+       "data-type" => base64_encode("v=".base64_encode("Shop:Payroll"))
+      ]]) : "";
       $reactions = ($id != md5($you)) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
        "CRID" => $id,
        "T" => $t["Login"]["Username"],
@@ -420,6 +424,7 @@
         "Type" => base64_encode("Shop"),
         "st" => "Contributors"
        ]]),
+       "[Shop.Payroll]" => $payroll,
        "[Shop.ProductList]" => $this->view($search, ["Data" => [
          "UN" => base64_encode($t["Login"]["Username"]),
          "b2" => $shop["Title"],
@@ -476,70 +481,102 @@
    return $r;
   }
   function Payroll(array $a) {
+   $_Day = $this->system->Page("ca72b0ed3686a52f7db1ae3b2f2a7c84");
+   $_Month = $this->system->Page("2044776cf5f8b7307b3c4f4771589111");
+   $_Partner = $this->system->Page("210642ff063d1b3cbe0b2468aba070f2");
+   $_Sale = $this->system->Page("a2adc6269f67244fc703a6f3269c9dfe");
+   $_Year = $this->system->Page("676193c49001e041751a458c0392191f");
    $data = $a["Data"] ?? [];
    $r = "";
-   $tplMonth = $this->system->Page("0da629b18fe74500ec86bc8d3878bdc6");
-   $tplPartner = $this->system->Page("210642ff063d1b3cbe0b2468aba070f2");
-   $tplYear = $this->system->Page("676193c49001e041751a458c0392191f");
    $y = $this->you;
+   $yearTable = "";
    $you = $y["Login"]["Username"];
    $payroll = $this->system->Data("Get", ["id", md5($you)]) ?? [];
-   foreach($payroll as $k => $v) {
-    if(is_array($v)) {
-     $month = "";
-     if($k != "UN") {
-      foreach($v as $k2 => $v2) {
-       $partner = "";
-       $revenue = 0;
-       $partners = $v2["Partners"] ?? [];
-       $partnerCount = count($partners);
-       $sales = $v2["Sales"] ?? [];
-       $salesCount = count($sales);
-       for($i = 0; $i < $salesCount; $i++) {
-        $sales = $sales[$i] ?? [];
-        foreach($sales as $k3 => $v3) {
-         $prc = $v3["Cost"] + $v3["Profit"];
-         $prc = $prc * $v3["Quantity"];
-         $revenue = $revenue + $prc;
+   foreach($payroll as $year => $yearData) {
+    if(is_array($yearData)) {
+     $monthTable = "";
+     if($year != "UN") {
+      foreach($yearData as $month => $monthData) {
+       $dayTable = "";
+       $partnerTable = "";
+       $partners = $monthData["Partners"] ?? [];
+       $partnersCount = count($partners);
+       $sales = $monthData["Sales"] ?? [];
+       $subtotal = 0;
+       $tax = 0;
+       $total = 0;
+       foreach($sales as $day => $salesGroup) {
+        $saleTable = "";
+        foreach($salesGroup as $daySales => $daySale) {
+         foreach($daySale as $id => $product) {
+          $price = str_replace(",", "", $product["Cost"]);
+          $price = $price + str_replace(",", "", $product["Profit"]);
+          $price = $price * $product["Quantity"];
+          $subtotal = $subtotal + $price;
+          $saleTable .= $this->system->Change([[
+           "[IncomeDisclosure.Sale.Price]" => number_format($price, 2),
+           "[IncomeDisclosure.Sale.Title]" => $product["Title"]
+          ], $_Sale]);
+         }
         }
+        $dayTable .= $this->system->Change([[
+         "[IncomeDisclosure.Day]" => $day,
+         "[IncomeDisclosure.Day.Sales]" => $saleTable
+        ], $_Day]);
        }
-       $revenueOverheadCosts = $revenue * (5.00 / 100);
-       $revenueSplit = ($revenue - $revenueOverheadCosts) / $partnerCount;
-       foreach($partners as $username => $data) {
-        $paid = $v["Paid"] ?? 0;
-        $pck = ($paid == 0 && $username != $you) ? 1 : 0;
-        $pck = ($pck == 1 && $k2 != date("m")) ? 1 : 0;
-        $pay = base64_encode("Pay:Partner");
+       $subtotal = str_replace(",", "", $subtotal);
+       $commission = number_format($subtotal * (5.00 / 100), 2);
+       $tax = $shop["Tax"] ?? 10.00;
+       $tax = number_format($subtotal * ($tax / 100), 2);
+       $total = number_format($subtotal - $commission - $tax, 2);
+       $revenueOverheadCosts = $total * (5.00 / 100);
+       $revenueSplit = ($revenue - $revenueOverheadCosts) / $partnersCount;
+       foreach($partners as $partner => $info) {
+        $paid = $vinfo["Paid"] ?? 0;
+        $pck = ($paid == 0 && $partner != $you) ? 1 : 0;
+        $pck = ($pck == 1 && $month != date("m")) ? 1 : 0;
         $pay = ($pck == 1) ? $this->system->Element([
          "button", "$".number_format($revenueSplit, 2), [
           "class" => "BB BBB v2",
-          "data-lm" => base64_encode($k2),
-          "onclick" => "FST('N/A', 'v=$pay&Month=$k2&UN=".base64_encode($username)."&Year=$k', '".md5("Pay".md5($username))."');"
+          "data-lm" => base64_encode($month),
+          "onclick" => "FST('N/A', 'v=".base64_encode("Pay:Partner")."&Month=$month&UN=".base64_encode($username)."&Year=$year', '".md5("Pay".md5($username))."');"
          ]
         ]) : $this->system->Element(["p", "No Action Needed"]);
         $partner .= $this->system->Change([[
          "[Partner.Description]" => $data["Description"],
          "[Partner.DisplayName]" => $username,
          "[Partner.Pay]" => $pay
-        ], $tplPartner]);
+        ], $_Partner]);
        }
-       $month .= $this->system->Change([[
-        "[Month]" => $this->system->ConvertCalendarMonths($k2),
-        "[Month.Partners]" => $partner
-       ], $tplMonth]);
+       $monthTable .= $this->system->Change([[
+        "[IncomeDisclosure.Table.Month]" => $this->ConvertCalendarMonths($month),
+        "[IncomeDisclosure.Table.Month.Commission]" => $commission,
+        "[IncomeDisclosure.Table.Month.Partners]" => $partnerTable,
+        "[IncomeDisclosure.Table.Month.Sales]" => $dayTable,
+        "[IncomeDisclosure.Table.Month.Subtotal]" => number_format($subtotal, 2),
+        "[IncomeDisclosure.Table.Month.Tax]" => $tax,
+        "[IncomeDisclosure.Table.Month.Total]" => $total
+       ], $_Month]);
       }
-      $r .= $this->system->Change([[
-       "[IncomeDisclosure.Table.Year]" => $k,
-       "[IncomeDisclosure.Table.Year.Lists]" => $month
-      ], $tplYear]);
+      $yearTable .= $this->system->Change([[
+       "[IncomeDisclosure.Table.Year]" => $year,
+       "[IncomeDisclosure.Table.Year.Lists]" => $monthTable
+      ], $_Year]);
      }
     }
+    $yearTable = (empty($id)) ? $this->system->Element([
+     "h3", "No earnings to report...", [
+      "class" => "CenterText",
+      "style" => "margin:0.5em"
+     ]
+    ]) : $yearTable;
+    $r = $this->system->Change([[
+     "[IncomeDisclosure.DisplayName]" => $t["Personal"]["DisplayName"],
+     "[IncomeDisclosure.Gallery.Title]" => $shop["Title"],
+     "[IncomeDisclosure.Table]" => $yearTable
+    ], $this->system->Page("4ab1c6f35d284a6eae66ebd46bb88d5d")]);
    }
-   $r = (empty($payroll)) ? $this->system->Element(["p", "No Results", [
-    "class" => "CenterText",
-    "style" => "margin:0.5em"
-   ]]) : $r;
-   return $r;
+   return $this->system->Card(["Front" => $r]);
   }
   function Save(array $a) {
    $accessCode = "Denied";
