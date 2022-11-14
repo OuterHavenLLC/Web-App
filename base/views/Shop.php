@@ -382,14 +382,18 @@
       ]);
       $coverPhoto = base64_encode($coverPhoto);
       $disclaimer = "Products and Services sold on the <em>Made in New York</em> Shop Network by third parties do not represent the views of <em>Outer Haven</em>, unless sold under the signature Shop.";
-      $edit = ($ck == 1) ? $this->system->Element(["button", "Edit", [
-       "class" => "Small dB2O v2",
-       "data-type" => base64_encode("v=".base64_encode("Shop:Edit")."&ID=".base64_encode($id))
-      ]]) : "";
-      $payroll = ($ck == 1) ? $this->system->Element(["button", "Payroll", [
-       "class" => "Small dB2O v2",
-       "data-type" => base64_encode("v=".base64_encode("Shop:Payroll"))
-      ]]) : "";
+      $edit = ($ck == 1) ? $this->system->Element([
+       "button", "Edit", [
+        "class" => "Small dB2O v2",
+        "data-type" => base64_encode("v=".base64_encode("Shop:Edit")."&ID=".base64_encode($id))
+       ]
+      ]) : "";
+      $payroll = ($id == md5($you)) ? $this->system->Element([
+       "button", "Payroll", [
+        "class" => "Small dB2O v2",
+        "data-type" => base64_encode("v=".base64_encode("Shop:Payroll"))
+       ]
+      ]) : "";
       $reactions = ($id != md5($you)) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
        "CRID" => $id,
        "T" => $t["Login"]["Username"],
@@ -487,7 +491,10 @@
    $_Sale = $this->system->Page("a2adc6269f67244fc703a6f3269c9dfe");
    $_Year = $this->system->Page("676193c49001e041751a458c0392191f");
    $data = $a["Data"] ?? [];
-   $r = "";
+   $r = $this->system->Change([[
+    "[Error.Header]" => "No Data",
+    "[Error.Message]" => "You have not earned any income yet..."
+   ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    $y = $this->you;
    $yearTable = "";
    $you = $y["Login"]["Username"];
