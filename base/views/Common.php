@@ -207,6 +207,11 @@
   function Income(array $a) {
    $data = $a["Data"] ?? [];
    $pub = $data["pub"] ?? 0;
+   $r = $this->system->Change([[
+    "[Error.Back]" => "",
+    "[Error.Header]" => "Not Found",
+    "[Error.Message]" => "The requested Income Disclosure could not be found."
+   ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    $username = $data["UN"] ?? "";
    $y = $this->you;
    $you = $y["Login"]["Username"];
@@ -283,7 +288,7 @@
      }
     }
     $yearTable = (empty($id)) ? $this->system->Element([
-     "p", "No Earnings", [
+     "h3", "No earnings to report...", [
       "class" => "CenterText",
       "style" => "margin:0.5em"
      ]
@@ -293,7 +298,6 @@
      "[IncomeDisclosure.Gallery.Title]" => $shop["Title"],
      "[IncomeDisclosure.Table]" => $yearTable
     ], $this->system->Page("4ab1c6f35d284a6eae66ebd46bb88d5d")]);
-    $r.="<br/>RAW DATA: ".json_encode($income, true);//TEMP
    }
    $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
     "Data" => ["Content" => $r]
