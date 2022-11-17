@@ -500,11 +500,11 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
      #$na.=" ".$query.json_encode($Pages, true);//TEMP
     }
    } elseif($st == "BGP") {
+    $ec = "Accepted";
     $blog = $this->system->Data("Get", [
      "blg",
      base64_decode($data["ID"])
     ]) ?? [];
-    $ec = "Accepted";
     $owner = ($blog["UN"] == $you) ? $y : $this->system->Member($blog["UN"]);
     $tpl = $this->system->Page("dba88e1a123132be03b9a2e13995306d");
     if($notAnon == 1) {
@@ -580,7 +580,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
         "[BlogPost.PageID]" => base64_encode(md5("BlogPost".$post["ID"])),
         "[BlogPost.ProfilePicture]" => base64_encode($this->system->ProfilePicture($op, "margin:5%;width:90%")),
         "[BlogPost.Title]" => base64_encode($post["Title"]),
-        "[BlogPost.View]" => base64_encode(base64_encode("v=".base64_encode("BlogPost:Home")."&Blog=".$blog["ID"]."&Post=".$post["ID"]."&b2=".$blog["Title"]."&back=1")),
+        "[BlogPost.View]" => base64_encode("Blog".$blog["ID"].";$lpg;".base64_encode("v=".base64_encode("BlogPost:Home")."&Blog=".$blog["ID"]."&Post=".$post["ID"]."&b2=".$blog["Title"]."&back=1")),
        ]);
       }
      }

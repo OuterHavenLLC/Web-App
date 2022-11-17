@@ -23,23 +23,6 @@
    }
    return $r;
   }
-  function Containers(array $a) {
-   $data = $a["Data"] ?? [];
-   $lpp = $data["lPP"] ?? ".OHCC";
-   $st = $data["st"] ?? "";
-   $r = $this->system->Page("01a2e08879ca98f660834cc966a21a29");
-   if(!empty($lpg) || !empty($st)) {
-    $lpg = $lpg ?? $st;
-    $d2 = ["lPG" => $lpg, "st" => $st];
-    $d2["UN"] = $data["UN"] ?? "";
-    $sc = base64_encode("Search:Containers");
-    $r = $this->system->Change([[
-     "[Container]" => $lpg,
-     "[Container.List]" => $this->view($sc, ["Data" => $d2])
-    ], $this->system->Page("46fc25c871bbcd0203216e329db12162")]);
-   }
-   return $r;
-  }
   function DesignView(array $a) {
    $data = $a["Data"] ?? [];
    $dv = $data["DV"] ?? "";
