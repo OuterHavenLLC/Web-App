@@ -160,7 +160,6 @@
     $r = $this->system->Change([[
      "[Album.CoverPhoto]" => $ico,
      "[Album.Created]" => $this->system->TimeAgo($alb["Created"]),
-     "[Album.DT]" => "v=$ah&AID=$id&UN=$tun&back=$bck&b2=$b2&lPG=$lpg&lPP=$lpp",
      "[Album.Description]" => $alb["Description"],
      "[Album.Modified]" => $this->system->TimeAgo($alb["Modified"]),
      "[Album.Illegal]" => base64_encode("v=".base64_encode("Common:Illegal")."&ID=".base64_encode("Album;".$t["Login"]["Username"].";$id")),
@@ -171,10 +170,11 @@
       "CRID" => $id, "T" => $t["Login"]["Username"], "Type" => 2
      ]]),
      "[Album.Share]" => base64_encode("v=$as&ID=$id&UN=$tun"),
-     "[Album.Title]" => $alb["Title"]
+     "[Album.Title]" => $alb["Title"],
+     "[Album.View]" => base64_encode("v=$ah&AID=$id&UN=$tun&back=$bck&b2=$b2")
     ], $this->system->Page("91c56e0ee2a632b493451aa044c32515")]);
    }
-   return $r;
+   return $this->system->Card(["CardFront" => $r]);
   }
   function Save(array $a) {
    $data = $a["Data"] ?? [];

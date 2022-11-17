@@ -1555,7 +1555,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
         "[Album.CRID]" => base64_encode($k),
         "[Album.CSS.Style]" => base64_encode("background:url('$src')"),
         "[Album.CSS.Class]" => base64_encode($type),
-        "[Album.Lobby]" => base64_encode("v=$al&AID=$k&UN=".$data["UN"]),
+        "[Album.Lobby]" => base64_encode(base64_encode("v=$al&AID=$k&UN=".$data["UN"])),
         "[Album.Title]" => base64_encode($v["Title"])
        ]);
       }
