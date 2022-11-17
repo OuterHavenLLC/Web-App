@@ -46,12 +46,7 @@
    $cc = base64_encode("Common:Containers");
    $search = base64_encode("Search:Containers");
    $support = [md5("High Command"), md5("Support")];
-   $support = (in_array($y["Rank"], $support)) ? $this->system->Element([
-    "button", "Manage", [
-     "class" => "CloseNetMap LI NPS",
-     "data-type" => "v=".base64_encode("KnowledgeBase:Administration")
-    ]
-   ]) : "";
+   $support = (in_array($y["Rank"], $support)) ? "<!--SUPPORT OPTIONS-->" : "";
    $yun = base64_encode($you);
    $shop = ($y["Subscriptions"]["Artist"]["A"] == 1) ? $this->system->Element([
     "button", "Shop", [
@@ -69,8 +64,7 @@
      "[Menu.Company.VVA]" => "v=".base64_encode("Company:VVA"),
      "[Menu.Mainstream]" => "v=$search&st=Mainstream",
      "[Menu.MiNY]" => "v=".base64_encode("Shop:MadeInNewYork"),
-     "[Menu.OptIn]" => "v=".base64_encode("WebUI:OptIn"),
-     "[Menu.Support]" => "v=".base64_encode("KnowledgeBase:Home")
+     "[Menu.OptIn]" => "v=".base64_encode("WebUI:OptIn")
     ], $this->system->Page("73859ffa637c369b9fa88399a27b5598")]);
    } else {
     $r = $this->system->Change([[
@@ -108,7 +102,6 @@
      "[Menu.Search.Blogs]" => "v=$cc&lPG=Blogs&st=BLG",
      "[Menu.Search.Members]" => "v=$cc&lPG=Members&st=MBR",
      "[Menu.Search.PublicForums]" => "v=$cc&lPG=Forums&st=Forums",
-     "[Menu.Support]" => "v=".base64_encode("KnowledgeBase:Home"),
      "[Menu.Support.Manage]" => $support,
      "[Menu.SwitchLanguages]" => "v=".base64_encode("WebUI:SwitchLanguages")
     ], $this->system->Page("d14e3045df35f4d9784d45ac2c0fe73b")]);

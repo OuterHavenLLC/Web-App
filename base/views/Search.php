@@ -301,9 +301,9 @@
      $aid = $data["AID"] ?? md5("unsorted");
      $fd = base64_encode("Authentication:DeleteFile");
      $fu = base64_encode("File:Upload");
-     $un = $data["UN"] ?? base64_encode($y["Login"]["Username"]);
+     $un = $data["UN"] ?? base64_encode($you);
      $un = base64_decode($un);
-     $t = ($un == $y["Login"]["Username"]) ? $y : $this->system->Member($un);
+     $t = ($un == $you) ? $y : $this->system->Member($un);
      $fs = $this->system->Data("Get", [
       "fs",
       md5($t["Login"]["Username"])

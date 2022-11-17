@@ -92,11 +92,11 @@
    }
    return $r;
   }
-  function Home(array $a) {
+  function Lobby(array $a) {
    $ad = base64_encode("Authentication:DeleteAlbum");
    $ae = base64_encode("Album:Edit");
-   $ah = base64_encode("Album:Home");
    $as = base64_encode("Album:Share");
+   $bck = "";
    $cr = base64_encode("Common:Reactions");
    $data = $a["Data"] ?? [];
    $fu = base64_encode("File:Upload");
@@ -129,6 +129,11 @@
     $tun = base64_encode($t["Login"]["Username"]);
     $abl = base64_encode($t["Login"]["Username"]."-$id");
     $alb = $fs["Albums"][$id] ?? [];
+    $bck = $this->system->Change([
+     [
+      "[View.ID]" => $id
+     ], $this->system->Page("99a7eb5ad3c1c1ab75c7c711fc93fffc")
+    ]);
     $bl = $this->system->CheckBlocked([$y, "Albums", $abl]);
     $blc = ($bl == 0) ? "B" : "U";
     $blt = ($bl == 0) ? "Block" : "Unblock";
@@ -174,14 +179,20 @@
      "[Album.Options]" => $opt,
      "[Album.Owner]" => $t["Personal"]["DisplayName"],
      "[Album.Reactions]" => $this->view($cr, ["Data" => [
-      "CRID" => $id, "T" => $t["Login"]["Username"], "Type" => 2
+      "CRID" => $id,
+      "T" => $t["Login"]["Username"],
+      "Type" => 2
      ]]),
      "[Album.Share]" => base64_encode("v=$as&ID=$id&UN=$tun"),
      "[Album.Title]" => $alb["Title"],
-     "[Album.View]" => base64_encode("v=$ah&AID=$id&UN=$tun")
+     "[Album.View]" => base64_encode("v=".base64_encode("Album:Home")."&AID=$id&UN=$tun"),
+     "[Album.View.ID]" => $id,
     ], $this->system->Page("91c56e0ee2a632b493451aa044c32515")]);
    }
-   return $this->system->Card(["Front" => $r]);
+   return $this->system->Card([
+    "Back" => $bck,
+    "Front" => $r
+   ]);
   }
   function Save(array $a) {
    $data = $a["Data"] ?? [];
