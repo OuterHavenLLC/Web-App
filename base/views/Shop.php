@@ -317,9 +317,8 @@
    $lpg = $data["lPG"];
    $lpp = $data["lPP"] ?? "OHCC";
    $bck = ($data["back"] == 1) ? $this->system->Element(["button", "Back", [
-    "class" => "LI head",
-    "data-type" => ".$lpp;$lpg",
-    "id" => "lPG"
+    "class" => "GoToParent LI head",
+    "data-type" => ".$lpp;$lpg"
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $r = $this->MadeInNewYork(["back" => $bck]);

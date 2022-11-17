@@ -170,9 +170,8 @@
    $b2 = $this->system->Element(["em", $b2]);
    $bck = $data["back"] ?? 0;
    $bck = ($bck == 1) ? $this->system->Element(["button", "Back to $b2", [
-    "class" => "LI header",
-    "data-type" => ".OHCC;$lpg",
-    "id" => "lPG"
+    "class" => "GoToParent LI header",
+    "data-type" => ".OHCC;$lpg"
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $r = $this->system->Change([[
@@ -215,11 +214,10 @@
       "Type" => 4
      ]]) : "";
      $actions .= ($bl == 0 && $ck == 0) ? $this->system->Element(["button", $_BlockText, [
-      "class" => "BLK dB2C Small v2 v2w",
+      "class" => "BLK GoToParent dB2C Small v2 v2w",
       "data-cmd" => base64_encode($_BlockCommand),
       "data-type" => ".OHCC;$lpg",
-      "data-u" => base64_encode("v=".base64_encode("Common:SaveBlacklist")."&BU=".base64_encode($f["Title"])."&content=".base64_encode($f["ID"])."&list=".base64_encode("Forums")."&BC="),
-      "id" => "lPG"
+      "data-u" => base64_encode("v=".base64_encode("Common:SaveBlacklist")."&BU=".base64_encode($f["Title"])."&content=".base64_encode($f["ID"])."&list=".base64_encode("Forums")."&BC=")
      ]]) : "";
      $actions .= ($active == 1 || $ck == 1) ? $this->system->Element([
       "button", "Chat", [

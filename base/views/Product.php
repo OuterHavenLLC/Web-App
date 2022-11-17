@@ -177,9 +177,8 @@
    $id = $data["ID"];
    $lpg = $data["lPG"];
    $bck = ($data["back"] == 1) ? $this->system->Element(["button", "Back to ".$data["b2"], [
-    "class" => "LI head",
-    "data-type" => ".OHCC;$lpg",
-    "id" => "lPG"
+    "class" => "GoToParent LI head",
+    "data-type" => ".OHCC;$lpg"
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $r = $this->system->Change([[

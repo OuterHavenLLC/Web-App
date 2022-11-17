@@ -166,9 +166,8 @@
    $lpg = $data["lPG"];
    $bck = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to Blogs", [
-     "class" => "LI",
-     "data-type" => ".OHCC;$lpg",
-     "id" => "lPG"
+     "class" => "GoToParent LI",
+     "data-type" => ".OHCC;$lpg"
     ]
    ]) : "";
    $i = 0;

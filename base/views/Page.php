@@ -255,9 +255,8 @@
    $lpg = $data["lPG"];
    $lpp = $data["lPP"] ?? "OHCC";
    $bck = ($bck == 1) ? $this->system->Element(["button", "Back to $b2", [
-    "class" => "LI header",
-    "data-type" => ".$lpp;$lpg",
-    "id" => "lPG"
+    "class" => "GoToParent LI header",
+    "data-type" => ".$lpp;$lpg"
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $r = $this->system->Change([[

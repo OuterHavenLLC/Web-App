@@ -293,9 +293,8 @@
    $b2 = $data["b2"];
    $back = $data["back"] ?? 0;
    $back = ($back == 1) ? $this->system->Element(["button", "Back to $b2", [
-    "class" => "LI head",
-    "data-type" => "$lpp;$lpg",
-    "id" => "lPG"
+    "class" => "GoToParent LI head",
+    "data-type" => "$lpp;$lpg"
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $t = $this->system->Member(base64_decode($data["UN"]));

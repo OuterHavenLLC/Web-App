@@ -226,9 +226,8 @@
    ]);
    $bck = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to <em>".$data["b2"]."</em>", [
-     "class" => "LI head",
-     "data-type" => ".OHCC;".$data["lPG"],
-     "id" => "lPG"
+     "class" => "GoToParent LI head",
+     "data-type" => ".OHCC;".$data["lPG"]
     ]
    ]) : "";
    $r = $this->system->Change([[
