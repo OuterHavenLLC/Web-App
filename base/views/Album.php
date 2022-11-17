@@ -60,7 +60,12 @@
   function Home(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, [
-    "AID", "UN", "b2", "back", "lPG", "lPP"
+    "AID",
+    "UN",
+    "b2",
+    "back",
+    "lPG",
+    "lPP"
    ]);
    $y = $this->you;
    $id = $data["AID"];
@@ -68,10 +73,10 @@
    $bck = $data["back"] ?? 0;
    $lpg = $data["lPG"];
    $lpp = $data["lPP"] ?? "OHCC";
-   $sc = base64_encode("Search:Containers");
    $un = $data["UN"] ?? $y["Login"]["Username"];
    $bck = ($bck == 1) ? $this->system->Element(["button", "Back to $b2", [
-    "class" => "LI head", "data-type" => ".$lpp;$lpg", "id" => "lPG"
+    "class" => "GoToParent LI head",
+    "data-type" => ".$lpp;$lpg"
    ]]) : "";
    $r = $this->system->Change([[
     "[Error.Back]" => $bck,
@@ -79,13 +84,15 @@
     "[Error.Message]" => "The requested Album could not be found."
    ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    if(!empty($id)) {
-    $r = $bck.$this->view($sc, ["Data" => [
-     "AID" => $id, "UN" => $un, "st" => "MBR-XFS"
+    $r = $bck.$this->view(base64_encode("Search:Containers"), ["Data" => [
+     "AID" => $id,
+     "UN" => $un,
+     "st" => "MBR-XFS"
     ]]);
    }
    return $r;
   }
-  function Lobby(array $a) {
+  function Home(array $a) {
    $ad = base64_encode("Authentication:DeleteAlbum");
    $ae = base64_encode("Album:Edit");
    $ah = base64_encode("Album:Home");
@@ -171,10 +178,10 @@
      ]]),
      "[Album.Share]" => base64_encode("v=$as&ID=$id&UN=$tun"),
      "[Album.Title]" => $alb["Title"],
-     "[Album.View]" => base64_encode("v=$ah&AID=$id&UN=$tun&back=$bck&b2=$b2")
+     "[Album.View]" => base64_encode("v=$ah&AID=$id&UN=$tun")
     ], $this->system->Page("91c56e0ee2a632b493451aa044c32515")]);
    }
-   return $this->system->Card(["CardFront" => $r]);
+   return $this->system->Card(["Front" => $r]);
   }
   function Save(array $a) {
    $data = $a["Data"] ?? [];
