@@ -615,7 +615,7 @@
   }
   function NewPassword(array $a) {
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -626,14 +626,14 @@
     $r = $this->system->Change([[
      "[Member.ProfilePicture]" => $this->system->ProfilePicture($y, "margin:5%;width:90%"),
      "[Member.DisplayName]" => $y["Personal"]["DisplayName"],
-     "[Member.Update]" => "v=".base64_encode("Authentication:NewPassword")
+     "[Member.Update]" => "v=".base64_encode("Profile:SavePassword")
     ], $this->system->Page("08302aec8e47d816ea0b3f80ad87503c")]);
    }
    return $r;
   }
   function NewPIN(array $a) {
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -644,7 +644,8 @@
     $r = $this->system->Change([[
      "[Member.ProfilePicture]" => $this->system->ProfilePicture($y, "margin:5%;width:90%"),
      "[Member.DisplayName]" => $y["Personal"]["DisplayName"],
-     "[Member.Update]" => "v=".base64_encode("Authentication:NewPIN")
+     "[Member.Username]" => $y["Login"]["Username"],
+     "[Member.Update]" => "v=".base64_encode("Profile:SavePIN")
     ], $this->system->Page("867bd8480f46eea8cc3d2a2ed66590b7")]);
    }
    return $r;
@@ -760,9 +761,14 @@
    $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
+   $data = $this->system->FixMissing($data, [
+    "CurrentPassword",
+    "NewPassword",
+    "NewPassword2"
+   ]);
    $responseType = "Dialog";
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -772,7 +778,9 @@
    } else {
     $accessCode = "Accepted";
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "Your Password has been updated!"]),
+     "Body" => $this->system->Element([
+      "p", "Your Password has been updated!"
+     ]),
      "Header" => "Done"
     ]);
    }
@@ -789,19 +797,41 @@
    $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
+   $data = $this->system->FixMissing($data, [
+    "CurrentPIN",
+    "NewPIN",
+    "NewPIN2"
+   ]);
    $responseType = "Dialog";
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
      ]),
      "Header" => "Forbidden"
     ]);
+   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The PINs do not match."]),
+     "Header" => "Error"
+    ]);
+   } elseif(!is_numeric($data["NewPIN"]) || !is_numeric($data["NewPIN2"])) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "PINs must be numeric (0-9)."]),
+     "Header" => "Error"
+    ]);
+   } elseif($data["NewPIN"] != $data["NewPIN2"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The new PINs do not match."]),
+     "Header" => "Error"
+    ]);
    } else {
     $accessCode = "Accepted";
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "Your PIN has been updated!"]),
+     "Body" => $this->system->Element([
+      "p", "Your PIN has been updated!"
+     ]),
      "Header" => "Done"
     ]);
    }

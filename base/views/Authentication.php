@@ -399,69 +399,6 @@
    }
    return $r;
   }
-  function NewPassword(array $a) {
-   $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "Unknown error."]),
-    "Header" => "Error"
-   ]);
-   $y = $this->you;
-   if($this->system->ID == $y["Login"]["Username"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
-     "Header" => "Forbidden"
-    ]);
-   } else {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must enter your current PIN to update your Password."
-     ]).$this->system->Page("92c7c84d33f9c3d8ccd6cc04dc228bf0"),
-     "Header" => "Update Password",
-     "Option" => $this->system->Element([
-      "button", "Cancel", ["class" => "dBC v2 v2w"]
-     ]),
-     "Option2" => $this->system->Element([
-      "button", "Update Password", [
-       "class" => "SendData v2 v2w",
-       "data-form" => ".NewPassword",
-       "data-processor" => base64_encode("v=".base64_encode("Profile:SavePassword"))
-      ]
-     ])
-    ]);
-   }
-   return $r;
-  }
-  function NewPIN(array $a) {
-   $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "Unknown error."]),
-    "Header" => "Error"
-   ]);
-   $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
-     "Header" => "Forbidden"
-    ]);
-   } else {
-    $save = base64_encode("Profile:SavePIN");
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "Are you sure you want to update your PIN?"
-     ]),
-     "Header" => "Update PIN",
-     "Option" => $this->system->Element([
-      "button", "Cancel", ["class" => "dBC v2 v2w"]
-     ]),
-     "Option2" => $this->system->Element([
-      "button", "Update PIN", [
-       "class" => "SendData dBC v2 v2w",
-       "data-form" => ".NewPIN",
-       "data-processor" => base64_encode("v=$save")
-      ]
-     ])
-    ]);
-   }
-   return $r;
-  }
   function PFChangeMemberRole(array $a) {
    $data = $a["Data"] ?? [];
    $id = $data["ID"] ?? "";
