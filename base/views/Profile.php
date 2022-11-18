@@ -626,7 +626,7 @@
     $r = $this->system->Change([[
      "[Member.ProfilePicture]" => $this->system->ProfilePicture($y, "margin:5%;width:90%"),
      "[Member.DisplayName]" => $y["Personal"]["DisplayName"],
-     "[Member.Update]" => "v=".base64_encode("Profile:SavePassword")
+     "[Member.Update]" => base64_encode("v=".base64_encode("Profile:SavePassword"))
     ], $this->system->Page("08302aec8e47d816ea0b3f80ad87503c")]);
    }
    return $r;
@@ -645,7 +645,7 @@
      "[Member.ProfilePicture]" => $this->system->ProfilePicture($y, "margin:5%;width:90%"),
      "[Member.DisplayName]" => $y["Personal"]["DisplayName"],
      "[Member.Username]" => $y["Login"]["Username"],
-     "[Member.Update]" => "v=".base64_encode("Profile:SavePIN")
+     "[Member.Update]" => base64_encode("v=".base64_encode("Profile:SavePIN"))
     ], $this->system->Page("867bd8480f46eea8cc3d2a2ed66590b7")]);
    }
    return $r;
@@ -722,128 +722,6 @@
    }
    return $this->system->Card(["Back" => "", "Front" => $r]);
   }
-  function SaveDeactivate(array $a) {
-   $data = $a["Data"] ?? [];
-   $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must be signed in to continue."
-     ]),
-     "Header" => "Forbidden"
-    ]);
-   } elseif(1 == 1) {
-    // DEACTIVATE PROFILE
-   }
-  }
-  function SaveDelete(array $a) {
-   $data = $a["Data"] ?? [];
-   $y = $this->you;
-   // DELETE PROFILE
-   /* DELETE CONVERSATION
-   if($y["Login"]["Username"] == $this->system->ID) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must be signed in to continue."
-     ]),
-     "Header" => "Forbidden"
-    ]);
-   } elseif(1 == 1) {
-    if(!empty($this->system->Data("Get", ["conversation", md5("MBR_".$y["Login"]["Username"])]))) {
-     $this->view(base64_encode("Conversation:SaveDelete"), [
-      "Data" => ["ID" => md5("MBR_".$y["Login"]["Username"])]
-     ]);
-    }
-   }
-   */
-  }
-  function SavePassword(array $a) {
-   $accessCode = "Denied";
-   $data = $a["Data"] ?? [];
-   $data = $this->system->DecodeBridgeData($data);
-   $data = $this->system->FixMissing($data, [
-    "CurrentPassword",
-    "NewPassword",
-    "NewPassword2"
-   ]);
-   $responseType = "Dialog";
-   $y = $this->you;
-   if($this->system->ID == $y["Login"]["Username"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must be signed in to continue."
-     ]),
-     "Header" => "Forbidden"
-    ]);
-   } else {
-    $accessCode = "Accepted";
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "Your Password has been updated!"
-     ]),
-     "Header" => "Done"
-    ]);
-   }
-   return $this->system->JSONResponse([
-    "AccessCode" => $accessCode,
-    "Response" => [
-     "JSON" => "",
-     "Web" => $r
-    ],
-    "ResponseType" => $responseType
-   ]);
-  }
-  function SavePIN(array $a) {
-   $accessCode = "Denied";
-   $data = $a["Data"] ?? [];
-   $data = $this->system->DecodeBridgeData($data);
-   $data = $this->system->FixMissing($data, [
-    "CurrentPIN",
-    "NewPIN",
-    "NewPIN2"
-   ]);
-   $responseType = "Dialog";
-   $y = $this->you;
-   if($this->system->ID == $y["Login"]["Username"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must be signed in to continue."
-     ]),
-     "Header" => "Forbidden"
-    ]);
-   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The PINs do not match."]),
-     "Header" => "Error"
-    ]);
-   } elseif(!is_numeric($data["NewPIN"]) || !is_numeric($data["NewPIN2"])) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "PINs must be numeric (0-9)."]),
-     "Header" => "Error"
-    ]);
-   } elseif($data["NewPIN"] != $data["NewPIN2"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The new PINs do not match."]),
-     "Header" => "Error"
-    ]);
-   } else {
-    $accessCode = "Accepted";
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "Your PIN has been updated!"
-     ]),
-     "Header" => "Done"
-    ]);
-   }
-   return $this->system->JSONResponse([
-    "AccessCode" => $accessCode,
-    "Response" => [
-     "JSON" => "",
-     "Web" => $r
-    ],
-    "ResponseType" => $responseType
-   ]);
-  }
   function Save(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
@@ -916,6 +794,138 @@
     ]);
    }
    return $r;
+  }
+  function SaveDeactivate(array $a) {
+   $data = $a["Data"] ?? [];
+   $y = $this->you;
+   if($y["Login"]["Username"] == $this->system->ID) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "You must be signed in to continue."
+     ]),
+     "Header" => "Forbidden"
+    ]);
+   } elseif(1 == 1) {
+    // DEACTIVATE PROFILE
+   }
+  }
+  function SaveDelete(array $a) {
+   $data = $a["Data"] ?? [];
+   $y = $this->you;
+   // DELETE PROFILE
+   /* DELETE CONVERSATION
+   if($y["Login"]["Username"] == $this->system->ID) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "You must be signed in to continue."
+     ]),
+     "Header" => "Forbidden"
+    ]);
+   } elseif(1 == 1) {
+    if(!empty($this->system->Data("Get", ["conversation", md5("MBR_".$y["Login"]["Username"])]))) {
+     $this->view(base64_encode("Conversation:SaveDelete"), [
+      "Data" => ["ID" => md5("MBR_".$y["Login"]["Username"])]
+     ]);
+    }
+   }
+   */
+  }
+  function SavePassword(array $a) {
+   $accessCode = "Denied";
+   $data = $a["Data"] ?? [];
+   $data = $this->system->DecodeBridgeData($data);
+   $data = $this->system->FixMissing($data, [
+    "CurrentPassword",
+    "NewPassword",
+    "NewPassword2"
+   ]);
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "You must be signed in to continue."
+     ]),
+     "Header" => "Forbidden"
+    ]);
+   } else {
+    $accessCode = "Accepted";
+    $newPassword = md5($data["NewPassword"]);
+    #$y["Login"]["PIN"] = $newPassword;
+    #$this->system->Data("Save", ["mbr", md5($you), $y]);
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "Your Password has been updated!<br/>".json_encode([
+       "Data" => $data,
+       "Pass" => $y["Login"]["Password"],
+       "NewPass" => $newPassword
+      ], true)
+     ]),
+     "Header" => "Done"
+    ]);
+   }
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => "",
+     "Web" => $r
+    ],
+    "ResponseType" => "Dialog",
+    "Success" => "CloseDialog"
+   ]);
+  }
+  function SavePIN(array $a) {
+   $accessCode = "Denied";
+   $data = $a["Data"] ?? [];
+   $data = $this->system->DecodeBridgeData($data);
+   $data = $this->system->FixMissing($data, [
+    "CurrentPIN",
+    "NewPIN",
+    "NewPIN2"
+   ]);
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "You must be signed in to continue."
+     ]),
+     "Header" => "Forbidden"
+    ]);
+   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The PINs do not match."]),
+     "Header" => "Error"
+    ]);
+   } elseif(!is_numeric($data["NewPIN"]) || !is_numeric($data["NewPIN2"])) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "PINs must be numeric (0-9)."]),
+     "Header" => "Error"
+    ]);
+   } elseif($data["NewPIN"] != $data["NewPIN2"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The new PINs do not match."]),
+     "Header" => "Error"
+    ]);
+   } else {
+    $accessCode = "Accepted";
+    $newPIN = md5($data["NewPIN"]);
+    $y["Login"]["PIN"] = $newPIN;
+    $this->system->Data("Save", ["mbr", md5($you), $y]);
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "Your PIN has been updated."]),
+     "Header" => "Done"
+    ]);
+   }
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => "",
+     "Web" => $r
+    ],
+    "ResponseType" => "Dialog",
+    "Success" => "CloseDialog"
+   ]);
   }
   function Share(array $a) {
    $data = $a["Data"] ?? [];

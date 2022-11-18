@@ -34,8 +34,6 @@
    "Display" => 1,
    "HTMLDecode" => 1
   ])]);
- } elseif($api == "JSON") {
-  # JSON-BASED API
  } elseif($api == "Maintanance") {
   # MAINTANANCE STATUS
   $r = $gw->system->core[$c[0]];
@@ -45,6 +43,8 @@
     "Data" => $data,
     "Files" => $_FILES["file"]
    ]);
+  } elseif($view == "MD5") {
+   $r = md5(base64_decode($data["MD5"]));
   } else {
    $r = $gw->view($view, ["Data" => $data]);
   }
