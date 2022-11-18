@@ -848,6 +848,16 @@
      ]),
      "Header" => "Forbidden"
     ]);
+   } elseif(md5($data["CurrentPassword"]) != $y["Login"]["Password"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The Passwords do not match."]),
+     "Header" => "Error"
+    ]);
+   } elseif($data["NewPassword"] != $data["NewPassword2"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The new PINs do not match."]),
+     "Header" => "Error"
+    ]);
    } else {
     $accessCode = "Accepted";
     $newPassword = md5($data["NewPassword"]);
