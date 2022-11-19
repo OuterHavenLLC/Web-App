@@ -371,6 +371,7 @@
      $bundle = [];
      $category = base64_decode($data["ProductCategory"]);
      $cats = ["ARCH", "DLC", "DONATE", "PHYS", "SUB"];
+     $cost = $data["Cost"] ?? 5.00;
      $created = $product["Created"] ?? $now;
      $dlc = [];
      $coverPhoto = "";
@@ -383,6 +384,7 @@
      $modifiedBy[$now] = $you;
      $newProducts = $shop["Products"] ?? [];
      $points = $this->system->core["PTS"];
+     $profit = $data["Profit"] ?? 0.00;
      $quantity = $data["Quantity"] ?? "-1";
      $quantity = ($quantity == "-1") ? $quantity : number_format($quantity);
      $username = $product["UN"] ?? $you;
@@ -449,7 +451,7 @@
       "Body" => $data["Body"],
       "Bundled" => $bundle,
       "Category" => $category,
-      "Cost" => number_format($data["Cost"], 2),
+      "Cost" => number_format($cost, 2),
       "Created" => $created,
       "Description" => htmlentities($data["Description"]),
       "Disclaimer" => $data["Disclaimer"],
@@ -464,7 +466,7 @@
       "ModifiedBy" => $modifiedBy,
       "NSFW" => $data["nsfw"],
       "Points" => $points,
-      "Profit" => number_format($data["Profit"], 2),
+      "Profit" => number_format($profit, 2),
       "Quantity" => $quantity,
       "Role" => $data["Role"],
       "SubscriptionTerm" => $data["ProductSubscriptionTerm"],

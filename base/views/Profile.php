@@ -626,7 +626,8 @@
     $r = $this->system->Change([[
      "[Member.ProfilePicture]" => $this->system->ProfilePicture($y, "margin:5%;width:90%"),
      "[Member.DisplayName]" => $y["Personal"]["DisplayName"],
-     "[Member.Update]" => base64_encode("v=".base64_encode("Profile:SavePassword"))
+     "[Member.Update]" => base64_encode("v=".base64_encode("Profile:SavePassword")),
+     "[Member.Username]" => $y["Login"]["Username"]
     ], $this->system->Page("08302aec8e47d816ea0b3f80ad87503c")]);
    }
    return $r;
@@ -644,7 +645,6 @@
     $r = $this->system->Change([[
      "[Member.ProfilePicture]" => $this->system->ProfilePicture($y, "margin:5%;width:90%"),
      "[Member.DisplayName]" => $y["Personal"]["DisplayName"],
-     "[Member.Username]" => $y["Login"]["Username"],
      "[Member.Update]" => base64_encode("v=".base64_encode("Profile:SavePIN"))
     ], $this->system->Page("867bd8480f46eea8cc3d2a2ed66590b7")]);
    }
@@ -879,14 +879,11 @@
    } else {
     $accessCode = "Accepted";
     $newPassword = md5($data["NewPassword"]);
-    #$y["Login"]["Password"] = $newPassword;
-    #$this->system->Data("Save", ["mbr", md5($you), $y]);
+    $y["Login"]["Password"] = $newPassword;
+    $this->system->Data("Save", ["mbr", md5($you), $y]);
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
-      "p", "Your Password has been updated!<br/>".json_encode([
-       "Pass" => $y["Login"]["Password"],
-       "NewPass" => $newPassword
-      ], true)
+      "p", "Your Password has been updated."
      ]),
      "Header" => "Done"
     ]);
