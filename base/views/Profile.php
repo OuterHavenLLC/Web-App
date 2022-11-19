@@ -862,14 +862,18 @@
      ]),
      "Header" => "Error"
     ]);
-   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
+   } elseif(md5($data["CurrentPassword"]) != $y["Login"]["Password"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The PINs do not match."]),
+     "Body" => $this->system->Element([
+      "p", "The Passwords do not match."
+     ]),
      "Header" => "Error"
     ]);
    } elseif($data["NewPassword"] != $data["NewPassword2"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The new PINs do not match."]),
+     "Body" => $this->system->Element([
+      "p", "The new Passwords do not match."
+     ]),
      "Header" => "Error"
     ]);
    } else {
