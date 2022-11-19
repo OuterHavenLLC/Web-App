@@ -61,12 +61,15 @@
     $at5 = base64_encode("Add to $title Bundle:.ATTP$id");
     $at5input = "$at4input .rATT";
     $at5lv = base64_encode("v=".base64_encode("LiveView:EditorProducts")."&AddTo=$at5input&BNDL=");
+    $cost = $product["Cost"] ?? 0.00;
     $created = $product["Created"] ?? $this->system->timestamp;
     $header = ($new == 1) ? "New Product" : "Edit ".$product["Title"];
     $nsfw = $product["NSFW"] ?? $_YourPrivacy["NSFW"];
     $privacy = $product["Privacy"] ?? $_YourPrivacy["Products"];
+    $profit = $product["Profit"] ?? 0.00;
     $quantity = $product["Quantity"] ?? "-1";
     $search = base64_encode("Search:Containers");
+    $subscriptionTerm = $product["SubscriptionTerm"] ?? "";
     if(!empty($product["Attachments"])) {
      $attachmentsachments = base64_encode(implode(";", $product["Attachments"]));
     } if(!empty($product["Bundled"])) {
@@ -112,7 +115,7 @@
      "[Product.Attachments.LiveView]" => $at4lv,
      "[Product.Bundled]" => $bundle,
      "[Product.Bundled.LiveView]" => $at5lv,
-     "[Product.Cost]" => $product["Cost"],
+     "[Product.Cost]" => $cost,
      "[Product.CoverPhoto]" => $coverPhoto,
      "[Product.CoverPhoto.LiveView]" => $at2lv,
      "[Product.Created]" => $created,
@@ -142,8 +145,8 @@
      "[Product.NSFW]" => $this->system->Select("nsfw", "req v2w", $nsfw),
      "[Product.Privacy]" => $this->system->Select("Privacy", "req v2w", $privacy),
      "[Product.Role]" => $this->system->Select("Role", "req v2w", $product["Role"]),
-     "[Product.SubscriptionTerm]" => $this->system->Select("ProductSubscriptionTerm", "req v2w", $product["SubscriptionTerm"]),
-     "[Product.Profit]" => $product["Profit"],
+     "[Product.SubscriptionTerm]" => $this->system->Select("ProductSubscriptionTerm", "req v2w", $subscriptionTerm),
+     "[Product.Profit]" => $profit,
      "[Product.Quantity]" => $quantity,
      "[Product.Title]" => $product["Title"]
     ], $this->system->Page("3e5dc31db9719800f28abbaa15ce1a37")]);
