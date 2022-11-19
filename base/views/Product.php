@@ -112,7 +112,7 @@
      "[Product.Attachments.LiveView]" => $at4lv,
      "[Product.Bundled]" => $bundle,
      "[Product.Bundled.LiveView]" => $at5lv,
-     "[Product.Cost]" => $this->system->Select("ProductCost", "req v2w", $product["Cost"]),
+     "[Product.Cost]" => $product["Cost"],
      "[Product.CoverPhoto]" => $coverPhoto,
      "[Product.CoverPhoto.LiveView]" => $at2lv,
      "[Product.Created]" => $created,
@@ -143,7 +143,7 @@
      "[Product.Privacy]" => $this->system->Select("Privacy", "req v2w", $privacy),
      "[Product.Role]" => $this->system->Select("Role", "req v2w", $product["Role"]),
      "[Product.SubscriptionTerm]" => $this->system->Select("ProductSubscriptionTerm", "req v2w", $product["SubscriptionTerm"]),
-     "[Product.Profit]" => $this->system->Select("ProductProfit", "req v2w", $product["Profit"]),
+     "[Product.Profit]" => $product["Profit"],
      "[Product.Quantity]" => $quantity,
      "[Product.Title]" => $product["Title"]
     ], $this->system->Page("3e5dc31db9719800f28abbaa15ce1a37")]);

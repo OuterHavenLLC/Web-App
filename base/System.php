@@ -1277,16 +1277,6 @@
       "optgroup", $r, ["label" => "Choose a Product Category..."]
      ]), ["class" => $cl, "name" => $a]
     ]);
-   } elseif($a == "ProductCost") {
-    $i = "RI".md5($this->timestamp.rand(0, 9999));
-    $m = 1;
-    $v = $c ?? 0;
-    $r = "<input class=\"$i\" max=\"1999\" min=\"$m\" name=\"$a\" type=\"range\" value=\"$v\"/>\r\n";
-    $r .= $this->Element([
-     "p", $m, ["class" => "GetRangeValue"]
-    ]).$this->Element([
-     "script", "getRangeValue(\".$i\");"
-    ]);
    } elseif($a == "ProductExpiresQuantity") {
     for($i = 1; $i <= 100; $i++) {
      $s = ($c == $i) ? " selected=\"selected\"" : "";
@@ -1323,16 +1313,6 @@
      "select", $this->Element([
       "optgroup", $r, ["label" => "Allow Instructions?"]
      ]), ["class" => $cl, "name" => $a]
-    ]);
-   } elseif($a == "ProductProfit") {
-    $i = "RI".md5($this->timestamp.rand(0, 9999));
-    $m = 0;
-    $v = $c ?? 5;
-    $r = "<input class=\"$i\" max=\"1999\" min=\"$m\" name=\"$a\" type=\"range\" value=\"$v\"/>\r\n";
-    $r .= $this->Element([
-     "p", $m, ["class" => "GetRangeValue"]
-    ]).$this->Element([
-     "script", "getRangeValue(\".$i\");"
     ]);
    } elseif($a == "ProductSubscriptionTerm") {
     $hli = ["Month", "Year"];

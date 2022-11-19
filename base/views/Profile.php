@@ -848,9 +848,23 @@
      ]),
      "Header" => "Forbidden"
     ]);
-   } elseif(md5($data["CurrentPassword"]) != $y["Login"]["Password"]) {
+   } elseif(empty($data["CurrentPassword"])) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The Passwords do not match."]),
+     "Body" => $this->system->Element([
+      "p", "You must enter your current Password."
+     ]),
+     "Header" => "Error"
+    ]);
+   } elseif(empty($data["NewPassword"]) || empty($data["NewPassword2"])) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "You must enter and confirm your new Password."
+     ]),
+     "Header" => "Error"
+    ]);
+   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The PINs do not match."]),
      "Header" => "Error"
     ]);
    } elseif($data["NewPassword"] != $data["NewPassword2"]) {
@@ -861,12 +875,11 @@
    } else {
     $accessCode = "Accepted";
     $newPassword = md5($data["NewPassword"]);
-    #$y["Login"]["PIN"] = $newPassword;
+    #$y["Login"]["Password"] = $newPassword;
     #$this->system->Data("Save", ["mbr", md5($you), $y]);
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "Your Password has been updated!<br/>".json_encode([
-       "Data" => $data,
        "Pass" => $y["Login"]["Password"],
        "NewPass" => $newPassword
       ], true)
@@ -902,14 +915,28 @@
      ]),
      "Header" => "Forbidden"
     ]);
-   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
+   } elseif(empty($data["CurrentPIN"])) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The PINs do not match."]),
+     "Body" => $this->system->Element([
+      "p", "You must enter your current PIN."
+     ]),
+     "Header" => "Error"
+    ]);
+   } elseif(empty($data["NewPIN"]) || empty($data["NewPIN2"])) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element([
+      "p", "You must enter and confirm your new PIN."
+     ]),
      "Header" => "Error"
     ]);
    } elseif(!is_numeric($data["NewPIN"]) || !is_numeric($data["NewPIN2"])) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element(["p", "PINs must be numeric (0-9)."]),
+     "Header" => "Error"
+    ]);
+   } elseif(md5($data["CurrentPIN"]) != $y["Login"]["PIN"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The PINs do not match."]),
      "Header" => "Error"
     ]);
    } elseif($data["NewPIN"] != $data["NewPIN2"]) {
