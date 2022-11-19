@@ -657,8 +657,6 @@
    $ck = ($y["Personal"]["Age"] >= $minAge) ? 1 : 0;
    $ck2 = ($this->system->ID != $you) ? 1 : 0;
    if($ck == 0) {
-    #$shop = $this->system->Data("Get", ["shop", md5($you)]) ?? [];
-    #$shop["Live"] = $shop["Live"] ?? 0;
     $r = $this->system->Change([[
      "[Error.Back]" => "",
      "[Error.Header]" => "Not of Age",
@@ -671,7 +669,6 @@
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    } elseif($ck == 1 && $ck2 == 1) {
-    $sc = base64_encode("Search:Containers");
     $r = $this->system->Change([[
      "[Preferences.Authentication]" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences$you")."&ID=$you&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?"),
      "[Preferences.Donations.Patreon]" => $y["Donations"]["Patreon"],
@@ -720,9 +717,13 @@
      "[Preferences.Privacy.Shop]" => $this->system->Select("Privacy_Shop", "req v2w", $y["Privacy"]["Shop"])
     ], $this->system->Page("e54cb66a338c9dfdcf0afa2fec3b6d8a")]);
    }
-   return $this->system->Card(["Back" => "", "Front" => $r]);
+   return $this->system->Card([
+    "Back" => "",
+    "Front" => $r
+   ]);
   }
   function Save(array $a) {
+   $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
    $data = $this->system->FixMissing($data, [
@@ -731,7 +732,7 @@
     "UN",
     "email"
    ]);
-   $ec = "Denied";
+   $json = "";
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if(empty($data["DN"])) {
@@ -743,7 +744,7 @@
    } elseif($this->system->ID == $you) {
     $r = "You must be signed in to continue.";
    } else {
-    $ec = "Accepted";
+    $accessCode = "Accepted";
     $y2 = $this->system->NewMember($y);
     foreach($y2 as $k => $v) {
      $y2[$k] = $y[$k] ?? $v;
@@ -777,28 +778,34 @@
      }
     }
     $y2["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
-    $r = $this->system->JSONResponse([
-     $ec, $this->system->Dialog([
-      "Body" => $this->system->Element(["p", "Your Preferences were saved!<br/>".json_encode($y2, true)]),
-      "Header" => "Done"
-     ]),
-     $this->system->Encrypt($you.":".$y2["PW"])
-    ]);
+    $json = $this->system->Encrypt($you.":".$y2["PW"]);
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "Your Preferences were saved!<br/>".json_encode($y2, true)]),
+     "Header" => "Done"
+    ]),
     #$this->system->Data("Save", ["mbr", md5($you), $y2]);
     #$this->system->Data("Save", ["shop", md5($you), $shop]);
-   } if($ec == "Denied") {
-    $r = $this->system->JSONResponse([$ec, $this->system->Dialog([
-      "Body" => $this->system->Element(["p", $r]),
-      "Header" => "Error"
-     ])
+   } if($accessCode == "Denied") {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", $r]),
+     "Header" => "Error"
     ]);
    }
-   return $r;
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => $json,
+     "Web" => $r
+    ],
+    "ResponseType" => "Dialog",
+    "Success" => "CloseDialog"
+   ]);
   }
   function SaveDeactivate(array $a) {
    $data = $a["Data"] ?? [];
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
