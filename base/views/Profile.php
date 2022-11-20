@@ -670,12 +670,13 @@
     ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    } elseif($ck == 1 && $ck2 == 1) {
     $r = $this->system->Change([[
-     "[Preferences.Authentication]" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=$you&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?"),
+     "[Preferences.Authentication]" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=".md5($you)."&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?"),
      "[Preferences.Donations.Patreon]" => $y["Donations"]["Patreon"],
      "[Preferences.Donations.PayPal]" => $y["Donations"]["PayPal"],
      "[Preferences.Donations.SubscribeStar]" => $y["Donations"]["SubscribeStar"],
      "[Preferences.General.Bio]" => $y["Personal"]["Bio"],
-     "[Preferences.General.Birthday]" => $this->system->Select("bDayMM", "req", $y["Personal"]["Birthday"]["Month"]).$this->system->Select("bDayYYYY", "req", $y["Personal"]["Birthday"]["Year"]),
+     "[Preferences.General.Birthday.Month]" => $y["Personal"]["Birthday"]["Month"],
+     "[Preferences.General.Birthday.Year]" => $y["Personal"]["Birthday"]["Year"],
      "[Preferences.General.Description]" => $y["Personal"]["Description"],
      "[Preferences.General.DisplayName]" => $y["Personal"]["DisplayName"],
      "[Preferences.General.Email]" => $y["Personal"]["Email"],
@@ -734,7 +735,7 @@
    ]);
    $y = $this->you;
    $you = $y["Login"]["Username"];
-   if(empty($data["DN"])) {
+   if(empty($data["Personal_DisplayName"])) {
     $r = "Your Display Name is missing.";
    } elseif(empty($data["email"])) {
     $r = "Your E-Mail is missing.";
@@ -744,6 +745,9 @@
     $r = "You must be signed in to continue.";
    } else {
     $accessCode = "Accepted";
+    # GOAL: Migrate existing Member data to $newMember.
+    #       Update New Member data with input data.
+    $newMember = $this->NewMember(["Username" => $you]);
     $y2 = $this->system->NewMember($y);
     foreach($y2 as $k => $v) {
      $y2[$k] = $y[$k] ?? $v;
@@ -751,8 +755,8 @@
     $fName = explode(" ", $data["name"]);
     $shop = $this->system->Data("Get", ["shop", md5($y["Login"]["Username"])]) ?? [];
     $y2["Personal"]["Birthday"] = [
-     "Month" => $data["bDayMM"],
-     "Year" => $data["bDayYYYY"]
+     "Month" => $data["BirthMonth"],
+     "Year" => $data["BirthYear"]
     ];
     $y2["Personal"]["Description"] = $this->system->PlainText([
      "Data" => $data["Description"],
@@ -779,7 +783,10 @@
     $y2["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
     #$this->system->Data("Save", ["mbr", md5($you), $y2]);
     #$this->system->Data("Save", ["shop", md5($you), $shop]);
-    $r = "Your Preferences were saved!<br/>".json_encode($y2, true);
+    $r = "Your Preferences were saved!<br/>".json_encode([
+     "YourData" => $data,
+     "YourData" => $y2
+    ], true);
    } if($accessCode == "Denied") {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element(["p", $r]),
