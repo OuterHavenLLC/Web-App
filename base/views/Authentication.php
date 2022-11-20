@@ -427,41 +427,6 @@
    }
    return $r;
   }
-  function Preferences(array $a) {
-   $data = $a["Data"] ?? [];
-   $data = $this->system->FixMissing($data, ["UN"]);
-   $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Username is missing!"]),
-    "Header" => "Error"
-   ]);
-   $sp = base64_encode("Profile:SavePreferences");
-   $y = $this->you;
-   if($this->system->ID == $y["Login"]["Username"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
-     "Header" => "Forbidden"
-    ]);
-   } elseif(!empty($data["UN"])) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must enter your current PIN to save your Preferences."
-     ]).$this->system->Page("92c7c84d33f9c3d8ccd6cc04dc228bf0"),
-     "Header" => "Update Preferences",
-     "Option" => $this->system->Element([
-      "button", "Cancel", ["class" => "dBC v2 v2w"]
-     ]),
-     "Option2" => $this->system->Element([
-      "button", "Save", [
-       "class" => "Xpref v2 v2w",
-       "data-f" => ".Preferences",
-       "data-u" => base64_encode("v=$sp&UN=".$data["UN"]),
-       "id" => "fSub"
-      ]
-     ])
-    ]);
-   }
-   return $r;
-  }
   function __destruct() {
    // DESTROYS THIS CLASS
   }

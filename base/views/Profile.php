@@ -670,7 +670,7 @@
     ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    } elseif($ck == 1 && $ck2 == 1) {
     $r = $this->system->Change([[
-     "[Preferences.Authentication]" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences$you")."&ID=$you&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?"),
+     "[Preferences.Authentication]" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=$you&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?"),
      "[Preferences.Donations.Patreon]" => $y["Donations"]["Patreon"],
      "[Preferences.Donations.PayPal]" => $y["Donations"]["PayPal"],
      "[Preferences.Donations.SubscribeStar]" => $y["Donations"]["SubscribeStar"],
@@ -732,7 +732,6 @@
     "UN",
     "email"
    ]);
-   $json = "";
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if(empty($data["DN"])) {
@@ -778,13 +777,9 @@
      }
     }
     $y2["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
-    $json = $this->system->Encrypt($you.":".$y2["PW"]);
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "Your Preferences were saved!<br/>".json_encode($y2, true)]),
-     "Header" => "Done"
-    ]),
     #$this->system->Data("Save", ["mbr", md5($you), $y2]);
     #$this->system->Data("Save", ["shop", md5($you), $shop]);
+    $r = "Your Preferences were saved!<br/>".json_encode($y2, true);
    } if($accessCode == "Denied") {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element(["p", $r]),
@@ -794,7 +789,7 @@
    return $this->system->JSONResponse([
     "AccessCode" => $accessCode,
     "Response" => [
-     "JSON" => $json,
+     "JSON" => "",
      "Web" => $r
     ],
     "ResponseType" => "Dialog",
