@@ -351,15 +351,15 @@
        "D" => ["3dm", "bimx", "cr", "cr2", "cr3", "doc", "docx", "dwg", "dwf", "pcx", "pdf", "rar", "tar.gz", "ttf", "txt", "usdz", "vbs"],
        "P" => ["bmp", "gif", "jpg", "jpeg", "png", "tiff"],
        "V" => ["avi", "flv", "mov", "mp4", "ogg"]
-      ],
-      "limits" => [
-       "Audio" => 50,
-       "Documents" => 250,
-       "Images" => 10,
-       "Videos" => 200,
-       "Total" => 500
-      ]
      ],
+     "limits" => [
+      "Audio" => 50,
+      "Documents" => 250,
+      "Images" => 10,
+      "Videos" => 200,
+      "Total" => 500
+     ]
+    ],
     "Xmaintanance" => 0,
     "minAge" => 18,
     "minRegAge" => 13

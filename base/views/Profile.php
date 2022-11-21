@@ -752,7 +752,7 @@
     $accessCode = "Accepted";
     # GOAL: Migrate existing Member data to $newMember.
     #       Update New Member data with input data.
-    $newMember = $this->NewMember(["Username" => $you]);
+    $newMember = $this->system->NewMember(["Username" => $you]);
     $firstName = explode(" ", $data["name"])[0];
     foreach($data as $key => $value) {
      if(strpos($key, "Donations_") !== false) {
@@ -765,6 +765,14 @@
       $k1 = explode("_", $key);
       $newMember["Privacy"][$k1[1]] = $value ?? $y["Privacy"][$k1[1]];
      }
+    } foreach($newMember["Subscriptions"] as $key => $value) {
+     $y["Subscriptions"][$key] = $y["Subscriptions"][$key] ?? [];
+     $active = $y["Subscriptions"][$key]["A"] ?? $value["A"];
+     $begins = $y["Subscriptions"][$key]["B"] ?? $value["B"];
+     $ends = $y["Subscriptions"][$key]["E"] ?? $value["E"];
+     $y["Subscriptions"][$key]["A"] = $active;
+     $y["Subscriptions"][$key]["B"] = $begins;
+     $y["Subscriptions"][$key]["E"] = $ends;
     }
     $newMember["Blogs"] = $y["Blogs"];
     $newMember["Login"] = $y["Login"];
@@ -772,10 +780,6 @@
      "Month" => $data["BirthMonth"],
      "Year" => $data["BirthYear"]
     ];
-    $newMember["Personal"]["Description"] = $this->system->PlainText([
-     "Data" => $data["Description"],
-     "HTMLEncode" => 1
-    ]);
     #$newMember["Personal"]["FirstName"] = $firstName;
     $newMember["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
     $newMember["Privacy"]["LookMeUp"] = $data["Index"];
@@ -784,7 +788,7 @@
     #$newMember["Shopping"]["History"] = $y["Shopping"]["History"];
     #$this->system->Data("Save", ["mbr", md5($you), $newMember]);
     $r = "Your Preferences were saved!<br/>".json_encode([
-     "SampleMember" => $this->NewMember(["Username" => $you]),
+     "SampleMember" => $this->system->NewMember(["Username" => $you]),
      "YourData" => $newMember
     ], true);
    } if($accessCode == "Denied") {
