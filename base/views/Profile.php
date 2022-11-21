@@ -651,6 +651,7 @@
    return $r;
   }
   function Preferences(array $a) {
+   $button = "";
    $minAge = $this->system->core["minRegAge"] ?? 13;
    $y = $this->you;
    $you = $y["Login"]["Username"];
@@ -669,8 +670,11 @@
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("f7d85d236cc3718d50c9ccdd067ae713")]);
    } elseif($ck == 1 && $ck2 == 1) {
+    $button = $this->system->Element(["button", "Save", [
+     "class" => "CardButton dBO",
+     "data-type" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=".md5($you)."&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?")
+    ]]);
     $r = $this->system->Change([[
-     "[Preferences.Authentication]" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=".md5($you)."&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?"),
      "[Preferences.Donations.Patreon]" => $y["Donations"]["Patreon"],
      "[Preferences.Donations.PayPal]" => $y["Donations"]["PayPal"],
      "[Preferences.Donations.SubscribeStar]" => $y["Donations"]["SubscribeStar"],
@@ -720,7 +724,8 @@
    }
    return $this->system->Card([
     "Back" => "",
-    "Front" => $r
+    "Front" => $r,
+    "FrontButton" => $button
    ]);
   }
   function Save(array $a) {
@@ -748,44 +753,39 @@
     # GOAL: Migrate existing Member data to $newMember.
     #       Update New Member data with input data.
     $newMember = $this->NewMember(["Username" => $you]);
-    $y2 = $this->system->NewMember($y);
-    foreach($y2 as $k => $v) {
-     $y2[$k] = $y[$k] ?? $v;
-    }
-    $fName = explode(" ", $data["name"]);
-    $shop = $this->system->Data("Get", ["shop", md5($y["Login"]["Username"])]) ?? [];
-    $y2["Personal"]["Birthday"] = [
-     "Month" => $data["BirthMonth"],
-     "Year" => $data["BirthYear"]
-    ];
-    $y2["Personal"]["Description"] = $this->system->PlainText([
-     "Data" => $data["Description"],
-     "HTMLEncode" => 1
-    ]);
-    $y2["Privacy"]["LookMeUp"] = $data["Index"];
-    $y2["Privacy"]["NSFW"] = $data["nsfw"];
+    $firstName = explode(" ", $data["name"])[0];
     foreach($data as $key => $value) {
      if(strpos($key, "Donations_") !== false) {
       $k1 = explode("_", $key);
-      $y2["Donations"][$k1[1]] = $value;
-     } elseif(strpos($key, "PayProc_") !== false) {
-      $k1 = explode("_", $k);
-      $value = (!empty($value)) ? base64_encode($value) : $value;
-      $shop["Processing"][$k1[1]] = $value;
+      #$newMember["Donations"][$k1[1]] = $value ?? $y["Donations"][$k1[1]];
      } elseif(strpos($key, "Personal_") !== false) {
       $k1 = explode("_", $key);
-      $y2["Personal"][$k1[1]] = $value;
+      $newMember["Personal"][$k1[1]] = $value ?? $y["Personal"][$k1[1]];
      } elseif(strpos($key, "Privacy_") !== false) {
       $k1 = explode("_", $key);
-      $y2["Privacy"][$k1[1]] = $value ?? $y["Privacy"][$k1[1]];
+      $newMember["Privacy"][$k1[1]] = $value ?? $y["Privacy"][$k1[1]];
      }
     }
-    $y2["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
-    #$this->system->Data("Save", ["mbr", md5($you), $y2]);
-    #$this->system->Data("Save", ["shop", md5($you), $shop]);
+    $newMember["Blogs"] = $y["Blogs"];
+    $newMember["Login"] = $y["Login"];
+    $newMember["Personal"]["Birthday"] = [
+     "Month" => $data["BirthMonth"],
+     "Year" => $data["BirthYear"]
+    ];
+    $newMember["Personal"]["Description"] = $this->system->PlainText([
+     "Data" => $data["Description"],
+     "HTMLEncode" => 1
+    ]);
+    #$newMember["Personal"]["FirstName"] = $firstName;
+    $newMember["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
+    $newMember["Privacy"]["LookMeUp"] = $data["Index"];
+    $newMember["Privacy"]["NSFW"] = $data["nsfw"];
+    #$newMember["Shopping"]["Cart"] = $y["Shopping"]["Cart"];
+    #$newMember["Shopping"]["History"] = $y["Shopping"]["History"];
+    #$this->system->Data("Save", ["mbr", md5($you), $newMember]);
     $r = "Your Preferences were saved!<br/>".json_encode([
-     "YourData" => $data,
-     "YourData" => $y2
+     "SampleMember" => $this->NewMember(["Username" => $you]),
+     "YourData" => $newMember
     ], true);
    } if($accessCode == "Denied") {
     $r = $this->system->Dialog([
