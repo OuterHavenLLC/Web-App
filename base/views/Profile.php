@@ -757,7 +757,7 @@
     foreach($data as $key => $value) {
      if(strpos($key, "Donations_") !== false) {
       $k1 = explode("_", $key);
-      #$newMember["Donations"][$k1[1]] = $value ?? $y["Donations"][$k1[1]];
+      $newMember["Donations"][$k1[1]] = $value ?? $y["Donations"][$k1[1]];
      } elseif(strpos($key, "Personal_") !== false) {
       $k1 = explode("_", $key);
       $newMember["Personal"][$k1[1]] = $value ?? $y["Personal"][$k1[1]];
@@ -765,17 +765,20 @@
       $k1 = explode("_", $key);
       $newMember["Privacy"][$k1[1]] = $value ?? $y["Privacy"][$k1[1]];
      }
+    } foreach($newMember["Blocked"] as $key => $value) {
+     $newMember["Blocked"][$key] = $y["Blocked"][$key] ?? [];
     } foreach($newMember["Subscriptions"] as $key => $value) {
-     $y["Subscriptions"][$key] = $y["Subscriptions"][$key] ?? [];
      $active = $y["Subscriptions"][$key]["A"] ?? $value["A"];
      $begins = $y["Subscriptions"][$key]["B"] ?? $value["B"];
      $ends = $y["Subscriptions"][$key]["E"] ?? $value["E"];
-     $y["Subscriptions"][$key]["A"] = $active;
-     $y["Subscriptions"][$key]["B"] = $begins;
-     $y["Subscriptions"][$key]["E"] = $ends;
+     $newMember["Subscriptions"][$key]["A"] = $active;
+     $newMember["Subscriptions"][$key]["B"] = $begins;
+     $newMember["Subscriptions"][$key]["E"] = $ends;
     }
-    $newMember["Blogs"] = $y["Blogs"];
-    $newMember["Login"] = $y["Login"];
+    $newMember["Blogs"] = $y["Blogs"] ?? [];
+    $newMember["Forums"] = $y["Forums"] ?? [];
+    $newMember["Login"] = $y["Login"] ?? [];
+    $newMember["Pages"] = $y["Pages"] ?? [];
     $newMember["Personal"]["Birthday"] = [
      "Month" => $data["BirthMonth"],
      "Year" => $data["BirthYear"]
@@ -784,8 +787,9 @@
     $newMember["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
     $newMember["Privacy"]["LookMeUp"] = $data["Index"];
     $newMember["Privacy"]["NSFW"] = $data["nsfw"];
-    #$newMember["Shopping"]["Cart"] = $y["Shopping"]["Cart"];
-    #$newMember["Shopping"]["History"] = $y["Shopping"]["History"];
+    $newMember["Rank"] = $y["Rank"];
+    $newMember["Shopping"]["Cart"] = $y["Shopping"]["Cart"];
+    $newMember["Shopping"]["History"] = $y["Shopping"]["History"];
     #$this->system->Data("Save", ["mbr", md5($you), $newMember]);
     $r = "Your Preferences were saved!<br/>".json_encode([
      "SampleMember" => $this->system->NewMember(["Username" => $you]),
