@@ -767,6 +767,8 @@
      }
     } foreach($newMember["Blocked"] as $key => $value) {
      $newMember["Blocked"][$key] = $y["Blocked"][$key] ?? [];
+    } foreach($newMember["Login"] as $key => $value) {
+     $newMember["Login"][$key] = $y["Login"][$key] ?? [];
     } foreach($newMember["Subscriptions"] as $key => $value) {
      $active = $y["Subscriptions"][$key]["A"] ?? $value["A"];
      $begins = $y["Subscriptions"][$key]["B"] ?? $value["B"];
@@ -777,7 +779,6 @@
     }
     $newMember["Blogs"] = $y["Blogs"] ?? [];
     $newMember["Forums"] = $y["Forums"] ?? [];
-    $newMember["Login"] = $y["Login"] ?? [];
     $newMember["Pages"] = $y["Pages"] ?? [];
     $newMember["Personal"]["Birthday"] = [
      "Month" => $data["BirthMonth"],
