@@ -750,8 +750,6 @@
     $r = "You must be signed in to continue.";
    } else {
     $accessCode = "Accepted";
-    # GOAL: Migrate existing Member data to $newMember.
-    #       Update New Member data with input data.
     $newMember = $this->system->NewMember(["Username" => $you]);
     $firstName = explode(" ", $data["name"])[0];
     foreach($data as $key => $value) {
@@ -784,7 +782,7 @@
      "Month" => $data["BirthMonth"],
      "Year" => $data["BirthYear"]
     ];
-    #$newMember["Personal"]["FirstName"] = $firstName;
+    $newMember["Personal"]["FirstName"] = $firstName;
     $newMember["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
     $newMember["Privacy"]["LookMeUp"] = $data["Index"];
     $newMember["Privacy"]["NSFW"] = $data["nsfw"];
