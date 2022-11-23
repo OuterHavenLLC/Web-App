@@ -2018,7 +2018,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
      if($ck == 1 && $illegal == 0) {
       $bl = $this->system->CheckBlocked([$y, "Status Updates", $v]);
       $from = $from ?? $this->system->ID;
-      if($bl == 0 || $from == $y["Login"]["Username"]) {
+      if($bl == 0 || $from == $you) {
        $att = (!empty($su["Attachments"])) ? $this->view($attlv, ["Data" => [
         "ID" => base64_encode(implode(";", $su["Attachments"])),
         "Type" => base64_encode("DLC")

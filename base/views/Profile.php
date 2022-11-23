@@ -674,6 +674,7 @@
      "class" => "CardButton dBO",
      "data-type" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=".md5($you)."&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?")
     ]]);
+    $relationshipWith = $y["Personal"]["RelationshipWith"] ?? "";
     $r = $this->system->Change([[
      "[Preferences.Donations.Patreon]" => $y["Donations"]["Patreon"],
      "[Preferences.Donations.PayPal]" => $y["Donations"]["PayPal"],
@@ -686,8 +687,9 @@
      "[Preferences.General.Email]" => $y["Personal"]["Email"],
      "[Preferences.General.FirstName]" => $y["Personal"]["FirstName"],
      "[Preferences.General.Gender]" => $this->system->Select("gender", "req", $y["Personal"]["Gender"]),
-     "[Preferences.General.OnlineStatus]" => $this->system->Select("oStatus", "req v2w", $y["Activity"]["OnlineStatus"]),
-     "[Preferences.General.RelationshipStatus]" => $this->system->Select("rStatus", "req v2w", $y["Personal"]["RelationshipStatus"]),
+     "[Preferences.General.OnlineStatus]" => $this->system->Select("OnlineStatus", "req v2w", $y["Activity"]["OnlineStatus"]),
+     "[Preferences.General.RelationshipStatus]" => $this->system->Select("Personal_RelationshipStatus", "req v2w", $y["Personal"]["RelationshipStatus"]),
+     "[Preferences.General.RelationshipWith]" => $relationshipWith,
      "[Preferences.General.Username]" => md5($you),
      "[Preferences.ID]" => md5($you),
      "[Preferences.Links.EditShop]" => base64_encode("v=".base64_encode("Shop:Edit")."&ID=".base64_encode(md5($y["Login"]["Username"]))),
@@ -779,6 +781,7 @@
      $newMember["Subscriptions"][$key]["B"] = $begins;
      $newMember["Subscriptions"][$key]["E"] = $ends;
     }
+    $newMember["Activity"]["OnlineStatus"] = $data["OnlineStatus"];
     $newMember["Activity"]["Registered"] = $y["Activity"]["Registered"];
     $newMember["Blogs"] = $y["Blogs"] ?? [];
     $newMember["Forums"] = $y["Forums"] ?? [];
@@ -795,8 +798,8 @@
     $newMember["Privacy"]["LookMeUp"] = $data["Index"];
     $newMember["Privacy"]["NSFW"] = $data["nsfw"];
     $newMember["Rank"] = $y["Rank"];
-    #$this->system->Data("Save", ["mbr", md5($you), $newMember]);
-    $r = "Your Preferences were saved!<br/>".json_encode($newMember, true);
+    $this->system->Data("Save", ["mbr", md5($you), $newMember]);
+    $r = "Your Preferences were saved!";
    }
    return $this->system->JSONResponse([
     "AccessCode" => $accessCode,

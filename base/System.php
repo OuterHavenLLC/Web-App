@@ -1032,6 +1032,19 @@
       "optgroup", $r, ["label" => "Allow to be Indexed?"]
      ]), ["class" => $cl, "name" => $a]
     ]);
+   } elseif($a == "OnlineStatus") {
+    $hli = ["Online", "Offline"];
+    $opt = [1, 0];
+    foreach($opt as $opt) {
+     $s = ($opt == $y["Activity"]["OnlineStatus"]) ? " selected=\"selected\"" : "";
+     $r .= "<option value=\"$opt\"$s>".$hli[$i]."</option>\r\n";
+     $i++;
+    }
+    $r = $this->Element([
+     "select", $this->Element([
+      "optgroup", $r, ["label" => "Online Status"]
+     ]), ["class" => $cl, "name" => $a]
+    ]);
    } elseif($a == "Open") {
     $hli = ["Closed", "Open"];
     $opt = [0, 1];
@@ -1054,6 +1067,19 @@
     $r = $this->Element([
      "select", $this->Element([
       "optgroup", $r, ["label" => "Percent Off"]
+     ]), ["class" => $cl, "name" => $a]
+    ]);
+   } elseif($a == "Personal_RelationshipStatus") {
+    $hli = ["Single", "In a Relationship", "Engaged", "Married", "Divorced", "Widowed"];
+    $opt = ["Single", "In a Relationship", "Engaged", "Married", "Divorced", "Widowed"];
+    foreach($opt as &$opt) {
+     $s = ($c == md5($opt)) ? " selected=\"selected\"" : "";
+     $r .= "<option value=\"".md5($opt)."\"$s>".$hli[$i]."</option>\r\n";
+     $i++;
+    }
+    $r = $this->Element([
+     "select", $this->Element([
+      "optgroup", $r, ["label" => "Relationship Status"]
      ]), ["class" => $cl, "name" => $a]
     ]);
    } elseif($a == "PFType") {
@@ -1204,19 +1230,6 @@
       "optgroup", $r, ["label" => "Content Status"]
      ]), ["class" => $cl, "name" => $a]
     ]);
-   } elseif($a == "oStatus") {
-    $hli = ["Online", "Offline"];
-    $opt = [1, 0];
-    foreach($opt as $opt) {
-     $s = ($opt == $y["Activity"]["OnlineStatus"]) ? " selected=\"selected\"" : "";
-     $r .= "<option value=\"$opt\"$s>".$hli[$i]."</option>\r\n";
-     $i++;
-    }
-    $r = $this->Element([
-     "select", $this->Element([
-      "optgroup", $r, ["label" => "Online Status"]
-     ]), ["class" => $cl, "name" => $a]
-    ]);
    } elseif($a == "PageCategory") {
     if($_HC == 1) {
      $hli = [
@@ -1338,19 +1351,6 @@
     $r = $this->Element([
      "select", $this->Element([
       "optgroup", $r, ["label" => "Album"]
-     ]), ["class" => $cl, "name" => $a]
-    ]);
-   } elseif($a == "rStatus") {
-    $hli = ["Single", "In a Relationship", "Engaged", "Married", "Divorced", "Widowed"];
-    $opt = ["Single", "In a Relationship", "Engaged", "Married", "Divorced", "Widowed"];
-    foreach($opt as &$opt) {
-     $s = ($c == md5($opt)) ? " selected=\"selected\"" : "";
-     $r .= "<option value=\"".md5($opt)."\"$s>".$hli[$i]."</option>\r\n";
-     $i++;
-    }
-    $r = $this->Element([
-     "select", $this->Element([
-      "optgroup", $r, ["label" => "Relationship Status"]
      ]), ["class" => $cl, "name" => $a]
     ]);
    }
