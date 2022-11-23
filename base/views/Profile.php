@@ -769,6 +769,8 @@
      $newMember["Blocked"][$key] = $y["Blocked"][$key] ?? [];
     } foreach($newMember["Login"] as $key => $value) {
      $newMember["Login"][$key] = $y["Login"][$key] ?? [];
+    } foreach($newMember["Shopping"] as $key => $value) {
+     $newMember["Shopping"][$key] = $y["Shopping"][$key] ?? [];
     } foreach($newMember["Subscriptions"] as $key => $value) {
      $active = $y["Subscriptions"][$key]["A"] ?? $value["A"];
      $begins = $y["Subscriptions"][$key]["B"] ?? $value["B"];
@@ -793,8 +795,6 @@
     $newMember["Privacy"]["LookMeUp"] = $data["Index"];
     $newMember["Privacy"]["NSFW"] = $data["nsfw"];
     $newMember["Rank"] = $y["Rank"];
-    $newMember["Shopping"]["Cart"] = $y["Shopping"]["Cart"];
-    $newMember["Shopping"]["History"] = $y["Shopping"]["History"];
     #$this->system->Data("Save", ["mbr", md5($you), $newMember]);
     $r = "Your Preferences were saved!<br/>".json_encode($newMember, true);
    }
