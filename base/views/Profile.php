@@ -738,11 +738,12 @@
     "UN",
     "email"
    ]);
+   $header = "Error";
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if(empty($data["Personal_DisplayName"])) {
     $r = "Your Display Name is missing.";
-   } elseif(empty($data["email"])) {
+   } elseif(empty($data["Personal_Email"])) {
     $r = "Your E-Mail is missing.";
    } elseif(md5($data["PIN"]) != $y["Login"]["PIN"]) {
     $r = "The PINs do not match.";
@@ -750,6 +751,7 @@
     $r = "You must be signed in to continue.";
    } else {
     $accessCode = "Accepted";
+    $header = "Done";
     $newMember = $this->system->NewMember(["Username" => $you]);
     $firstName = explode(" ", $data["name"])[0];
     foreach($data as $key => $value) {
@@ -775,6 +777,7 @@
      $newMember["Subscriptions"][$key]["B"] = $begins;
      $newMember["Subscriptions"][$key]["E"] = $ends;
     }
+    $newMember["Activity"]["Registered"] = $y["Activity"]["Registered"];
     $newMember["Blogs"] = $y["Blogs"] ?? [];
     $newMember["Forums"] = $y["Forums"] ?? [];
     $newMember["Pages"] = $y["Pages"] ?? [];
@@ -782,7 +785,10 @@
      "Month" => $data["BirthMonth"],
      "Year" => $data["BirthYear"]
     ];
+    $newMember["Personal"]["Age"] = date("Y") - $data["BirthYear"];
     $newMember["Personal"]["FirstName"] = $firstName;
+    $newMember["Personal"]["CoverPhoto"] = $y["Personal"]["CoverPhoto"];
+    $newMember["Personal"]["ProfilePicture"] = $y["Personal"]["ProfilePicture"];
     $newMember["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
     $newMember["Privacy"]["LookMeUp"] = $data["Index"];
     $newMember["Privacy"]["NSFW"] = $data["nsfw"];
@@ -790,21 +796,16 @@
     $newMember["Shopping"]["Cart"] = $y["Shopping"]["Cart"];
     $newMember["Shopping"]["History"] = $y["Shopping"]["History"];
     #$this->system->Data("Save", ["mbr", md5($you), $newMember]);
-    $r = "Your Preferences were saved!<br/>".json_encode([
-     "SampleMember" => $this->system->NewMember(["Username" => $you]),
-     "YourData" => $newMember
-    ], true);
-   } if($accessCode == "Denied") {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", $r]),
-     "Header" => "Error"
-    ]);
+    $r = "Your Preferences were saved!<br/>".json_encode($newMember, true);
    }
    return $this->system->JSONResponse([
     "AccessCode" => $accessCode,
     "Response" => [
      "JSON" => "",
-     "Web" => $r
+     "Web" => $this->system->Dialog([
+      "Body" => $this->system->Element(["p", $r]),
+      "Header" => $header
+     ])
     ],
     "ResponseType" => "Dialog",
     "Success" => "CloseDialog"

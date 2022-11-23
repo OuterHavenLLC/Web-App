@@ -1183,10 +1183,10 @@
      $r .= $this->Element([
       "div", $this->Element([
        "div",
-       "<input class=\"req\" name=\"gender\" type=\"radio\" value=\"$opt\"$s/>",
+       "<input class=\"req\" name=\"Personal_Gender\" type=\"radio\" value=\"$opt\"$s/>",
        ["class" => "Desktop25"]
       ]).$this->Element([
-       "div", "<p>".$hli[$i]."</p>", ["class" => "d75s"]
+       "div", "<p>".$hli[$i]."</p>", ["class" => "Desktop75s"]
       ]), ["class" => "Desktop50"]
      ]);
      $i++;

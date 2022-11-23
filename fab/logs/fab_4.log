@@ -1,28 +1,29 @@
-2022-11-17 05:38:48	ERROR	[DST 167.248.133.46:37076 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-11-17 05:38:48	ERROR	[SRC 167.248.133.46:38262 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-11-17 09:12:33	ERROR	[SRC 146.0.77.38:35002 sid=1] SHOUTcast 1 source connection denied. Empty password not allowed.
-2022-11-17 09:12:33	ERROR	[DST 146.0.77.38:38436 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-11-17 09:12:40	ERROR	[DST 146.0.77.38:41552 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:40	ERROR	[DST 146.0.77.38:41554 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)'
-2022-11-17 09:12:40	ERROR	[DST 146.0.77.38:41564 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:40	ERROR	[DST 146.0.77.38:41746 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)'
-2022-11-17 09:12:40	ERROR	[DST 146.0.77.38:41744 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:40	ERROR	[DST 146.0.77.38:41912 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:41	ERROR	[DST 146.0.77.38:42042 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:41	ERROR	[DST 146.0.77.38:42206 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:41	ERROR	[DST 146.0.77.38:42374 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:42	ERROR	[DST 146.0.77.38:42632 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:42	ERROR	[DST 146.0.77.38:42770 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `curl/7.54.0'
-2022-11-17 09:12:47	ERROR	[DST 146.0.77.38:45780 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Guayoyo - Mozilla/5.0 (compatible; vCenter)'
-2022-11-17 10:33:02	ERROR	[DST 24.199.95.72:51362 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-11-17 10:33:02	ERROR	[DST 24.199.95.72:51368 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
-2022-11-17 10:33:02	ERROR	[DST 24.199.95.72:51374 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
-2022-11-17 10:33:03	ERROR	[DST 24.199.95.72:51384 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
-2022-11-17 10:33:03	ERROR	[DST 24.199.95.72:51400 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
-2022-11-17 10:33:03	ERROR	[DST 24.199.95.72:51406 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
-2022-11-17 18:53:49	ERROR	[SRC 80.66.75.170:64811 sid=1] SHOUTcast 1 source connection denied. Bad password: æ
-2022-11-17 20:01:07	ERROR	[SRC 185.216.71.75:41450 sid=1] SHOUTcast 1 source connection denied. Empty password not allowed.
-2022-11-17 22:01:19	INFO	[MAIN] Exiting threads...
-2022-11-17 22:01:19	INFO	[BANDWIDTH] Total: 116817, Sent: 116817, Recv: 0
-2022-11-17 22:01:19	INFO	[MAIN] Shutdown after 15 days 3 hours 22 minutes 58 seconds running
-
+2022-11-17 22:04:04	WARN	[CONFIG] Ignoring streampath_1=http://outerhaven.nyc:8000 as this will produce an invalid path.
+2022-11-17 22:04:04	WARN	[CONFIG] Ignoring streampath_2=http://outerhaven.nyc:8000 as this will produce an invalid path.
+2022-11-17 22:04:04	INFO	*********************************************************************
+2022-11-17 22:04:04	INFO	**        SHOUTcast Distributed Network Audio Server (DNAS)        **
+2022-11-17 22:04:04	INFO	**    Copyright (C) 2014-2017 Radionomy SA, All Rights Reserved    **
+2022-11-17 22:04:04	INFO	*********************************************************************
+2022-11-17 22:04:04	INFO	[MAIN] SHOUTcast DNAS/posix(linux x64) v2.5.5.733 (Oct  9 2017)
+2022-11-17 22:04:04	INFO	[MAIN] PID: 1412
+2022-11-17 22:04:04	INFO	[MAIN] Saving log output to `/var/www/html/fab/logs/fab.log'
+2022-11-17 22:04:04	INFO	[MAIN] Automatic log rotation interval: 1 day
+2022-11-17 22:04:04	INFO	[MAIN] Loaded config from `/var/www/html/fab/fab.conf'
+2022-11-17 22:04:04	INFO	[MAIN] Calculated CPU count is 1 -> 2 CPUs specified to be used
+2022-11-17 22:04:04	INFO	[MAIN] Limited to 1024 file descriptors [relates to ulimit -n]
+2022-11-17 22:04:04	INFO	[MAIN] Starting 2 network threads
+2022-11-17 22:04:04	INFO	[MICROSERVER] Listening for source and client connections on port 8000
+2022-11-17 22:04:04	INFO	[MICROSERVER] Listening for legacy source connections on port 8001
+2022-11-17 22:04:04	INFO	[MICROSERVER] Flash policy file server not enabled
+2022-11-17 22:04:06	INFO	[BAN] No banned lists reloaded.
+2022-11-17 22:04:06	INFO	[RIP] No reserved lists reloaded.
+2022-11-17 22:04:06	INFO	[ADMINCGI] Reloaded admin access list.
+2022-11-17 22:04:06	INFO	[AGENT] No user agent lists reloaded.
+2022-11-17 22:06:16	ERROR	[SRC 192.241.206.16:58428 sid=1] SHOUTcast 1 source connection denied. Bad password: MGLNDD_174.138.58.184_8000
+2022-11-18 07:55:19	ERROR	[DST 154.26.136.165:57495 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Go-http-client/1.1'
+2022-11-18 07:55:20	ERROR	[DST 154.26.136.165:5836 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Go-http-client/1.1'
+2022-11-18 07:55:20	ERROR	[DST 154.26.136.165:33916 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Go-http-client/1.1'
+2022-11-18 11:26:09	ERROR	[DST 167.248.133.120:54582 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-11-18 11:26:09	ERROR	[SRC 167.248.133.120:54012 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-11-18 12:22:24	ERROR	[DST 185.224.128.15:38198 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 zgrab/0.x'
+2022-11-18 17:33:53	ERROR	[DST 198.235.24.164:60584 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
