@@ -674,6 +674,7 @@
      "class" => "CardButton dBO",
      "data-type" => "v=".base64_encode("Authentication:AuthorizeChange")."&Form=".base64_encode(".Preferences".md5($you))."&ID=".md5($you)."&Processor=".base64_encode("v=".base64_encode("Profile:Save"))."&Text=".base64_encode("Are you sure you want to update your preferences?")
     ]]);
+    $minimalDesign = $y["Personal"]["MinimalDesign"] ?? "";
     $relationshipWith = $y["Personal"]["RelationshipWith"] ?? "";
     $r = $this->system->Change([[
      "[Preferences.Donations.Patreon]" => $y["Donations"]["Patreon"],
@@ -696,7 +697,7 @@
      "[Preferences.Links.NewPassword]" => "v=".base64_encode("Profile:NewPassword"),
      "[Preferences.Links.NewPIN]" => "v=".base64_encode("Profile:NewPIN"),
      "[Preferences.Personal.AboutPage]" => $y["Personal"]["AboutPage"],
-     "[Preferences.Personal.MinimalDesign]" => $this->system->Select("Personal_MinimalDesign", "req", $y["Personal"]["MinimalDesign"]),
+     "[Preferences.Personal.MinimalDesign]" => $this->system->Select("Personal_MinimalDesign", "req", $minimalDesign),
      "[Preferences.Privacy.Albums]" => $this->system->Select("Privacy_Albums", "req v2w", $y["Privacy"]["Albums"]),
      "[Preferences.Privacy.Archive]" => $this->system->Select("Privacy_Archive", "req v2w", $y["Privacy"]["Archive"]),
      "[Preferences.Privacy.Articles]" => $this->system->Select("Privacy_Articles", "req v2w", $y["Privacy"]["Articles"]),
