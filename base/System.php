@@ -665,8 +665,10 @@
      "Email" => $email,
      "FirstName" => $firstName,
      "Gender" => $gender,
+     "MinimalDesign" => 0,
      "ProfilePicture" => $a["ProfilePicture"],
-     "RelationshipStatus" => $relationshipStatus
+     "RelationshipStatus" => $relationshipStatus,
+     "RelationshipWith" => ""
     ],
     "Points" => 1000,
     "Privacy" => [
@@ -1067,6 +1069,19 @@
     $r = $this->Element([
      "select", $this->Element([
       "optgroup", $r, ["label" => "Percent Off"]
+     ]), ["class" => $cl, "name" => $a]
+    ]);
+   } elseif($a == "Personal_MinimalDesign") {
+    $hli = ["Off", "On"];
+    $opt = [0, 1];
+    foreach($opt as &$opt) {
+     $s = ($c == md5($opt)) ? " selected=\"selected\"" : "";
+     $r .= "<option value=\"".md5($opt)."\"$s>".$hli[$i]."</option>\r\n";
+     $i++;
+    }
+    $r = $this->Element([
+     "select", $this->Element([
+      "optgroup", $r, ["label" => "Minimal Design"]
      ]), ["class" => $cl, "name" => $a]
     ]);
    } elseif($a == "Personal_RelationshipStatus") {

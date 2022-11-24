@@ -696,6 +696,7 @@
      "[Preferences.Links.NewPassword]" => "v=".base64_encode("Profile:NewPassword"),
      "[Preferences.Links.NewPIN]" => "v=".base64_encode("Profile:NewPIN"),
      "[Preferences.Personal.AboutPage]" => $y["Personal"]["AboutPage"],
+     "[Preferences.Personal.MinimalDesign]" => $this->system->Select("Personal_MinimalDesign", "req", $y["Personal"]["MinimalDesign"]),
      "[Preferences.Privacy.Albums]" => $this->system->Select("Privacy_Albums", "req v2w", $y["Privacy"]["Albums"]),
      "[Preferences.Privacy.Archive]" => $this->system->Select("Privacy_Archive", "req v2w", $y["Privacy"]["Archive"]),
      "[Preferences.Privacy.Articles]" => $this->system->Select("Privacy_Articles", "req v2w", $y["Privacy"]["Articles"]),
