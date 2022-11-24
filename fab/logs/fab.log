@@ -10,3 +10,5 @@
 2022-11-23 20:56:57	ERROR	[DST 146.190.111.115:55400 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
 2022-11-23 20:56:59	ERROR	[DST 146.190.111.115:42276 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
 2022-11-23 20:57:05	ERROR	[DST 146.190.111.115:42296 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
+2022-11-24 00:49:26	ERROR	[DST 167.248.133.46:58446 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-11-24 00:49:26	ERROR	[SRC 167.248.133.46:37708 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0

@@ -14,7 +14,7 @@
     header("Content-type: application/x-file-to-save");
     header("Content-Disposition: attachment; filename=". basename($filePath));
     ob_end_clean();
-    readfile($remoteURL):
+    readfile($remoteURL);
     exit;
    }
   }
