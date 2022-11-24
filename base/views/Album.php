@@ -97,7 +97,6 @@
    $ae = base64_encode("Album:Edit");
    $as = base64_encode("Album:Share");
    $bck = "";
-   $cr = base64_encode("Common:Reactions");
    $data = $a["Data"] ?? [];
    $fu = base64_encode("File:Upload");
    $lpg = $data["lPG"] ?? "";
@@ -141,10 +140,15 @@
     $ck = ($t["Login"]["Username"] == $you) ? 1 : 0;
     $ck2 = $y["subscr"]["XFS"]["A"] ?? 0;
     $ck2 = ($ck2 == 1 || $xfsUsage < $xfsLimit) ? 1 : 0;
-    $ico = $alb["ICO"] ?? "";
-    $ico = $this->system->GetSourceFromExtension([$t["Login"]["Username"], $ico]);
-    $nsfw = ($alb["NSFW"] == 1) ? "No" : "Yes";
-    $opt = ($ck == 0) ? $this->system->Element([
+    $coverPhoto = $alb["ICO"] ?? $this->system->PlainText([
+     "Data" => "[sIMG:CP]",
+     "Display" => 1
+    ]);
+    $coverPhoto = $this->system->GetSourceFromExtension([
+     $t["Login"]["Username"],
+     $coverPhoto
+    ]);
+    $actions = ($ck == 0) ? $this->system->Element([
      "button", $blt, [
       "class" => "BLK Small v2",
       "data-cmd" => base64_encode($blc),
@@ -152,35 +156,36 @@
      ]
     ]) : "";
     if($ck == 1) {
-     $opt .= ($ck2 == 1) ? $this->system->Element(["button", "Add Files", [
-      "class" => "Small dB2O v2",
-      "data-type" => base64_encode("v=$fu&AID=$id&UN=".$t["Login"]["Username"])
-     ]]) : "";
-     $opt .= ($id != md5("unsorted")) ? $this->system->Element([
+     $actions .= ($ck2 == 1) ? $this->system->Element([
+      "button", "Add Files", [
+       "class" => "Small dB2O v2",
+       "data-type" => base64_encode("v=$fu&AID=$id&UN=".$t["Login"]["Username"])
+      ]
+     ]) : "";
+     $actions .= ($id != md5("unsorted")) ? $this->system->Element([
       "button", "Delete Album", [
        "class" => "Small dBO dB2C v2 v2w",
        "data-type" => "v=$ad&AID=$id&UN=$tun"
       ]
      ]) : "";
-     $opt .= $this->system->Element(["button", "Edit Album", [
+     $actions .= $this->system->Element(["button", "Edit Album", [
       "class" => "Small dB2O v2 v2w",
       "data-type" => base64_encode("v=$ae&AID=$id&UN=$tun")
      ]]);
     }
-    $opt = ($this->system->ID != $you) ? $opt : "";
-    $reactions = ($ck == 0) ? $this->view($cr, ["Data" => [
+    $actions = ($this->system->ID != $you) ? $actions : "";
+    $reactions = ($ck == 0) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
      "CRID" => $id,
      "T" => $t["Login"]["Username"],
      "Type" => 4
     ]]) : "";
     $r = $this->system->Change([[
-     "[Album.CoverPhoto]" => $ico,
+     "[Album.Actions]" => $actions,
+     "[Album.CoverPhoto]" => $coverPhoto,
      "[Album.Created]" => $this->system->TimeAgo($alb["Created"]),
      "[Album.Description]" => $alb["Description"],
      "[Album.Modified]" => $this->system->TimeAgo($alb["Modified"]),
      "[Album.Illegal]" => base64_encode("v=".base64_encode("Common:Illegal")."&ID=".base64_encode("Album;".$t["Login"]["Username"].";$id")),
-     "[Album.NSFW]" => $nsfw,
-     "[Album.Options]" => $opt,
      "[Album.Owner]" => $t["Personal"]["DisplayName"],
      "[Album.Reactions]" => $reactions,
      "[Album.Share]" => base64_encode("v=$as&ID=$id&UN=$tun"),
