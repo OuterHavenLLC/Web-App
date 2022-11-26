@@ -42,7 +42,7 @@
      "fs"
     ]) : $fs["Files"];
     $dlc = $efs[$id];
-    $nsfw = $dlc["NSFW"] ?? $y["privacy_opt"]["NSFW"];
+    $nsfw = $dlc["NSFW"] ?? $y["Privacy"]["NSFW"];
     $pri = $dlc["Privacy"];
     $fr = $this->system->Change([[
      "[File.Description]" => $dlc["Description"],
@@ -647,14 +647,15 @@
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    } elseif(!empty($id)) {
+    $_HC = ($y["Rank"] == md5("High Command")) ? 1 : 0;
     $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
     $id = $id ?? md5("unsorted");
     $efs = $fs["Files"] ?? [];
     $xfsLimit = $this->system->core["XFS"]["limits"]["Total"] ?? 0;
     $xfsLimit = $xfsLimit."MB";
     $xfsUsage = 0;
-    foreach($fs["Files"] as $k => $v) {
-     $xfsUsage = $xfsUsage + $v["Size"];
+    foreach($fs["Files"] as $key => $value) {
+     $xfsUsage = $xfsUsage + $value["Size"];
     }
     $xfsUsage = $this->system->ByteNotation($xfsUsage)."MB";
     $limit = $this->system->Change([["MB" => "", "," => ""], $xfsLimit]);
@@ -663,41 +664,43 @@
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage, and exceeded the limit of $xfsLimit."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-    $un = $data["UN"] ?? $y["Login"]["Username"];
-    if(!empty($id) && !empty($un) && $usage < $limit) {
+    $un = $data["UN"] ?? $you;
+    $uploadsAllowed = ($usage < $limit) ? 1 : 0;
+    $uploadsAllowed = $y["Subscriptions"]["XFS"]["A"] ?? $uploadsAllowed;
+    #$uploadsAllowed = ($_HC == 1) ? 1 : $uploadsAllowed;
+    if(!empty($id) && !empty($un) && $uploadsAllowed == 1) {
      $t = ($un != $you) ? $this->system->Member($un) : $y;
-     $fs = $this->system->Data("Get", ["fs", md5($t["UN"])]) ?? [];
-     $ck = ($t["Login"]["Username"] == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
-     $ck2 = ($t["Login"]["Username"] == $y["Login"]["Username"]) ? 1 : 0;
-     $limit = ($ck == 1 || $y["subscr"]["Artist"]["A"] == 1) ? "You do not have a cumulative upload limit" : "Your cumulative file upload limit is $xfsLimit";
+     $fs = $this->system->Data("Get", [
+      "fs",
+      md5($t["Login"]["Username"])
+     ]) ?? [];
+     $ck = ($_HC == 1 && $t["Login"]["Username"] == $this->system->ID) ? 1 : 0;
+     $ck2 = ($t["Login"]["Username"] == $you) ? 1 : 0;
+     $limit = ($ck == 1 || $y["Subscriptions"]["Artist"]["A"] == 1) ? "You do not have a cumulative upload limit" : "Your cumulative file upload limit is $xfsLimit";
      if($ck == 1 || $ck2 == 1) {
       $opt = "<input name=\"UN\" type=\"hidden\" value=\"".$t["Login"]["Username"]."\"/>\r\n";
       if($ck == 1) {
-       $ttl = "System Library";
        $opt .= "<input id=\"AID\" name=\"AID\" type=\"hidden\" value=\"".md5("unsorted")."\"/>\r\n";
        $opt .= "<input id=\"nsfw\" name=\"nsfw\" type=\"hidden\" value=\"0\"/>\r\n";
        $opt .= "<input id=\"pri\" name=\"pri\" type=\"hidden\" value=\"".md5("public")."\"/>\r\n";
+       $title = "System Library";
       } elseif($ck2 == 1) {
-       $ttl = $fs["Albums"][$id]["Title"] ?? "Unsorted";
        $opt .= "<input name=\"AID\" type=\"hidden\" value=\"$id\"/>\r\n";
        $opt .= $this->system->Element([
-        "div", $this->system->Select("Privacy", "req v2w", $y["privacy_opt"]["Posts"]),
+        "div", $this->system->Select("Privacy", "req v2w", $y["Privacy"]["Posts"]),
         ["class" => "Desktop50"]
        ]).$this->system->Element([
-        "div", $this->system->Select("nsfw", "req v2w", $y["privacy_opt"]["NSFW"]),
+        "div", $this->system->Select("nsfw", "req v2w", $y["Privacy"]["NSFW"]),
         ["class" => "Desktop50"]
        ]);
+       $title = $fs["Albums"][$id]["Title"] ?? "Unsorted";
       }
-      $fr = $this->system->Change([[
+      $r = $this->system->Change([[
        "[Upload.Limit]" => $limit,
        "[Upload.Options]" => $opt,
-       "[Upload.Title]" => $ttl
+       "[Upload.Title]" => $title,
+       "[Upload.Upload]" => base64_encode("v=".base64_encode("File:SaveUpload"))
       ], $this->system->Page("bf6bb3ddf61497a81485d5eded18e5f8")]);
-      $button = $this->system->Element(["button", "Upload", [
-       "class" => "BBB v2",
-       "data-form" => "#FU",
-       "data-processor" => base64_encode("v=".base64_encode("File:SaveUpload"))
-      ]]);
      } else {
       $r = $this->system->Change([[
        "[Error.Header]" => "Forbidden",
@@ -706,7 +709,7 @@
      }
     }
    }
-   return $r;
+   return $back.$r;
   }
   function __destruct() {
    // DESTROYS THIS CLASS

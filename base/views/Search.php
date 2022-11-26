@@ -314,11 +314,11 @@
      $lis = "Search $h";
      $uf = ($ck == 1) ? "You have unlimited storage." : "You used $xfsUsage out of $xfsLimit.";
      $ck = ($ck == 1 || $usage < $limit) ? 1 : 0;
-     if(($ck == 1 && $un == $y["Login"]["Username"]) || $ck2 == 1) {
+     if(($ck == 1 && $un == $you) || $ck2 == 1) {
       $lo = $this->system->Change([[
        "[Album.Description]" => $de,
        "[Album.Owner]" => $display,
-       "[Album.ULDT]" => ".$lpp;$lpg;".base64_encode("v=".base64_encode("File:Upload")."&AID=$aid&UN=".$t["Login"]["Username"]),
+       "[Album.ULDT]" => ".$lpp;$lpg;".base64_encode("v=".base64_encode("File:Upload")."&AID=$aid&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg&lPP=$lpp"),
        "[Album.XFSstats]" => $uf
       ], $this->system->Page("b9e1459dc1c687cebdaa9aade72c50a9")]);
      } else {

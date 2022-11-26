@@ -38,7 +38,7 @@
   # MAINTANANCE STATUS
   $r = $gw->system->core[$c[0]];
  } elseif($api == "Web") {
-  if($view == base64_encode("File:Upload")) {
+  if($view == base64_encode("File:SaveUpload")) {
    $r = $gw->view($view, [
     "Data" => $data,
     "Files" => $_FILES["file"]
