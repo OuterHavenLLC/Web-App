@@ -285,22 +285,17 @@
      $tpl = "8568ac7727dae51ee4d96334fa891395";
     } elseif($st == "MBR-XFS") {
      $aid = $data["AID"] ?? md5("unsorted");
-     $fs = $this->system->Data("Get", [
-      "fs",
-      md5($y["Login"]["Username"])
-     ]);
+     $fs = $this->system->Data("Get", ["fs", md5($you)]);
      $xfsLimit = $this->system->core["XFS"]["limits"]["Total"] ?? 0;
      $xfsLimit = $xfsLimit."MB";
      $xfsUsage = 0;
-     foreach($fs["Files"] as $k => $v) {
-      $xfsUsage = $xfsUsage + $v["Size"];
+     foreach($fs["Files"] as $key => $value) {
+      $xfsUsage = $xfsUsage + $value["Size"];
      }
      $xfsUsage = $this->system->ByteNotation($xfsUsage)."MB";
      $limit = $this->system->Change([["MB" => "", "," => ""], $xfsLimit]);
      $usage = $this->system->Change([["MB" => "", "," => ""], $xfsUsage]);
      $aid = $data["AID"] ?? md5("unsorted");
-     $fd = base64_encode("Authentication:DeleteFile");
-     $fu = base64_encode("File:Upload");
      $un = $data["UN"] ?? base64_encode($you);
      $un = base64_decode($un);
      $t = ($un == $you) ? $y : $this->system->Member($un);
@@ -315,7 +310,7 @@
      $de = $alb["Description"] ?? "";
      $display = ($t["Personal"]["DisplayName"] == $this->system->ID) ? "Anonymous" : $t["Personal"]["DisplayName"];
      $h = $alb["Title"] ?? "Unsorted";
-     $li .= "&AID=$aid&UN=".base64_encode($t["Login"]["Username"]);
+     $li .= "&AID=$aid&UN=".base64_encode($t["Login"]["Username"])."&lPP=$lpp&lPG=$lpg";
      $lis = "Search $h";
      $uf = ($ck == 1) ? "You have unlimited storage." : "You used $xfsUsage out of $xfsLimit.";
      $ck = ($ck == 1 || $usage < $limit) ? 1 : 0;
@@ -323,8 +318,7 @@
       $lo = $this->system->Change([[
        "[Album.Description]" => $de,
        "[Album.Owner]" => $display,
-       "[Album.EADT]" => "v=$fd&AID=$aid&UN=".base64_encode($t["Login"]["Username"])."&all=1",
-       "[Album.ULDT]" => base64_encode("v=$fu&AID=$aid&UN=".$t["Login"]["Username"]),
+       "[Album.ULDT]" => ".$lpp;$lpg;".base64_encode("v=".base64_encode("File:Upload")."&AID=$aid&UN=".$t["Login"]["Username"]),
        "[Album.XFSstats]" => $uf
       ], $this->system->Page("b9e1459dc1c687cebdaa9aade72c50a9")]);
      } else {
@@ -412,6 +406,7 @@
       "BBCodes" => 1,
       "Data" => "[sIMG:CPW]"
      ]),
+     "[Search.Type]" => $st,
      "[UI.LIT]" => $lit,
      "[UI.LIU]" => $li,
      "[UI.header]" => $h,
@@ -1765,22 +1760,21 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
      $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
     } else {
      $efs = $fs["Files"] ?? [];
-    } foreach($efs as $k => $v) {
-     $bl = $this->system->CheckBlocked([$y, "Files", $v["ID"]]);
-     $illegal = $v["Illegal"] ?? 0;
+    } foreach($efs as $key => $value) {
+     $bl = $this->system->CheckBlocked([$y, "Files", $value["ID"]]);
+     $illegal = $value["Illegal"] ?? 0;
      $illegal = ($illegal >= $this->illegal) ? 1 : 0;
-     if($aid == $v["AID"] && $bl == 0 && $illegal == 0) {
-      $fv = base64_encode("File:Home");
-      $fv = "v=$fv&ID=".$v["ID"]."&UN=".$t["Login"]["Username"];
-      $src = $v ?? "";
+     if($aid == $value["AID"] && $bl == 0 && $illegal == 0) {
+      $src = $value ?? "";
       $src = $this->system->GetSourceFromExtension([
-       $t["Login"]["Username"], $src
+       $t["Login"]["Username"],
+       $src
       ]);
-      $type = ($i % 2 == 0 || $i % 3 == 0) ? "Desktop33" : "Desktop66";
+      $type = ($i % 2 == 0 || $i % 3 == 0) ? "Desktop66" : "Desktop33";
       array_push($msg, [
-       "[X.LI.DT]" => base64_encode(base64_encode($fv)),
+       "[X.LI.DT]" => base64_encode(".$lpp;$lpg;".base64_encode("v=".base64_encode("File:Home")."&ID=".$value["ID"]."&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg&lPP=$lpp")),
        "[X.LI.Style]" => base64_encode("background:url('$src')"),
-       "[X.LI.Title]" => base64_encode($v["Title"]),
+       "[X.LI.Title]" => base64_encode($value["Title"]),
        "[X.LI.Type]" => base64_encode($type)
       ]);
       $i++;

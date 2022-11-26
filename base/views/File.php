@@ -71,14 +71,28 @@
    $con = base64_encode("Conversation:Home");
    $cr = base64_encode("Common:Reactions");
    $data = $a["Data"] ?? [];
-   $data = $this->system->FixMissing($data, ["AddTo", "Added", "ID", "UN"]);
+   $data = $this->system->FixMissing($data, [
+    "AddTo",
+    "Added",
+    "ID",
+    "UN",
+    "back",
+    "lPG",
+    "lPP"
+   ]);
    $at = $data["AddTo"] ?? "";
    $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
+   $back = ($data["back"] == 1) ? $this->system->Element([
+    "button", "Back to Files", [
+     "class" => "GoToParent LI",
+     "data-type" => ".".$data["lPP"].";".$data["lPG"]
+    ]
+   ]) : "";
    $id = $data["ID"] ?? "";
    $y = $this->you;
    $you = $y["Login"]["Username"];
-   $un = $data["UN"] ?? $y["Login"]["Username"];
-   $t = ($un == $y["Login"]["Username"]) ? $y : $this->system->Member($un);
+   $un = $data["UN"] ?? $you;
+   $t = ($un == $you) ? $y : $this->system->Member($un);
    $fs = $this->system->Data("Get", [
     "fs",
     md5($t["Login"]["Username"])
@@ -86,13 +100,13 @@
    $atf = base64_encode($t["Login"]["Username"]."-".$id);
    $dm = base64_encode(json_encode([
     "t" => $un,
-    "y" => $y["Login"]["Username"]
+    "y" => $you
    ]));
-   $efs = ($un == $this->system->ID) ? $this->system->Data("Get", [
+   $efs = ($this->system->ID == $un) ? $this->system->Data("Get", [
     "x",
     "fs"
    ]) : $fs["Files"];
-   $fr = $this->system->Change([[
+   $r = $this->system->Change([[
     "[Error.Header]" => "Not Found",
     "[Error.Message]" => "The File <em>$id</em> could not be located."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
@@ -105,27 +119,22 @@
      "data-m" => $dm
     ]]) : "";
     $bl = $this->system->CheckBlocked([$y, "Files", $id]);
-    $blc = ($bl == 0) ? "B" : "U";
-    $blt = ($bl == 0) ? "Block" : "Unblock";
-    $blt .= " this File";
     $ck = ($un == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
     $dlc = $efs[$id] ?? [];
     $fck = $this->system->CheckFileType([$dlc["EXT"], "Photo"]);
-    $fd = base64_encode("Authentication:DeleteFile");
     $fd = ($ck == 1 || $un == $y["Login"]["Username"]) ? $this->system->Element([
      "button", "Delete", [
       "class" => "LI dBO",
-      "data-type" => "v=$fd&ID=$id&UN=".base64_encode($un)
+      "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($un)
      ]
     ]) : "";
-    $fe = base64_encode("File:Edit");
-    $fe = ($ck == 1 || $un == $y["Login"]["Username"]) ? $this->system->Element([
+    $fe = ($ck == 1 || $un == $you) ? $this->system->Element([
      "button", "Edit", [
       "class" => "LI dB2O",
-      "data-type" => base64_encode("v=$fe&ID=".base64_encode($id)."&UN=".base64_encode($un))
+      "data-type" => base64_encode("v=".base64_encode("File:Edit")."&ID=".base64_encode($id)."&UN=".base64_encode($un))
      ]
     ]) : "";
-    $nsfw = $dlc["NSFW"] ?? $y["privacy_opt"]["NSFW"];
+    $nsfw = $dlc["NSFW"] ?? $y["Privacy"]["NSFW"];
     $opt = "";
     if($nsfw == 0 && $fck == 1) {
      $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
@@ -136,32 +145,31 @@
      list($isw, $ish) = getimagesize($isrc);
      $is = ($ish <= ($isw / 1.5) || $ish == $isw) ? 1 : 0;
      $cp = ($ish <= ($isw / 1.5)) ? "Cover Photo" : "Profile Picture";
-     $spi = base64_encode("File:SaveProfileImage");
      $type = ($ish <= ($isw / 1.5)) ? "CoverPhoto" : "ProfilePicture";
      $type = base64_encode($type);
      $opt .= ($is == 1) ? $this->system->Element(["button", "Set as Your $cp", [
       "class" => "Disable LI dBO",
-      "data-type" => "v=$spi&DLC=$atf&FT=$type"
+      "data-type" => "v=".base64_encode("File:SaveProfileImage")."&DLC=$atf&FT=$type"
      ]]) : "";
     }
-    $bck = $this->system->Change([[
-     "[Conversation.CRID]" => $id,
-     "[Conversation.CRIDE]" => base64_encode($id),
-     "[Conversation.Level]" => base64_encode(1),
-     "[Conversation.URL]" => base64_encode("v=$con&CRID=[CRID]&LVL=[LVL]")
-    ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]);
-    $bl = base64_encode("Common:SaveBlacklist");
-    $bl = ($un != $y["Login"]["Username"]) ? $this->system->Element([
-     "button", $blt, [
+    $bl = ($un != $you) ? $this->system->Element([
+     "button", "Block this File", [
       "class" => "BLK LI",
-      "data-cmd" => base64_encode($blc),
-      "data-u" => base64_encode("v=$bl&BU=".base64_encode("this File")."&content=".base64_encode($id)."&list=".base64_encode("Files")."&BC=")
+      "data-cmd" => base64_encode("B"),
+      "data-u" => base64_encode("v=".base64_encode("Common:SaveBlacklist")."&BU=".base64_encode("this File")."&content=".base64_encode($id)."&list=".base64_encode("Files")."&BC=")
      ]
     ]) : "";
     $bl = ($this->system->ID != $you) ? $bl : "";
-    $fr = $this->system->Change([[
+    $r = $this->system->Change([[
      "[File.AddTo]" => $at,
+     "[File.Back]" => $back,
      "[File.Block]" => $bl,
+     "[File.Conversation]" => $this->system->Change([[
+      "[Conversation.CRID]" => $id,
+      "[Conversation.CRIDE]" => base64_encode($id),
+      "[Conversation.Level]" => base64_encode(1),
+      "[Conversation.URL]" => base64_encode("v=$con&CRID=[CRID]&LVL=[LVL]")
+     ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]),
      "[File.Delete]" => $fd,
      "[File.Description]" => $dlc["Description"],
      "[File.Edit]" => $fe,
@@ -175,10 +183,11 @@
      "[File.Preview]" => $this->system->AttachmentPreview([
       "DLL" => $dlc,
       "T" => $un,
-      "Y" => $y["Login"]["Username"]
-     ]).$this->system->Element([
-      "div", NULL, ["class" => "NONAME", "style" => "height:0.5em"]
-     ]),
+      "Y" => $you
+     ]).$this->system->Element(["div", NULL, [
+      "class" => "NONAME",
+      "style" => "height:0.5em"
+     ]]),
      "[File.Reactions]" => $this->view($cr, ["Data" => [
       "CRID" => $id,
       "T" => $t["Login"]["Username"],
@@ -191,7 +200,7 @@
      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
     ], $this->system->Page("c31701a05a48069702cd7590d31ebd63")]);
    }
-   return $this->system->Card(["Back" => $bck, "Front" => $fr]);
+   return $back.$r;
   }
   function Save(array $a) {
    $data = $a["Data"] ?? [];
@@ -617,20 +626,28 @@
   }
   function Upload(array $a) {
    $data = $a["Data"] ?? [];
-   $data = $this->system->FixMissing($data, ["AID", "UN"]);
-   $frbtn = "";
+   $data = $this->system->FixMissing($data, [
+    "AID",
+    "UN",
+    "lPG",
+    "lPP"
+   ]);
+   $back = ($data["back"] == 1) ? $this->system->Element([
+    "button", "Back to Files", [
+     "class" => "GoToParent LI",
+     "data-type" => ".".$data["lPP"].";".$data["lPG"]
+    ]
+   ]) : "";
    $id = $data["AID"];
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $fr = $this->system->Change([[
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    } elseif(!empty($id)) {
-    $fs = $this->system->Data("Get", [
-     "fs",
-     md5($y["Login"]["Username"])
-    ]) ?? [];
+    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
     $id = $id ?? md5("unsorted");
     $efs = $fs["Files"] ?? [];
     $xfsLimit = $this->system->core["XFS"]["limits"]["Total"] ?? 0;
@@ -642,14 +659,13 @@
     $xfsUsage = $this->system->ByteNotation($xfsUsage)."MB";
     $limit = $this->system->Change([["MB" => "", "," => ""], $xfsLimit]);
     $usage = $this->system->Change([["MB" => "", "," => ""], $xfsUsage]);
-    $fr = $this->system->Change([[
+    $r = $this->system->Change([[
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage, and exceeded the limit of $xfsLimit."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-    $frbtn = "";
     $un = $data["UN"] ?? $y["Login"]["Username"];
     if(!empty($id) && !empty($un) && $usage < $limit) {
-     $t = ($un != $y["Login"]["Username"]) ? $this->system->Member($un) : $y;
+     $t = ($un != $you) ? $this->system->Member($un) : $y;
      $fs = $this->system->Data("Get", ["fs", md5($t["UN"])]) ?? [];
      $ck = ($t["Login"]["Username"] == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
      $ck2 = ($t["Login"]["Username"] == $y["Login"]["Username"]) ? 1 : 0;
@@ -677,20 +693,20 @@
        "[Upload.Options]" => $opt,
        "[Upload.Title]" => $ttl
       ], $this->system->Page("bf6bb3ddf61497a81485d5eded18e5f8")]);
-      $frbtn = $this->system->Element(["button", "Upload", [
+      $button = $this->system->Element(["button", "Upload", [
        "class" => "BBB v2",
        "data-form" => "#FU",
        "data-processor" => base64_encode("v=".base64_encode("File:SaveUpload"))
       ]]);
      } else {
-      $fr = $this->system->Change([[
+      $r = $this->system->Change([[
        "[Error.Header]" => "Forbidden",
        "[Error.Message]" => "You do not have permission to upload files to ".$t["Personal"]["DisplayName"]."'s Library."
       ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
      }
     }
    }
-   return $this->system->Card(["Front" => $fr, "FrontButton" => $frbtn]);
+   return $r;
   }
   function __destruct() {
    // DESTROYS THIS CLASS
