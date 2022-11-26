@@ -14,7 +14,7 @@
    $i = 0;
    $st = $data["st"] ?? "";
    $lpg = $data["lPG"] ?? $st;
-   $lpp = $data["lPP"] ?? "OHCC";
+   $lpp = "Search$st";
    $pub = $data["pub"] ?? 0;
    $query = $data["query"] ?? "";
    $sl = $this->lists;
@@ -419,12 +419,7 @@
      "[UI.s]" => $lis,
      "[XS.UI]" => $li
     ], $this->system->Page($tpl)]);
-    if($st == "XFS") {
-     $r .= $this->system->Change([[
-      "[Search.Upload]" => base64_encode("v=".base64_encode("File:Upload")."&AID=".md5("unsorted")."&UN=".$y["Login"]["Username"])
-     ], $this->system->Page("f628271f6ec933fe08d62f9a79ecf295")]);
-    }
-   } if(in_array($st, ["DC", "FAB", "MBR-MiNY", "XFS"])) {
+   } if(in_array($st, ["DC", "FAB", "MBR-MiNY"])) {
     $r = $this->system->Card(["Front" => $r]);
    } else {
     $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [

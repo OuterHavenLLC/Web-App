@@ -200,20 +200,28 @@
    ]);
   }
   function Save(array $a) {
+   $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
    $data = $this->system->FixMissing($data, [
-    "AID", "Title", "new", "nsfw", "pri"
+    "AID",
+    "Title",
+    "new",
+    "nsfw",
+    "pri"
    ]);
-   $ec = "Denied";
    $id = $data["AID"];
    $new = $data["new"] ?? 0;
+   $now = $this->system->timestamp;
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Album Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Album Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -221,37 +229,42 @@
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
-    $ec = "Accepted";
+    $accessCode = "Accepted";
     $actionTaken = ($new == 1) ? "saved" : "updated";
-    $fs = $this->system->Data("Get", [
-     "fs",
-     md5($y["Login"]["Username"])
-    ]) ?? [];
+    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
     $efs = $fs["Albums"] ?? [];
-    $cr = $efs[$id]["Created"] ?? $this->system->timestamp;
-    $ico = $efs[$id]["ICO"] ?? "";
+    $created = $efs[$id]["Created"] ?? $now;
+    $coverPhoto = $efs[$id]["ICO"] ?? "";
     $illegal = $efs[$id]["Illegal"] ?? 0;
     $nsfw = $data["nsfw"] ?? $y["privacy_opt"]["NSFW"];
-    $pri = $data["pri"] ?? $y["privacy_opt"]["Albums"];
+    $privacy = $data["pri"] ?? $y["privacy_opt"]["Albums"];
     $efs[$id] = [
-     "Created" => $cr,
+     "Created" => $created,
      "Description" => $data["Description"],
-     "ICO" => $ico,
+     "ICO" => $coverPhoto,
      "ID" => $id,
      "Illegal" => $illegal,
-     "Modified" => $this->system->timestamp,
+     "Modified" => $now,
      "NSFW" => $nsfw,
-     "Privacy" => $pri,
+     "Privacy" => $privacy,
      "Title" => $data["Title"]
     ];
     $fs["Albums"] = $efs;
+    #$this->system->Data("Save", ["fs", md5($you), $fs]);
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The Album was $actionTaken."]),
+     "Body" => $this->system->Element(["p", "The Album was $actionTaken.<br/>".json_encode($efs, true)]),
      "Header" => "Done"
     ]);
-    #$this->system->Data("Save", ["fs", md5($y["Login"]["Username"]), $fs]);
    }
-   return $this->system->JSONResponse([$ec, $r]);
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => "",
+     "Web" => $r
+    ],
+    "ResponseType" => "Dialog",
+    "Success" => "CloseCard"
+   ]);
   }
   function SaveDelete(array $a) {
    $data = $a["Data"] ?? [];
