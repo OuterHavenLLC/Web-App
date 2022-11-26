@@ -266,8 +266,9 @@
    $data = $this->system->DecodeBridgeData($data);
    $ec = "Denied";
    $y = $this->you;
+   $you = $y["Login"]["Username"];
    $id = $data["AID"] ?? md5("unsorted");
-   $un = $data["UN"] ?? $y["Login"]["Username"];
+   $un = $data["UN"] ?? $you;
    $fs = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
    $efs = $fs["Files"] ?? [];
    $efs = ($un == $this->system->ID) ? $this->system->Data("Get", [
@@ -276,10 +277,17 @@
    ]) : $efs;
    $id = $data["ID"] ?? "";
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The File Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The File Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
-   if($y["Login"]["Username"] == $this->system->ID) {
+   if(md5($data["PIN"]) != $y["Login"]["PIN"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The PINs do not match."]),
+     "Header" => "Error"
+    ]);
+   } elseif($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -288,10 +296,7 @@
     ]);
    } elseif(!empty($id) && !empty($un)) {
     $ec = "Accepted";
-    $fs = $this->system->Data("Get", [
-     "fs",
-     md5($y["Login"]["Username"])
-    ]) ?? [];
+    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
     $efs2 = [];
     $efsa = $fs["Albums"] ?? [];
     $pts = $this->system->core["PTS"]["DeleteFile"];
@@ -317,7 +322,7 @@
        ftp_chdir($p2p_domain, $mbr);
        $list = ftp_nlist($p2p_domain, ".");
        if(in_array($v["Name"], $list)) {
-        if($efsa[$id]["ICO"] == $v["Name"] && $un == $y["Login"]["Username"]) {
+        if($efsa[$id]["ICO"] == $v["Name"] && $un == $you) {
          $efsa[$id]["ICO"] = "";
         }
         $this->view(base64_encode("Conversation:SaveDelete"), [
@@ -335,8 +340,8 @@
      $y["Points"] = $y["Points"] + $pts;
      $fs["Albums"] = $efsa;
      $fs["Files"] = $efs2;
-     $this->system->Data("Save", ["fs", md5($y["Login"]["Username"]), $fs]);
-     $this->system->Data("Save", ["mbr", md5($y["Login"]["Username"]), $y]);
+     $this->system->Data("Save", ["fs", md5($you), $fs]);
+     $this->system->Data("Save", ["mbr", md5($you), $y]);
     }
     $r = $this->system->Dialog([
      "Body" => $this->system->Element(["p", "The File was deleted."]),
