@@ -676,8 +676,12 @@
      ]) ?? [];
      $ck = ($_HC == 1 && $t["Login"]["Username"] == $this->system->ID) ? 1 : 0;
      $ck2 = ($t["Login"]["Username"] == $you) ? 1 : 0;
-     $limit = ($ck == 1 || $y["Subscriptions"]["Artist"]["A"] == 1) ? "You do not have a cumulative upload limit" : "Your cumulative file upload limit is $xfsLimit";
+     $r = $this->system->Change([[
+      "[Error.Header]" => "Forbidden",
+      "[Error.Message]" => "You do not have permission to upload files to ".$t["Personal"]["DisplayName"]."'s Library."
+     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
      if($ck == 1 || $ck2 == 1) {
+      $limit = ($ck == 1 || $y["Subscriptions"]["Artist"]["A"] == 1) ? "You do not have a cumulative upload limit" : "Your cumulative file upload limit is $xfsLimit";
       $opt = "<input name=\"UN\" type=\"hidden\" value=\"".$t["Login"]["Username"]."\"/>\r\n";
       if($ck == 1) {
        $opt .= "<input id=\"AID\" name=\"AID\" type=\"hidden\" value=\"".md5("unsorted")."\"/>\r\n";
@@ -701,11 +705,6 @@
        "[Upload.Title]" => $title,
        "[Upload.Upload]" => base64_encode("v=".base64_encode("File:SaveUpload"))
       ], $this->system->Page("bf6bb3ddf61497a81485d5eded18e5f8")]);
-     } else {
-      $r = $this->system->Change([[
-       "[Error.Header]" => "Forbidden",
-       "[Error.Message]" => "You do not have permission to upload files to ".$t["Personal"]["DisplayName"]."'s Library."
-      ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
      }
     }
    }
