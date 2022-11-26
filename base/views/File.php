@@ -66,22 +66,17 @@
    ]);
   }
   function Home(array $a) {
-   $base = $this->system->efs;
-   $blu = base64_encode("Common:Blacklist");
-   $con = base64_encode("Conversation:Home");
-   $cr = base64_encode("Common:Reactions");
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, [
     "AddTo",
     "Added",
+    "CARD",
     "ID",
     "UN",
     "back",
     "lPG",
     "lPP"
    ]);
-   $at = $data["AddTo"] ?? "";
-   $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
    $back = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to Files", [
      "class" => "GoToParent LI",
@@ -112,6 +107,8 @@
     "[Error.Message]" => "The File <em>$id</em> could not be located."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    if(!empty($efs[$id])) {
+    $at = $data["AddTo"] ?? "";
+    $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
     $at = (!empty($at[1])) ? $this->system->Element(["button", $at[0], [
      "class" => "AddTo LI",
      "data-a" => $atf,
@@ -119,6 +116,7 @@
      "data-f" => base64_encode($at[1]),
      "data-m" => $dm
     ]]) : "";
+    $base = $this->system->efs;
     $bl = $this->system->CheckBlocked([$y, "Files", $id]);
     $ck = ($un == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
     $dlc = $efs[$id] ?? [];
@@ -161,6 +159,11 @@
      ]
     ]) : "";
     $bl = ($this->system->ID != $you) ? $bl : "";
+    $reactions = ($un != $you) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
+     "CRID" => $id,
+     "T" => $t["Login"]["Username"],
+     "Type" => 2
+    ]]) : "";
     $r = $this->system->Change([[
      "[File.AddTo]" => $at,
      "[File.Back]" => $back,
@@ -169,7 +172,7 @@
       "[Conversation.CRID]" => $id,
       "[Conversation.CRIDE]" => base64_encode($id),
       "[Conversation.Level]" => base64_encode(1),
-      "[Conversation.URL]" => base64_encode("v=$con&CRID=[CRID]&LVL=[LVL]")
+      "[Conversation.URL]" => base64_encode("v=".base64_encode("Conversation:Home")."&CRID=[CRID]&LVL=[LVL]")
      ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]),
      "[File.Delete]" => $fd,
      "[File.Description]" => $dlc["Description"],
@@ -189,11 +192,7 @@
       "class" => "NONAME",
       "style" => "height:0.5em"
      ]]),
-     "[File.Reactions]" => $this->view($cr, ["Data" => [
-      "CRID" => $id,
-      "T" => $t["Login"]["Username"],
-      "Type" => 2
-     ]]),
+     "[File.Reactions]" => $reactions,
      "[File.Share]" => base64_encode("v=".base64_encode("File:Share")."&ID=".base64_encode($id)."&UN=".base64_encode($t["Login"]["Username"])),
      "[File.Source]" => $base.$t["Login"]["Username"]."/".$dlc["Name"],
      "[File.Title]" => $dlc["Title"],
@@ -201,9 +200,11 @@
      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
     ], $this->system->Page("c31701a05a48069702cd7590d31ebd63")]);
    }
+   $r = ($data["back"] == 1) ? $back.$r : $r;
+   $r = ($data["CARD"] == 1) ? $this->system->Card(["Front" => $r]) : $r;
    $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
     "Data" => ["Content" => $r]
-   ]) : $back.$r;
+   ]) : $r;
    return $r;
   }
   function Save(array $a) {
