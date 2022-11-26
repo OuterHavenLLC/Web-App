@@ -106,6 +106,7 @@
     "x",
     "fs"
    ]) : $fs["Files"];
+   $pub = $data["pub"] ?? 0;
    $r = $this->system->Change([[
     "[Error.Header]" => "Not Found",
     "[Error.Message]" => "The File <em>$id</em> could not be located."
@@ -200,7 +201,10 @@
      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
     ], $this->system->Page("c31701a05a48069702cd7590d31ebd63")]);
    }
-   return $back.$r;
+   $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
+    "Data" => ["Content" => $r]
+   ]) : $back.$r;
+   return $r;
   }
   function Save(array $a) {
    $data = $a["Data"] ?? [];
