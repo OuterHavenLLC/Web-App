@@ -48,7 +48,7 @@
     ], $this->system->Page("760cd577207eb0d2121509d7212038d4")]);
     $frbtn = $this->system->Element(["button", $action, [
      "class" => "CardButton SendData dB2C",
-     "data-form" => ".ALBE_$id",
+     "data-form" => ".EditAlbum$id",
      "data-processor" => base64_encode("v=".base64_encode("Album:Save"))
     ]]);
    }
@@ -204,13 +204,13 @@
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
    $data = $this->system->FixMissing($data, [
-    "AID",
+    "ID",
     "Title",
     "new",
     "nsfw",
     "pri"
    ]);
-   $id = $data["AID"];
+   $id = $data["ID"];
    $new = $data["new"] ?? 0;
    $now = $this->system->timestamp;
    $r = $this->system->Dialog([
@@ -229,16 +229,16 @@
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
+    $_FileSystem = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
     $accessCode = "Accepted";
     $actionTaken = ($new == 1) ? "saved" : "updated";
-    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
-    $efs = $fs["Albums"] ?? [];
-    $created = $efs[$id]["Created"] ?? $now;
-    $coverPhoto = $efs[$id]["ICO"] ?? "";
-    $illegal = $efs[$id]["Illegal"] ?? 0;
-    $nsfw = $data["nsfw"] ?? $y["privacy_opt"]["NSFW"];
-    $privacy = $data["pri"] ?? $y["privacy_opt"]["Albums"];
-    $efs[$id] = [
+    $albums = $_FileSystem["Albums"] ?? [];
+    $created = $albums[$id]["Created"] ?? $now;
+    $coverPhoto = $albums[$id]["ICO"] ?? "";
+    $illegal = $albums[$id]["Illegal"] ?? 0;
+    $nsfw = $data["nsfw"] ?? $y["Privacy"]["NSFW"];
+    $privacy = $data["pri"] ?? $y["Privacy"]["Albums"];
+    $albums[$id] = [
      "Created" => $created,
      "Description" => $data["Description"],
      "ICO" => $coverPhoto,
@@ -249,10 +249,10 @@
      "Privacy" => $privacy,
      "Title" => $data["Title"]
     ];
-    $fs["Albums"] = $efs;
-    #$this->system->Data("Save", ["fs", md5($you), $fs]);
+    $_FileSystem["Albums"] = $albums;
+    $this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The Album was $actionTaken.<br/>".json_encode($efs, true)]),
+     "Body" => $this->system->Element(["p", "The Album was $actionTaken."]),
      "Header" => "Done"
     ]);
    }
@@ -267,16 +267,17 @@
    ]);
   }
   function SaveDelete(array $a) {
+   $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
-   $ec = "Denied";
    $id = $data["AID"] ?? "";
    $r = $this->system->Dialog([
     "Body" => $this->system->Element(["p", "The Album Identifier is missing."]),
     "Header" => "Error"
    ]);
    $y = $this->you;
-   if($this->system->ID == $y["Login"]["Username"]) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -291,47 +292,52 @@
      "Header" => "Error"
     ]);
     if($id != md5("unsorted")) {
-     $ec = "Accepted";
-     $a2 = [];
-     $f2 = [];
-     $fs = $this->system->Data("Get", [
-      "fs",
-      md5($y["Login"]["Username"])
-     ]) ?? [];
+     $_FileSystem = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+     $accessCode = "Accepted";
+     $albums = $_FileSystem["Albums"] ?? [];
+     $files = $_FileSystem["Files"] ?? [];
      $id = base64_decode($id);
-     $efs = $fs["Albums"] ?? [];
-     $efs2 = $fs["Files"] ?? [];
-     $ttl = $efs[$id]["Title"];
-     foreach($efs as $k => $v) {
-      if($k != $id && $v["ID"] != $id) {
-       $a2[$k] = $v;
+     $newAlbums = [];
+     $newFiles = [];
+     $title = $albums[$id]["Title"] ?? "Album";
+     foreach($albums as $key => $value) {
+      if($key != $id && $value["ID"] != $id) {
+       $newAlbums[$key] = $value;
       }
-     } foreach($efs2 as $k => $v) {
-      if($v["AID"] == $id) {
-       $v["AID"] = md5("unsorted");
-       $f2[$k] = $v;
+     } foreach($files as $key => $value) {
+      if($value["AID"] == $id) {
+       $value["AID"] = md5("unsorted");
+       $newFiles[$key] = $value;
       }
      }
+     $_FileSystem["Albums"] = $newAlbums;
+     $_FileSystem["Files"] = $newFiles;
      #$this->view(base64_encode("Conversation:SaveDelete"), [
      # "Data" => ["ID" => $id]
      #]);
      #$this->system->Data("Purge", ["local", $id]);
      #$this->system->Data("Purge", ["react", $id]);
-     $fs["Albums"] = $a2;
-     $fs["Files"] = $f2;
-     #$this->system->Data("Save", ["fs", md5($y["Login"]["Username"]), $fs]);
+     #$this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
      $r = $this->system->Dialog([
       "Body" => $this->system->Element([
-       "p", "The Album <em>$ttl</em> was successfully deleted."
+       "p", "The Album <em>$title</em> was successfully deleted."
       ]),
       "Header" => "Done",
       "Option2" => $this->system->Element(["button", "Okay", [
-       "class" => "CFST2 dBC2"
+       "class" => "dBC dB2C"
       ]])
      ]);
     }
    }
-   return $this->system->JSONResponse([$ec, $r]);
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => "",
+     "Web" => $r
+    ],
+    "ResponseType" => "Dialog",
+    "Success" => "CloseDialog"
+   ]);
   }
   function Share(array $a) {
    $data = $a["Data"] ?? [];
