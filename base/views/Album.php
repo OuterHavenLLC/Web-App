@@ -17,7 +17,7 @@
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if($this->system->ID == $you) {
-    $fr = $this->system->Change([[
+    $r = $this->system->Change([[
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
@@ -40,7 +40,7 @@
     $bck = $this->view(base64_encode("Language:Edit"), ["Data" => [
      "ID" => base64_encode($id)
     ]]);
-    $fr = $this->system->Change([[
+    $r = $this->system->Change([[
      "[Album.Header]" => $header,
      "[Album.Description]" => $description,
      "[Album.ID]" => $id,
@@ -56,7 +56,7 @@
     ]]);
    }
    return $this->system->Card([
-    "Front" => $fr,
+    "Front" => $r,
     "FrontButton" => $frbtn
    ]);
   }

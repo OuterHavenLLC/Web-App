@@ -10,7 +10,7 @@
    if(empty($filePath)) {
     return "Not Found";
    } else {
-    $filePath = $this->system->efs.$filePath;
+    $filePath = $this->system->efs.bade64_decode($filePath);
     header("Content-type: application/x-file-to-save");
     header("Content-Disposition: attachment; filename=". basename($filePath));
     ob_end_clean();
@@ -116,12 +116,11 @@
      "data-f" => base64_encode($at[1]),
      "data-m" => $dm
     ]]) : "";
-    $base = $this->system->efs;
     $bl = $this->system->CheckBlocked([$y, "Files", $id]);
     $ck = ($un == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
     $dlc = $efs[$id] ?? [];
     $fck = $this->system->CheckFileType([$dlc["EXT"], "Photo"]);
-    $fd = ($ck == 1 || $un == $y["Login"]["Username"]) ? $this->system->Element([
+    $fd = ($ck == 1 || $un == $you) ? $this->system->Element([
      "button", "Delete", [
       "class" => "LI dBO",
       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($un)
@@ -194,7 +193,7 @@
      ]]),
      "[File.Reactions]" => $reactions,
      "[File.Share]" => base64_encode("v=".base64_encode("File:Share")."&ID=".base64_encode($id)."&UN=".base64_encode($t["Login"]["Username"])),
-     "[File.Source]" => $base.$t["Login"]["Username"]."/".$dlc["Name"],
+     "[File.Source]" => $this->system->base."/?_API=Web&v=".base64_encode("File:Download")."FilePath=".base64_encode($t["Login"]["Username"]."/".$dlc["Name"]),
      "[File.Title]" => $dlc["Title"],
      "[File.Type]" => $dlc["Type"],
      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
