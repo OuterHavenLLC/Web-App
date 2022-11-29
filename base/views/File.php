@@ -10,11 +10,11 @@
    if(empty($filePath)) {
     return "Not Found";
    } else {
-    $filePath = $this->system->efs.bade64_decode($filePath);
+    $filePath = $this->system->efs.base64_decode($filePath);
     header("Content-type: application/x-file-to-save");
     header("Content-Disposition: attachment; filename=". basename($filePath));
     ob_end_clean();
-    readfile($remoteURL);
+    readfile($filePath);
     exit;
    }
   }
@@ -175,6 +175,7 @@
      ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]),
      "[File.Delete]" => $fd,
      "[File.Description]" => $dlc["Description"],
+     "[File.Download]" => $this->system->base."/?_API=Web&v=".base64_encode("File:Download")."&FilePath=".base64_encode($t["Login"]["Username"]."/".$dlc["Name"]),
      "[File.Edit]" => $fe,
      "[File.Extension]" => $dlc["EXT"],
      "[File.ID]" => $dlc["ID"],
@@ -193,7 +194,6 @@
      ]]),
      "[File.Reactions]" => $reactions,
      "[File.Share]" => base64_encode("v=".base64_encode("File:Share")."&ID=".base64_encode($id)."&UN=".base64_encode($t["Login"]["Username"])),
-     "[File.Source]" => $this->system->base."/?_API=Web&v=".base64_encode("File:Download")."FilePath=".base64_encode($t["Login"]["Username"]."/".$dlc["Name"]),
      "[File.Title]" => $dlc["Title"],
      "[File.Type]" => $dlc["Type"],
      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
