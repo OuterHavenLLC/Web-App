@@ -95,26 +95,28 @@
    $data = $a["Data"] ?? [];
    $aid = $data["AID"] ?? md5("unsorted");
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Album Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Album Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
-   if($this->system->ID == $y["Login"]["Username"]) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($aid)) {
-    $alb = $this->system->Data("Get", [
-     "fs",
-     md5($y["Login"]["Username"])
-    ]) ?? [];
-    $alb = $alb["Albums"][$aid] ?? [];
+    $album = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+    $album = $album["Albums"][$aid] ?? [];
     $r = $this->system->Change([[
      "[Delete.Auth]" => $this->system->Page("92c7c84d33f9c3d8ccd6cc04dc228bf0"),
-     "[Delete.ID]" => $alb["ID"],
+     "[Delete.ID]" => $album["ID"],
      "[Delete.Processor]" => base64_encode("v=".base64_encode("Album:SaveDelete")),
-     "[Delete.Title]" => $alb["Title"]
+     "[Delete.Title]" => $album["Title"]
     ], $this->system->Page("fca4a243a55cc333f5fa35c8e32dd2a0")]);
    }
    return $r;

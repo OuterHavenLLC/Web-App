@@ -26,9 +26,12 @@
     $t = $data["UN"] ?? base64_encode($you);
     $t = base64_decode($t);
     $t = ($t == $you) ? $y : $this->system->Member($t);
-    $fs = $this->system->Data("Get", ["fs", md5($t["Login"]["Username"])]);
+    $fileSystem = $this->system->Data("Get", [
+     "fs",
+     md5($t["Login"]["Username"])
+    ]) ?? [];
     $id = ($new == 1) ? md5($t["Login"]["Username"].$this->system->timestamp) : $id;
-    $alb = $fs["Albums"][$id] ?? [];
+    $alb = $fileSystem["Albums"][$id] ?? [];
     $description = $alb["Description"] ?? "";
     $nsfw = $alb["NSFW"] ?? $y["Privacy"]["NSFW"];
     $privacy = $alb["Privacy"] ?? $y["Privacy"]["Albums"];
@@ -114,21 +117,21 @@
    $xfsUsage = 0;
    $y = $this->you;
    $you = $y["Login"]["Username"];
-   $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
-   foreach($fs["Files"] as $k => $v) {
+   $fileSystem = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+   foreach($fileSystem["Files"] as $k => $v) {
     $xfsUsage = $xfsUsage + $v["Size"];
    }
    $xfsUsage = number_format(round($xfsUsage / 1000));
    $xfsUsage = str_replace(",", "", $xfsUsage);
    if(!empty($id) || $new == 1) {
     $t = ($data["UN"] == $you) ? $y : $this->system->Member($data["UN"]);
-    $fs = $this->system->Data("Get", [
+    $fileSystem = $this->system->Data("Get", [
      "fs",
      md5($t["Login"]["Username"])
     ]) ?? [];
     $tun = base64_encode($t["Login"]["Username"]);
     $abl = base64_encode($t["Login"]["Username"]."-$id");
-    $alb = $fs["Albums"][$id] ?? [];
+    $alb = $fileSystem["Albums"][$id] ?? [];
     $bck = $this->system->Change([[
      "[View.ID]" => $id
     ], $this->system->Page("99a7eb5ad3c1c1ab75c7c711fc93fffc")]);
@@ -270,14 +273,21 @@
    $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
-   $id = $data["AID"] ?? "";
+   $id = $data["ID"] ?? "";
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Album Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Album Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
    $you = $y["Login"]["Username"];
-   if($this->system->ID == $you) {
+   if(md5($data["PIN"]) != $y["Login"]["PIN"]) {
+    $r = $this->system->Dialog([
+     "Body" => $this->system->Element(["p", "The PINs do not match."]),
+     "Header" => "Error"
+    ]);
+   } elseif($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -296,7 +306,6 @@
      $accessCode = "Accepted";
      $albums = $_FileSystem["Albums"] ?? [];
      $files = $_FileSystem["Files"] ?? [];
-     $id = base64_decode($id);
      $newAlbums = [];
      $newFiles = [];
      $title = $albums[$id]["Title"] ?? "Album";
@@ -312,20 +321,17 @@
      }
      $_FileSystem["Albums"] = $newAlbums;
      $_FileSystem["Files"] = $newFiles;
-     #$this->view(base64_encode("Conversation:SaveDelete"), [
-     # "Data" => ["ID" => $id]
-     #]);
-     #$this->system->Data("Purge", ["local", $id]);
-     #$this->system->Data("Purge", ["react", $id]);
-     #$this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
+     $this->view(base64_encode("Conversation:SaveDelete"), [
+      "Data" => ["ID" => $id]
+     ]);
+     $this->system->Data("Purge", ["local", $id]);
+     $this->system->Data("Purge", ["react", $id]);
+     $this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
      $r = $this->system->Dialog([
       "Body" => $this->system->Element([
        "p", "The Album <em>$title</em> was successfully deleted."
       ]),
-      "Header" => "Done",
-      "Option2" => $this->system->Element(["button", "Okay", [
-       "class" => "dBC dB2C"
-      ]])
+      "Header" => "Done"
      ]);
     }
    }
@@ -349,10 +355,11 @@
     "[Error.Message]" => "The Share Sheet Identifier is missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    $y = $this->you;
+   $you = $y["Login"]["Username"];
    if(!empty($id) && !empty($un)) {
     $un = base64_decode($un);
     $code = base64_encode("$un;$id");
-    $t = ($un == $y["Login"]["Username"]) ? $y : $this->system->Member($un);
+    $t = ($un == $you) ? $y : $this->system->Member($un);
     $body = $this->system->PlainText([
      "Data" => $this->system->Element([
       "p", "Check out ".$t["Personal"]["DisplayName"]."'s media album!"
@@ -362,8 +369,8 @@
      "HTMLEncode" => 1
     ]);
     $body = base64_encode($body);
-    $fs = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
-    $fs = $fs["Albums"][$id] ?? [];
+    $fileSystem = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
+    $fileSystem = $fileSystem["Albums"][$id] ?? [];
     $r = $this->system->Change([[
      "[Share.Code]" => "v=".base64_encode("LiveView:GetCode")."&Code=$code&Type=Album",
      "[Share.ContentID]" => "Album",
@@ -372,7 +379,7 @@
      "[Share.Link]" => "",
      "[Share.Message]" => base64_encode("v=".base64_encode("Chat:Share")."&ID=$body"),
      "[Share.StatusUpdate]" => base64_encode("v=".base64_encode("StatusUpdate:Edit")."&body=$body&new=1&UN=".base64_encode($y["Login"]["Username"])),
-     "[Share.Title]" => $fs["Title"]
+     "[Share.Title]" => $fileSystem["Title"]
     ], $this->system->Page("de66bd3907c83f8c350a74d9bbfb96f6")]);
    }
    return $this->system->Card(["Front" => $r]);
