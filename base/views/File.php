@@ -21,47 +21,47 @@
   function Edit(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["ID", "UN"]);
-   $fr = $this->system->Change([[
+   $id = $data["ID"];
+   $r = $this->system->Change([[
     "[Error.Header]" => "Forbidden",
     "[Error.Message]" => "The File Identifier is missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-   $id = $data["ID"];
    $un = $data["UN"];
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
-    $fr = $this->system->Change([[
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
+    $r = $this->system->Change([[
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    } elseif(!empty($id)) {
     $id = base64_decode($id);
-    $un = base64_decode($un);
-    $fs = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
-    $efs = ($un == $this->system->ID) ? $this->system->Data("Get", [
+    $username = $data["UN"] ?? base64_encode($you);
+    $username = base64_decode($username);
+    $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+    $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
-    ]) : $fs["Files"];
-    $dlc = $efs[$id];
-    $nsfw = $dlc["NSFW"] ?? $y["Privacy"]["NSFW"];
-    $pri = $dlc["Privacy"];
-    $fr = $this->system->Change([[
-     "[File.Description]" => $dlc["Description"],
+    ]) : $fileSystem["Files"];
+    $file = $files[$id] ?? [];
+    $nsfw = $file["NSFW"] ?? $y["Privacy"]["NSFW"];
+    $privacy = $file["Privacy"];
+    $r = $this->system->Change([[
+     "[File.Description]" => $file["Description"],
      "[File.ID]" => $id,
      "[File.NSFW]" => $this->system->Select("nsfw", "req v2w", $nsfw),
-     "[File.Privacy]" => $this->system->Select("Privacy", "req v2w", $pri),
-     "[File.Title]" => $dlc["Title"],
-     "[File.Username]" => base64_encode($un)
+     "[File.Privacy]" => $this->system->Select("Privacy", "req v2w", $privacy),
+     "[File.Title]" => $file["Title"],
+     "[File.Username]" => $username
     ], $this->system->Page("7c85540db53add027bddeb42221dd104")]);
     $frbtn = $this->system->Element(["button", "Update", [
-     "class" => "BB Xedit v2",
-     "data-type" => ".EditFile$id",
-     "data-u" => base64_encode("v=".base64_encode("File:Save")),
-     "id" => "fSub",
-     "onclick" => "dB2C();dB2C();"
+     "class" => "SendData",
+     "data-form" => ".EditFile$id",
+     "data-processor" => base64_encode("v=".base64_encode("File:Save"))
     ]]);
    }
    return $this->system->Card([
-    "Front" => $fr,
+    "Front" => $r,
     "FrontButton" => $frbtn
    ]);
   }
@@ -215,21 +215,27 @@
    return $r;
   }
   function Save(array $a) {
+   $accessCode = "Denied";
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
    $data = $this->system->FixMissing($data, [
-    "Description", "ID", "Title", "UN", "nsfw", "pri"
+    "Description",
+    "ID",
+    "Title",
+    "UN",
+    "nsfw",
+    "Privacy"
    ]);
-   $ec = "Denied";
    $id = $data["ID"];
    $r = $this->system->Dialog([
     "Body" => $this->system->Element([
-     "p", "The File Identifier is missing!"
+     "p", "The File Identifier is missing."
     ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
@@ -237,36 +243,46 @@
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
-    $un = base64_decode($data["UN"]);
-    $fs = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
-    $efs = ($un == $this->system->ID) ? $this->system->Data("Get", [
+    $accessCode = "Accepted";
+    $username = $data["UN"] ?? $you;
+    $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+    $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
-    ]) : $fs["Files"];
-    $dlc = $efs[$id];
-    $dlc["Created"] = $efs[$id]["Created"] ?? $this->system->timestamp;
-    $dlc["Description"] = $data["Description"];
-    $dlc["Illegal"] = $efs[$id]["Illegal"] ?? 0;
-    $dlc["Modified"] = $this->system->timestamp;
-    $dlc["NSFW"] = $data["nsfw"];
-    $dlc["Privacy"] = $data["pri"];
-    $dlc["Title"] = $data["Title"];
-    $efs[$id] = $dlc;
+    ]) : $fileSystem["Files"];
+    $now = $this->system->timestamp;
+    $file = $files[$id] ?? [];
+    $file["Created"] = $files[$id]["Created"] ?? $now;
+    $file["Description"] = $data["Description"];
+    $file["Illegal"] = $files[$id]["Illegal"] ?? 0;
+    $file["Modified"] = $now;
+    $file["NSFW"] = $data["nsfw"];
+    $file["Privacy"] = $data["pri"];
+    $file["Title"] = $data["Title"];
+    $files[$id] = $file;
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
-      "p", "The file <em>".$dlc["Title"]."</em> was updated."
+      "p", "The file <em>".$file["Title"]."</em> was updated.<br/>".json_encode($files, true)
      ]),
      "Header" => "Done"
     ]);
-    if($un == $this->system->ID) {
-     $this->system->Data("Save", ["x", "fs", $efs]);
+    if($this->system->ID == $username) {
+     #$this->system->Data("Save", ["x", "fs", $files]);
     } else {
-     $fs["Files"] = $efs;
-     $this->system->Data("Save", ["fs", md5($y["Login"]["Username"]), $fs]);
+     $fileSystem["Files"] = $files;
+     #$this->system->Data("Save", ["fs", md5($you), $fileSystem]);
     }
     $this->system->Statistic("ULu");
    }
-   return $this->system->JSONResponse([$ec, $r]);
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => "",
+     "Web" => $r
+    ],
+    "ResponseType" => "Dialog",
+    "Success" => "CloseCard"
+   ]);
   }
   function SaveDelete(array $a) {
    $data = $a["Data"] ?? [];
@@ -368,7 +384,8 @@
     "Header" => "Error"
    ]);
    $y = $this->you;
-   if($y["Login"]["Username"] == $this->system->ID) {
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
       "p", "You must be signed in to continue."
