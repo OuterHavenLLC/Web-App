@@ -84,120 +84,128 @@
     ]
    ]) : "";
    $id = $data["ID"] ?? "";
-   $y = $this->you;
-   $you = $y["Login"]["Username"];
-   $un = $data["UN"] ?? $you;
-   $t = ($un == $you) ? $y : $this->system->Member($un);
-   $fs = $this->system->Data("Get", [
-    "fs",
-    md5($t["Login"]["Username"])
-   ]) ?? [];
-   $atf = base64_encode($t["Login"]["Username"]."-".$id);
-   $dm = base64_encode(json_encode([
-    "t" => $un,
-    "y" => $you
-   ]));
-   $efs = ($this->system->ID == $un) ? $this->system->Data("Get", [
-    "x",
-    "fs"
-   ]) : $fs["Files"];
    $pub = $data["pub"] ?? 0;
    $r = $this->system->Change([[
     "[Error.Header]" => "Not Found",
-    "[Error.Message]" => "The File <em>$id</em> could not be located."
+    "[Error.Message]" => "The File Identifier or Username are missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-   if(!empty($efs[$id])) {
-    $at = $data["AddTo"] ?? "";
-    $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
-    $at = (!empty($at[1])) ? $this->system->Element(["button", $at[0], [
-     "class" => "AddTo LI",
-     "data-a" => $atf,
-     "data-c" => $data["Added"],
-     "data-f" => base64_encode($at[1]),
-     "data-m" => $dm
-    ]]) : "";
-    $bl = $this->system->CheckBlocked([$y, "Files", $id]);
-    $ck = ($un == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
-    $dlc = $efs[$id] ?? [];
-    $fck = $this->system->CheckFileType([$dlc["EXT"], "Photo"]);
-    $fd = ($ck == 1 || $un == $you) ? $this->system->Element([
-     "button", "Delete", [
-      "class" => "LI dBO",
-      "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($un)
-     ]
-    ]) : "";
-    $fe = ($ck == 1 || $un == $you) ? $this->system->Element([
-     "button", "Edit", [
-      "class" => "LI dB2O",
-      "data-type" => base64_encode("v=".base64_encode("File:Edit")."&ID=".base64_encode($id)."&UN=".base64_encode($un))
-     ]
-    ]) : "";
-    $nsfw = $dlc["NSFW"] ?? $y["Privacy"]["NSFW"];
-    $opt = "";
-    if($nsfw == 0 && $fck == 1) {
-     $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
-     $isrc = $this->system->GetSourceFromExtension([
-      $t["Login"]["Username"],
-      $dlc
-     ]);
-     list($isw, $ish) = getimagesize($isrc);
-     $is = ($ish <= ($isw / 1.5) || $ish == $isw) ? 1 : 0;
-     $cp = ($ish <= ($isw / 1.5)) ? "Cover Photo" : "Profile Picture";
-     $type = ($ish <= ($isw / 1.5)) ? "CoverPhoto" : "ProfilePicture";
-     $type = base64_encode($type);
-     $opt .= ($is == 1) ? $this->system->Element(["button", "Set as Your $cp", [
-      "class" => "Disable LI dBO",
-      "data-type" => "v=".base64_encode("File:SaveProfileImage")."&DLC=$atf&FT=$type"
-     ]]) : "";
-    }
-    $bl = ($un != $you) ? $this->system->Element([
-     "button", "Block this File", [
-      "class" => "BLK LI",
-      "data-cmd" => base64_encode("B"),
-      "data-u" => base64_encode("v=".base64_encode("Common:SaveBlacklist")."&BU=".base64_encode("this File")."&content=".base64_encode($id)."&list=".base64_encode("Files")."&BC=")
-     ]
-    ]) : "";
-    $bl = ($this->system->ID != $you) ? $bl : "";
-    $reactions = ($un != $you) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
-     "CRID" => $id,
-     "T" => $t["Login"]["Username"],
-     "Type" => 2
-    ]]) : "";
+   $un = $data["UN"] ?? "";
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
+   if(!empty($id) && !empty($un)) {
+    $t = ($un == $you) ? $y : $this->system->Member($un);
+    $fs = $this->system->Data("Get", [
+     "fs",
+     md5($t["Login"]["Username"])
+    ]) ?? [];
+    $atf = base64_encode($t["Login"]["Username"]."-".$id);
+    $dm = base64_encode(json_encode([
+     "t" => $un,
+     "y" => $you
+    ]));
+    $efs = ($this->system->ID == $un) ? $this->system->Data("Get", [
+     "x",
+     "fs"
+    ]) : $fs["Files"];
     $r = $this->system->Change([[
-     "[File.AddTo]" => $at,
-     "[File.Back]" => $back,
-     "[File.Block]" => $bl,
-     "[File.Conversation]" => $this->system->Change([[
-      "[Conversation.CRID]" => $id,
-      "[Conversation.CRIDE]" => base64_encode($id),
-      "[Conversation.Level]" => base64_encode(1),
-      "[Conversation.URL]" => base64_encode("v=".base64_encode("Conversation:Home")."&CRID=[CRID]&LVL=[LVL]")
-     ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]),
-     "[File.Delete]" => $fd,
-     "[File.Description]" => $dlc["Description"],
-     "[File.Download]" => $this->system->base."/?_API=Web&v=".base64_encode("File:Download")."&FilePath=".base64_encode($t["Login"]["Username"]."/".$dlc["Name"]),
-     "[File.Edit]" => $fe,
-     "[File.Extension]" => $dlc["EXT"],
-     "[File.ID]" => $dlc["ID"],
-     "[File.Illegal]" => base64_encode("v=".base64_encode("Common:Illegal")."&ID=".base64_encode("File;".$t["Login"]["Username"].";$id")),
-     "[File.Modified]" => $this->system->TimeAgo($dlc["Modified"]),
-     "[File.Name]" => $dlc["Name"],
-     "[File.NSFW]" => $nsfw,
-     "[File.Options]" => $opt,
-     "[File.Preview]" => $this->system->AttachmentPreview([
-      "DLL" => $dlc,
-      "T" => $un,
-      "Y" => $you
-     ]).$this->system->Element(["div", NULL, [
-      "class" => "NONAME",
-      "style" => "height:0.5em"
-     ]]),
-     "[File.Reactions]" => $reactions,
-     "[File.Share]" => base64_encode("v=".base64_encode("File:Share")."&ID=".base64_encode($id)."&UN=".base64_encode($t["Login"]["Username"])),
-     "[File.Title]" => $dlc["Title"],
-     "[File.Type]" => $dlc["Type"],
-     "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
-    ], $this->system->Page("c31701a05a48069702cd7590d31ebd63")]);
+     "[Error.Header]" => "Not Found",
+     "[Error.Message]" => "The File <em>$id</em> could not be found."
+    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
+    if(!empty($efs[$id])) {
+     $at = $data["AddTo"] ?? "";
+     $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
+     $at = (!empty($at[1])) ? $this->system->Element(["button", $at[0], [
+      "class" => "AddTo LI",
+      "data-a" => $atf,
+      "data-c" => $data["Added"],
+      "data-f" => base64_encode($at[1]),
+      "data-m" => $dm
+     ]]) : "";
+     $bl = $this->system->CheckBlocked([$y, "Files", $id]);
+     $ck = ($un == $this->system->ID && $y["Rank"] == md5("High Command")) ? 1 : 0;
+     $dlc = $efs[$id] ?? [];
+     $fck = $this->system->CheckFileType([$dlc["EXT"], "Photo"]);
+     $fd = ($ck == 1 || $un == $you) ? $this->system->Element([
+      "button", "Delete", [
+       "class" => "LI dBO",
+       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($un)
+      ]
+     ]) : "";
+     $fe = ($ck == 1 || $un == $you) ? $this->system->Element([
+      "button", "Edit", [
+       "class" => "LI dB2O",
+       "data-type" => base64_encode("v=".base64_encode("File:Edit")."&ID=".base64_encode($id)."&UN=".base64_encode($un))
+      ]
+     ]) : "";
+     $nsfw = $dlc["NSFW"] ?? $y["Privacy"]["NSFW"];
+     $opt = "";
+     if($nsfw == 0 && $fck == 1) {
+      $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
+      $isrc = $this->system->GetSourceFromExtension([
+       $t["Login"]["Username"],
+       $dlc
+      ]);
+      list($isw, $ish) = getimagesize($isrc);
+      $is = ($ish <= ($isw / 1.5) || $ish == $isw) ? 1 : 0;
+      $cp = ($ish <= ($isw / 1.5)) ? "Cover Photo" : "Profile Picture";
+      $type = ($ish <= ($isw / 1.5)) ? "CoverPhoto" : "ProfilePicture";
+      $type = base64_encode($type);
+      $opt .= ($is == 1) ? $this->system->Element([
+       "button", "Set as Your $cp", [
+        "class" => "Disable LI dBO",
+        "data-type" => "v=".base64_encode("File:SaveProfileImage")."&DLC=$atf&FT=$type"
+       ]
+      ]) : "";
+     }
+     $bl = ($un != $you) ? $this->system->Element([
+      "button", "Block this File", [
+       "class" => "BLK LI",
+       "data-cmd" => base64_encode("B"),
+       "data-u" => base64_encode("v=".base64_encode("Common:SaveBlacklist")."&BU=".base64_encode("this File")."&content=".base64_encode($id)."&list=".base64_encode("Files")."&BC=")
+      ]
+     ]) : "";
+     $bl = ($this->system->ID != $you) ? $bl : "";
+     $reactions = ($un != $you) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
+      "CRID" => $id,
+      "T" => $t["Login"]["Username"],
+      "Type" => 2
+     ]]) : "";
+     $r = $this->system->Change([[
+      "[File.AddTo]" => $at,
+      "[File.Back]" => $back,
+      "[File.Block]" => $bl,
+      "[File.Conversation]" => $this->system->Change([[
+       "[Conversation.CRID]" => $id,
+       "[Conversation.CRIDE]" => base64_encode($id),
+       "[Conversation.Level]" => base64_encode(1),
+       "[Conversation.URL]" => base64_encode("v=".base64_encode("Conversation:Home")."&CRID=[CRID]&LVL=[LVL]")
+      ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]),
+      "[File.Delete]" => $fd,
+      "[File.Description]" => $dlc["Description"],
+      "[File.Download]" => $this->system->base."/?_API=Web&v=".base64_encode("File:Download")."&FilePath=".base64_encode($t["Login"]["Username"]."/".$dlc["Name"]),
+      "[File.Edit]" => $fe,
+      "[File.Extension]" => $dlc["EXT"],
+      "[File.ID]" => $dlc["ID"],
+      "[File.Illegal]" => base64_encode("v=".base64_encode("Common:Illegal")."&ID=".base64_encode("File;".$t["Login"]["Username"].";$id")),
+      "[File.Modified]" => $this->system->TimeAgo($dlc["Modified"]),
+      "[File.Name]" => $dlc["Name"],
+      "[File.NSFW]" => $nsfw,
+      "[File.Options]" => $opt,
+      "[File.Preview]" => $this->system->AttachmentPreview([
+       "DLL" => $dlc,
+       "T" => $un,
+       "Y" => $you
+      ]).$this->system->Element(["div", NULL, [
+       "class" => "NONAME",
+       "style" => "height:0.5em"
+      ]]),
+      "[File.Reactions]" => $reactions,
+      "[File.Share]" => base64_encode("v=".base64_encode("File:Share")."&ID=".base64_encode($id)."&UN=".base64_encode($t["Login"]["Username"])),
+      "[File.Title]" => $dlc["Title"],
+      "[File.Type]" => $dlc["Type"],
+      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
+     ], $this->system->Page("c31701a05a48069702cd7590d31ebd63")]);
+    }
    }
    $r = ($data["back"] == 1) ? $back.$r : $r;
    $r = ($data["CARD"] == 1) ? $this->system->Card(["Front" => $r]) : $r;

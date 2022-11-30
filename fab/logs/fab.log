@@ -1,4 +1,6 @@
-2022-11-28 17:54:16	ERROR	[DST 167.94.146.60:42860 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-11-28 17:54:17	ERROR	[SRC 167.94.146.60:58782 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-11-28 18:44:07	ERROR	[DST 167.94.145.58:40956 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-11-28 18:44:07	ERROR	[SRC 167.94.145.58:55836 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-11-29 20:23:28	ERROR	[DST 94.102.61.48:35590 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `python-requests/2.26.0'
+2022-11-29 20:31:28	ERROR	[SRC 192.241.199.57:43480 sid=1] SHOUTcast 1 source connection denied. Bad password: MGLNDD_174.138.58.184_8000
+2022-11-29 22:52:50	ERROR	[DST 205.210.31.174:61124 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
+2022-11-30 01:56:03	ERROR	[DST 64.62.197.126:23249 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0'
+2022-11-30 01:56:07	ERROR	[SRC 64.62.197.125:14865 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
+2022-11-30 02:02:01	ERROR	[DST 198.235.24.178:61730 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
