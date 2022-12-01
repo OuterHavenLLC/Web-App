@@ -55,7 +55,7 @@
      "[File.Username]" => $username
     ], $this->system->Page("7c85540db53add027bddeb42221dd104")]);
     $frbtn = $this->system->Element(["button", "Update", [
-     "class" => "SendData",
+     "class" => "CardButton SendData",
      "data-form" => ".EditFile$id",
      "data-processor" => base64_encode("v=".base64_encode("File:Save"))
     ]]);
@@ -157,6 +157,7 @@
      ]) : "";
      $fileCheck = $this->system->CheckFileType([$file["EXT"], "Photo"]);
      $nsfw = $file["NSFW"] ?? $y["Privacy"]["NSFW"];
+     $setAsProfileImage = "";
      if($nsfw == 0 && $fileCheck == 1) {
       $_Source = $this->system->GetSourceFromExtension([
        $t["Login"]["Username"],
@@ -257,22 +258,22 @@
     $file["Illegal"] = $files[$id]["Illegal"] ?? 0;
     $file["Modified"] = $now;
     $file["NSFW"] = $data["nsfw"];
-    $file["Privacy"] = $data["pri"];
+    $file["Privacy"] = $data["Privacy"];
     $file["Title"] = $data["Title"];
     $files[$id] = $file;
+    if($this->system->ID == $username) {
+     $this->system->Data("Save", ["x", "fs", $files]);
+    } else {
+     $fileSystem["Files"] = $files;
+     $this->system->Data("Save", ["fs", md5($you), $fileSystem]);
+    }
+    $this->system->Statistic("ULu");
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
-      "p", "The file <em>".$file["Title"]."</em> was updated.<br/>".json_encode($files, true)
+      "p", "The file <em>".$file["Title"]."</em> was updated.<br/>"
      ]),
      "Header" => "Done"
     ]);
-    if($this->system->ID == $username) {
-     #$this->system->Data("Save", ["x", "fs", $files]);
-    } else {
-     $fileSystem["Files"] = $files;
-     #$this->system->Data("Save", ["fs", md5($you), $fileSystem]);
-    }
-    $this->system->Statistic("ULu");
    }
    return $this->system->JSONResponse([
     "AccessCode" => $accessCode,
