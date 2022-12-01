@@ -26,7 +26,7 @@
     "[Error.Header]" => "Forbidden",
     "[Error.Message]" => "The File Identifier is missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-   $un = $data["UN"];
+   $username = $data["UN"];
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if($this->system->ID == $you) {
@@ -89,93 +89,95 @@
     "[Error.Header]" => "Not Found",
     "[Error.Message]" => "The File Identifier or Username are missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-   $un = $data["UN"] ?? "";
+   $username = $data["UN"] ?? "";
    $y = $this->you;
    $you = $y["Login"]["Username"];
-   if(!empty($id) && !empty($un)) {
-    $t = ($un == $you) ? $y : $this->system->Member($un);
-    $fs = $this->system->Data("Get", [
+   if(!empty($id) && !empty($username)) {
+    $t = ($username == $you) ? $y : $this->system->Member($username);
+    $attachmentID = base64_encode($t["Login"]["Username"]."-".$id);
+    $bl = $this->system->CheckBlocked([$y, "Files", $id]);
+    $dm = base64_encode(json_encode([
+     "t" => $username,
+     "y" => $you
+    ]));
+    $files = $this->system->Data("Get", [
      "fs",
      md5($t["Login"]["Username"])
     ]) ?? [];
-    $atf = base64_encode($t["Login"]["Username"]."-".$id);
-    $bl = $this->system->CheckBlocked([$y, "Files", $id]);
-    $dm = base64_encode(json_encode([
-     "t" => $un,
-     "y" => $you
-    ]));
-    $efs = ($this->system->ID == $un) ? $this->system->Data("Get", [
+    $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
-    ]) : $fs["Files"];
+    ]) : $files["Files"];
+    $file = $files[$id] ?? [];
     $r = $this->system->Change([[
      "[Error.Header]" => "Not Found",
      "[Error.Message]" => "The File <em>$id</em> could not be found."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-    if(!empty($efs[$id]) && $bl == 0) {
-     $actions = ($un != $you) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
+    if(!empty($file) && $bl == 0) {
+     $actions = ($username != $you) ? $this->view(base64_encode("Common:Reactions"), ["Data" => [
       "CRID" => $id,
       "T" => $t["Login"]["Username"],
       "Type" => 4
      ]]).$this->system->Element([
       "button", "Block", [
-       "class" => "BLK Small",
+       "class" => "BLK Small v2",
        "data-cmd" => base64_encode("B"),
        "data-u" => base64_encode("v=".base64_encode("Common:SaveBlacklist")."&BU=".base64_encode("this File")."&content=".base64_encode($id)."&list=".base64_encode("Files")."&BC=")
       ]
      ]) : "";
-     $at = $data["AddTo"] ?? "";
-     $at = (!empty($at)) ? explode(":", base64_decode($at)) : [];
-     $at = (!empty($at[1])) ? $this->system->Element(["button", $at[0], [
-      "class" => "AddTo v2",
-      "data-a" => $atf,
-      "data-c" => $data["Added"],
-      "data-f" => base64_encode($at[1]),
-      "data-m" => $dm
-     ]]) : "";
-     $ck = ($this->system->ID == $un && $y["Rank"] == md5("High Command")) ? 1 : 0;
-     $dlc = $efs[$id] ?? [];
-     $fck = $this->system->CheckFileType([$dlc["EXT"], "Photo"]);
-     $actions .= ($ck == 1 || $un == $you) ? $this->system->Element([
+     $addTo = $data["AddTo"] ?? "";
+     $addTo = (!empty($addTo)) ? explode(":", base64_decode($addTo)) : [];
+     $addTo = (!empty($addTo[1])) ? $this->system->Element([
+      "button", $addTo[0], [
+       "class" => "AddTo v2",
+       "data-a" => $attachmentID,
+       "data-c" => $data["Added"],
+       "data-f" => base64_encode($addTo[1]),
+       "data-m" => $dm
+      ]
+     ]) : "";
+     $ck = ($this->system->ID == $username && $y["Rank"] == md5("High Command")) ? 1 : 0;
+     $actions .= ($ck == 1 || $username == $you) ? $this->system->Element([
       "button", "Delete", [
-       "class" => "Small dBO",
-       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($un)
+       "class" => "Small dBO v2",
+       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($username)
       ]
      ]) : "";
      $actions .= $this->system->Element([
       "button", "Download", [
-       "class" => "Small",
-       "onclick" => "W('".$this->system->base."/?_API=Web&v=".base64_encode("File:Download")."&FilePath=".base64_encode($t["Login"]["Username"]."/".$dlc["Name"])."', '_top');"
+       "class" => "Small v2",
+       "onclick" => "W('".$this->system->base."/?_API=Web&v=".base64_encode("File:Download")."&FilePath=".base64_encode($t["Login"]["Username"]."/".$file["Name"])."', '_top');"
       ]
      ]);
-     $actions .= ($ck == 1 || $un == $you) ? $this->system->Element([
+     $actions .= ($ck == 1 || $username == $you) ? $this->system->Element([
       "button", "Edit", [
-       "class" => "Small dB2O",
-       "data-type" => base64_encode("v=".base64_encode("File:Edit")."&ID=".base64_encode($id)."&UN=".base64_encode($un))
+       "class" => "Small dB2O v2",
+       "data-type" => base64_encode("v=".base64_encode("File:Edit")."&ID=".base64_encode($id)."&UN=".base64_encode($username))
       ]
      ]) : "";
-     $nsfw = $dlc["NSFW"] ?? $y["Privacy"]["NSFW"];
-     if($nsfw == 0 && $fck == 1) {
-      $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
-      $isrc = $this->system->GetSourceFromExtension([
+     $fileCheck = $this->system->CheckFileType([$file["EXT"], "Photo"]);
+     $nsfw = $file["NSFW"] ?? $y["Privacy"]["NSFW"];
+     if($nsfw == 0 && $fileCheck == 1) {
+      $_Source = $this->system->GetSourceFromExtension([
        $t["Login"]["Username"],
-       $dlc
+       $file
       ]);
-      list($isw, $ish) = getimagesize($isrc);
-      $is = ($ish <= ($isw / 1.5) || $ish == $isw) ? 1 : 0;
-      $cp = ($ish <= ($isw / 1.5)) ? "Cover Photo" : "Profile Picture";
-      $type = ($ish <= ($isw / 1.5)) ? "CoverPhoto" : "ProfilePicture";
+      $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
+      list($height, $width) = getimagesize($_Source);
+      $_Size = ($height <= ($width / 1.5) || $height == $width) ? 1 : 0;
+      $cp = ($height <= ($width / 1.5)) ? "Cover Photo" : "Profile Picture";
+      $type = ($height <= ($width / 1.5)) ? "CoverPhoto" : "ProfilePicture";
       $type = base64_encode($type);
-      $setAsProfileImage = ($is == 1) ? $this->system->Element([
+      $setAsProfileImage = ($_Size == 1) ? $this->system->Element([
        "button", "Set as Your $cp", [
         "class" => "Disable dBO v2",
-        "data-type" => "v=".base64_encode("File:SaveProfileImage")."&DLC=$atf&FT=$type"
+        "data-type" => "v=".base64_encode("File:SaveProfileImage")."&DLC=$attachmentID&FT=$type"
        ]
       ]) : "";
      }
      $r = $this->system->Change([[
       "[File.Actions]" => $actions,
-      "[File.AddTo]" => $at,
+      "[File.AddTo]" => $addTo,
       "[File.Back]" => $back,
       "[File.Conversation]" => $this->system->Change([[
        "[Conversation.CRID]" => $id,
@@ -183,16 +185,16 @@
        "[Conversation.Level]" => base64_encode(1),
        "[Conversation.URL]" => base64_encode("v=".base64_encode("Conversation:Home")."&CRID=[CRID]&LVL=[LVL]")
       ], $this->system->Page("d6414ead3bbd9c36b1c028cf1bb1eb4a")]),
-      "[File.Description]" => $dlc["Description"],
-      "[File.Extension]" => $dlc["EXT"],
-      "[File.ID]" => $dlc["ID"],
+      "[File.Description]" => $file["Description"],
+      "[File.Extension]" => $file["EXT"],
+      "[File.ID]" => $id,
       "[File.Illegal]" => base64_encode("v=".base64_encode("Common:Illegal")."&ID=".base64_encode("File;".$t["Login"]["Username"].";$id")),
-      "[File.Modified]" => $this->system->TimeAgo($dlc["Modified"]),
-      "[File.Name]" => $dlc["Name"],
+      "[File.Modified]" => $this->system->TimeAgo($file["Modified"]),
+      "[File.Name]" => $file["Name"],
       "[File.NSFW]" => $nsfw,
       "[File.Preview]" => $this->system->AttachmentPreview([
-       "DLL" => $dlc,
-       "T" => $un,
+       "DLL" => $file,
+       "T" => $username,
        "Y" => $you
       ]).$this->system->Element(["div", NULL, [
        "class" => "NONAME",
@@ -200,13 +202,12 @@
       ]]),
       "[File.SetAsProfileImage]" => $setAsProfileImage,
       "[File.Share]" => base64_encode("v=".base64_encode("File:Share")."&ID=".base64_encode($id)."&UN=".base64_encode($t["Login"]["Username"])),
-      "[File.Title]" => $dlc["Title"],
-      "[File.Type]" => $dlc["Type"],
-      "[File.Uploaded]" => $this->system->TimeAgo($dlc["Timestamp"])
+      "[File.Title]" => $file["Title"],
+      "[File.Type]" => $file["Type"],
+      "[File.Uploaded]" => $this->system->TimeAgo($file["Timestamp"])
      ], $this->system->Page("c31701a05a48069702cd7590d31ebd63")]);
     }
    }
-   $r = ($data["back"] == 1) ? $back.$r : $r;
    $r = ($data["CARD"] == 1) ? $this->system->Card(["Front" => $r]) : $r;
    $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
     "Data" => ["Content" => $r]
@@ -290,10 +291,10 @@
    $y = $this->you;
    $you = $y["Login"]["Username"];
    $id = $data["AID"] ?? md5("unsorted");
-   $un = $data["UN"] ?? $you;
-   $fs = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
+   $username = $data["UN"] ?? $you;
+   $fs = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
    $efs = $fs["Files"] ?? [];
-   $efs = ($un == $this->system->ID) ? $this->system->Data("Get", [
+   $efs = ($username == $this->system->ID) ? $this->system->Data("Get", [
     "x",
     "fs"
    ]) : $efs;
@@ -316,7 +317,7 @@
      ]),
      "Header" => "Forbidden"
     ]);
-   } elseif(!empty($id) && !empty($un)) {
+   } elseif(!empty($id) && !empty($username)) {
     $ec = "Accepted";
     $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
     $efs2 = [];
@@ -344,7 +345,7 @@
        ftp_chdir($p2p_domain, $mbr);
        $list = ftp_nlist($p2p_domain, ".");
        if(in_array($v["Name"], $list)) {
-        if($efsa[$id]["ICO"] == $v["Name"] && $un == $you) {
+        if($efsa[$id]["ICO"] == $v["Name"] && $username == $you) {
          $efsa[$id]["ICO"] = "";
         }
         $this->view(base64_encode("Conversation:SaveDelete"), [
@@ -356,7 +357,7 @@
       }
       ftp_close($p2p_domain);
      }
-    } if($un == $this->system->ID) {
+    } if($username == $this->system->ID) {
      $this->system->Data("Save", ["x", "fs", $efs2]);
     } else {
      $y["Points"] = $y["Points"] + $pts;
@@ -374,7 +375,7 @@
   }
   function SaveProfileImage(array $a) {
    $data = $a["Data"];
-   $dlc = $data["DLC"] ?? "";
+   $file = $data["DLC"] ?? "";
    $type = $data["FT"] ?? "";
    $r = $this->system->Dialog([
     "Body" => $this->system->Element([
@@ -391,10 +392,10 @@
      ]),
      "Header" => "Forbidden"
     ]);
-   } elseif(!empty($dlc) && !empty($type)) {
+   } elseif(!empty($file) && !empty($type)) {
     $type = base64_decode($type);
     $cp = ($type == "CoverPhoto") ? "Cover Photo" : "Profile Picture";
-    $dbi = explode("-", base64_decode($dlc));
+    $dbi = explode("-", base64_decode($file));
     if(!empty($dbi[0]) && !empty($dbi[1])) {
      $t = $this->system->Member($dbi[0]);
      $fs = $this->system->Data("Get", [
@@ -418,18 +419,18 @@
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["ID", "UN"]);
    $id = $data["ID"];
-   $un = $data["UN"];
+   $username = $data["UN"];
    $r = $this->system->Change([[
     "[Error.Header]" => "Error",
     "[Error.Message]" => "The Share Sheet Identifier is missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    $y = $this->you;
-   if(!empty($id) && !empty($un)) {
+   if(!empty($id) && !empty($username)) {
     $id = base64_decode($id);
-    $un = base64_decode($un);
-    $code = base64_encode("$un;$id");
-    $t = ($un == $y["Login"]["Username"]) ? $y : $this->system->Member($un);
-    $fs = $this->system->Data("Get", ["fs", md5($un)]) ?? [];
+    $username = base64_decode($username);
+    $code = base64_encode("$username;$id");
+    $t = ($username == $y["Login"]["Username"]) ? $y : $this->system->Member($username);
+    $fs = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
     $fs = $fs["Files"][$id] ?? [];
     $body = $this->system->PlainText([
      "Data" => $this->system->Element([
@@ -460,12 +461,12 @@
    $data = $this->system->FixMissing($data, ["AID", "UN", "ss"]);
    $err = "Internal Error";
    $id = $data["AID"];
-   $un = $data["UN"];
+   $username = $data["UN"];
    $y = $this->you;
    $fs = $this->system->Data("Get", ["fs", md5($y["Login"]["Username"])]) ?? [];
    $fa = $fs["Albums"] ?? [];
    $fs = $fs["Files"] ?? [];
-   if(empty($id) || empty($un)) {
+   if(empty($id) || empty($username)) {
     $r = [
      "F" => "Denied",
      "MSG" => "You don't have permission to access this view.",
@@ -473,10 +474,10 @@
     ];
    } else {
     header("Content-Type: application/json");
-    $un = base64_decode($un);
-    $admin = ($un == $this->system->ID) ? 1 : 0;
+    $username = base64_decode($username);
+    $admin = ($username == $this->system->ID) ? 1 : 0;
     $admin = ($admin == 1 && $y["Rank"] == md5("High Command")) ? 1 : 0;
-    $admin = ($admin == 1 || $un != $this->system->ID) ? 1 : 0;
+    $admin = ($admin == 1 || $username != $this->system->ID) ? 1 : 0;
     $f = $a["Files"] ?? [];
     $fpri = $data["pri"] ?? base64_encode($y["Privacy"]["DLL"]);
     $fpri = base64_decode($fpri);
@@ -493,7 +494,7 @@
      $xfsUsage = $xfsUsage + $size;
     }
     $xfsUsage = str_replace(",", "", $this->system->ByteNotation($xfsUsage));
-    if($admin == 1 && $un == $this->system->ID) {
+    if($admin == 1 && $username == $this->system->ID) {
      $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
      $ck = 1;
     } else {
@@ -521,7 +522,7 @@
       $ck3 = ($s2 < $xfsLimits["Audio"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][0];
      } elseif(in_array($ext, $_DLC["P"])) {
-      $src = $src."$un/$name";
+      $src = $src."$username/$name";
       $ck3 = ($s2 < $xfsLimits["Images"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][2];
      } elseif(in_array($ext, $_DLC["D"])) {
@@ -583,7 +584,7 @@
        array_push($fck, "Failed to move $name to the transit camp.");
        array_push($_F, [$f["name"][$k], $err, $fck]);
       } else {
-       $dlc = [
+       $file = [
         "AID" => $id,
         "Description" => "",
         "EXT" => $ext,
@@ -598,7 +599,7 @@
         "Timestamp" => $this->system->timestamp,
         "Type" => $type
        ];
-       $efs[$fn] = $dlc;
+       $efs[$fn] = $file;
        $p2p = $this->system->core["EFS"] ?? [];
        $p2p_domain = ftp_connect($this->system->p2p);
        $p2p_password = base64_decode($p2p["Password"]);
@@ -610,11 +611,11 @@
         ftp_pasv($p2p_domain, true);
         ftp_chmod($p2p_domain, 0777, "html");
         ftp_chdir($p2p_domain, "html");
-        if(!in_array($un, ftp_nlist($p2p_domain, "."))) {
-         ftp_mkdir($p2p_domain, $un);
+        if(!in_array($username, ftp_nlist($p2p_domain, "."))) {
+         ftp_mkdir($p2p_domain, $username);
         }
-        ftp_chmod($p2p_domain, 0777, $un);
-        ftp_chdir($p2p_domain, $un);
+        ftp_chmod($p2p_domain, 0777, $username);
+        ftp_chdir($p2p_domain, $username);
         $local = $root.basename($name);
         if(in_array($name, ftp_nlist($p2p_domain, "."))) {
          array_push($fck, "Duplicate file.");
@@ -623,15 +624,15 @@
          array_push($fck, "Failed to push $name to the Extended File System.");
          array_push($_F, [$f["name"][$k], $err, $fck]);
         } else {
-         if($admin == 1 && $un == $this->system->ID) {
-          $dlc["UN"] = $y["Login"]["Username"];
+         if($admin == 1 && $username == $this->system->ID) {
+          $file["UN"] = $y["Login"]["Username"];
           $this->system->Data("Save", ["x", "fs", $efs]);
          } else {
           $fs = [];
           $fs["Albums"] = $fa;
           $fs["Files"] = $efs;
           if(in_array($ext, $this->system->core["XFS"]["FT"]["P"])) {
-           $fs["Albums"][$id]["ICO"] = $dlc["Name"];
+           $fs["Albums"][$id]["ICO"] = $file["Name"];
           }
           $fs["Albums"][$id]["Modified"] = $this->system->timestamp;
           $y["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
@@ -644,7 +645,7 @@
            md5($y["Login"]["Username"]), $y
           ]);
          }
-         array_push($_PS, [$dlc, $fn, $fck]);
+         array_push($_PS, [$file, $fn, $fck]);
         }
         ftp_close($p2p_domain);
        }
@@ -697,12 +698,12 @@
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage, and exceeded the limit of $xfsLimit."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-    $un = $data["UN"] ?? $you;
+    $username = $data["UN"] ?? $you;
     $uploadsAllowed = ($usage < $limit) ? 1 : 0;
     $uploadsAllowed = $y["Subscriptions"]["XFS"]["A"] ?? $uploadsAllowed;
     #$uploadsAllowed = ($_HC == 1) ? 1 : $uploadsAllowed;
-    if(!empty($id) && !empty($un) && $uploadsAllowed == 1) {
-     $t = ($un != $you) ? $this->system->Member($un) : $y;
+    if(!empty($id) && !empty($username) && $uploadsAllowed == 1) {
+     $t = ($username != $you) ? $this->system->Member($username) : $y;
      $fs = $this->system->Data("Get", [
       "fs",
       md5($t["Login"]["Username"])
