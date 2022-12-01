@@ -411,16 +411,16 @@
       "fs",
       md5($t["Login"]["Username"])
      ]) ?? [];
-     $ico = $dbi[0]."/".$fs["Files"][$dbi[1]]["Name"];
-     $y["Personalization"][$type] = base64_encode($ico);
+     $image = $dbi[0]."/".$fs["Files"][$dbi[1]]["Name"];
+     $y["Personal"][$type] = base64_encode($image);
     }
     $r = $this->system->Dialog([
      "Body" => $this->system->Element([
-      "p", "The Photo was set as your $cp."
+      "p", "The Photo was set as your $cp.<br/>".json_encode($y["Personal"], true)
      ]),
-     "Header" => "$cp Set!"
+     "Header" => "Done"
     ]);
-    $this->system->Data("Save", ["mbr", md5($y["Login"]["Username"]), $y]);
+    #$this->system->Data("Save", ["mbr", md5($you), $y]);
    }
    return $r;
   }
