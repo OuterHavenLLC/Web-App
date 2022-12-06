@@ -10,7 +10,9 @@
    $id = $data["ID"];
    $mbr = $data["Member"];
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Forum Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Forum Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;

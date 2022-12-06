@@ -311,15 +311,14 @@
     "b2",
     "back",
     "lPG",
-    "lPP",
     "pub"
    ]);
-   $lpg = $data["lPG"];
-   $lpp = $data["lPP"] ?? "OHCC";
-   $bck = ($data["back"] == 1) ? $this->system->Element(["button", "Back", [
-    "class" => "GoToParent LI head",
-    "data-type" => ".$lpp;$lpg"
-   ]]) : "";
+   $bck = ($data["back"] == 1) ? $this->system->Element([
+    "button", "Back", [
+     "class" => "GoToParent LI head",
+     "data-type" => $data["lPG"]
+    ]
+   ]) : "";
    $pub = $data["pub"] ?? 0;
    $r = $this->MadeInNewYork(["back" => $bck]);
    $username = $data["UN"] ?? base64_encode("");

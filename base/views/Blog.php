@@ -163,11 +163,10 @@
     "lPG",
     "pub"
    ]);
-   $lpg = $data["lPG"];
    $bck = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to Blogs", [
      "class" => "GoToParent LI",
-     "data-type" => ".OHCC;$lpg"
+     "data-type" => $data["lPG"]
     ]
    ]) : "";
    $i = 0;

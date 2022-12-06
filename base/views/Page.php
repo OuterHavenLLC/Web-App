@@ -10,7 +10,9 @@
    $id = $data["ID"];
    $mbr = $data["Member"];
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Forum Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Forum Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
@@ -252,11 +254,9 @@
    $bck = $data["back"] ?? 0;
    $card = $data["CARD"] ?? 0;
    $id = $data["ID"];
-   $lpg = $data["lPG"];
-   $lpp = $data["lPP"] ?? "OHCC";
    $bck = ($bck == 1) ? $this->system->Element(["button", "Back to $b2", [
     "class" => "GoToParent LI header",
-    "data-type" => ".$lpp;$lpg"
+    "data-type" => $data["lPG"]
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $r = $this->system->Change([[

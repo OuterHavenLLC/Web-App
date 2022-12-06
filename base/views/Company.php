@@ -77,9 +77,9 @@
      ]
     ]),
     "[OHC.Partners]" => $this->view(base64_encode("Company:Partners"), []),
-    "[OHC.Shop]" => ".OHCC;OHC;".base64_encode("v=".base64_encode("Shop:Home")."&b2=$b2&back=1&lPG=OHC&UN=$sid"),
+    "[OHC.Shop]" => "OHC;".base64_encode("v=".base64_encode("Shop:Home")."&b2=$b2&back=1&lPG=OHC&UN=$sid"),
     "[OHC.Statistics]" => $this->view(base64_encode("Company:Statistics"), []),
-    "[OHC.VVA]" => ".OHCC;OHC;".base64_encode("v=".base64_encode("Company:VVA")."&b2=$b2&back=1&lPG=OHC")
+    "[OHC.VVA]" => "OHC;".base64_encode("v=".base64_encode("Company:VVA")."&b2=$b2&back=1&lPG=OHC")
    ], $this->system->Page("0a24912129c7df643f36cb26038300d6")]);
    $r = ($pub == 1) ? $this->view(base64_encode("WebUI:Containers"), [
     "Data" => ["Content" => $r]
@@ -227,7 +227,7 @@
    $bck = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to <em>".$data["b2"]."</em>", [
      "class" => "GoToParent LI head",
-     "data-type" => ".OHCC;".$data["lPG"]
+     "data-type" => $data["lPG"]
     ]
    ]) : "";
    $r = $this->system->Change([[

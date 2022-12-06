@@ -74,12 +74,10 @@
    $id = $data["AID"];
    $b2 = $data["b2"] ?? "Albums";
    $bck = $data["back"] ?? 0;
-   $lpg = $data["lPG"];
-   $lpp = $data["lPP"] ?? "OHCC";
    $un = $data["UN"] ?? $y["Login"]["Username"];
    $bck = ($bck == 1) ? $this->system->Element(["button", "Back to $b2", [
     "class" => "GoToParent LI head",
-    "data-type" => ".$lpp;$lpg"
+    "data-type" => $data["lPG"]
    ]]) : "";
    $r = $this->system->Change([[
     "[Error.Back]" => $bck,
@@ -102,8 +100,6 @@
    $bck = "";
    $data = $a["Data"] ?? [];
    $fu = base64_encode("File:Upload");
-   $lpg = $data["lPG"] ?? "";
-   $lpp = $data["lPP"] ?? "OHCC";
    $id = $data["AID"] ?? "";
    $b2 = $data["b2"] ?? "Albums";
    $b2 = urlencode($b2);

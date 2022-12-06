@@ -14,7 +14,6 @@
    $i = 0;
    $st = $data["st"] ?? "";
    $lpg = $data["lPG"] ?? $st;
-   $lpp = "Search$st";
    $pub = $data["pub"] ?? 0;
    $query = $data["query"] ?? "";
    $sl = $this->lists;
@@ -91,7 +90,7 @@
      $ck = ($un == $y["Login"]["Username"]) ? 1 : 0;
      $t = ($ck == 1) ? $y : $this->system->Member($un);
      $h = ($ck == 1) ? "Your Contacts" : $t["Personal"]["DisplayName"]."'s Contacts";
-     $li .= "&b2=$b2&lPG=$lpg&lPP=$lpp&UN=".$data["UN"];
+     $li .= "&b2=$b2&lPG=$lpg&UN=".$data["UN"];
      $lis = "Search Contacts";
     } elseif($st == "ContactsRequests") {
      $h = "Contact Requests";
@@ -205,7 +204,7 @@
      $h = ($ck == 1) ? "Your Albums" : $t["Personal"]["DisplayName"]."'s Albums";
      $b2 = $b2 ?? $h;
      $b2 = urlencode($b2);
-     $li .= "&UN=".base64_encode($t["Login"]["Username"])."&b2=$b2&lPG=$lpg&lPP=$lpp";
+     $li .= "&UN=".base64_encode($t["Login"]["Username"])."&b2=$b2&lPG=$lpg";
      $lis = "Search Albums";
      $lo = ($ck == 1 && $notAnon == 1) ? $this->system->Element([
       "button", "New Album", [
@@ -229,7 +228,7 @@
      $t = $this->system->Member(base64_decode($data["UN"]));
      $ck = ($t["Login"]["Username"] == $y["Login"]["Username"]) ? 1 : 0;
      $h = ($ck == 1) ? "Your Contributions" : $t["Personal"]["DisplayName"]."'s Contributions";
-     $li .= "&b2=$b2&lPG=$lpg&lPP=$lpp&UN=".$data["UN"];
+     $li .= "&b2=$b2&lPG=$lpg&UN=".$data["UN"];
      $lis = "Search the Archive";
     } elseif($st == "MBR-Forums") {
      $fd = base64_encode("Authentication:DeleteForum");
@@ -249,11 +248,11 @@
      $t = $this->system->Member(base64_decode($data["UN"]));
      $ck = ($t["Login"]["Username"] == $y["Login"]["Username"]) ? 1 : 0;
      $h = ($ck == 1) ? "Your Journal" : $t["Personal"]["DisplayName"]."'s Journal";
-     $li .= "&b2=$b2&lPG=$lpg&lPP=$lpp";
+     $li .= "&b2=$b2&lPG=$lpg";
      $lis = "Search Entries";
     } elseif($st == "MBR-LLP") {
      $h = "Your Pages";
-     $li .= "&b2=$b2&lPG=$lpg&lPP=$lpp";
+     $li .= "&b2=$b2&lPG=$lpg";
      $lis = "Search Pages";
      $pd = base64_encode("Authentication:DeletePage");
      $pe = base64_encode("Page:Edit");
@@ -310,7 +309,7 @@
      $de = $alb["Description"] ?? "";
      $display = ($t["Personal"]["DisplayName"] == $this->system->ID) ? "Anonymous" : $t["Personal"]["DisplayName"];
      $h = $alb["Title"] ?? "Unsorted";
-     $li .= "&AID=$aid&UN=".base64_encode($t["Login"]["Username"])."&lPP=$lpp&lPG=$lpg";
+     $li .= "&AID=$aid&UN=".base64_encode($t["Login"]["Username"])."&lPG=$lpg";
      $lis = "Search $h";
      $uf = ($ck == 1) ? "You have unlimited storage." : "You used $xfsUsage out of $xfsLimit.";
      $ck = ($ck == 1 || $usage < $limit) ? 1 : 0;
@@ -318,7 +317,7 @@
       $lo = $this->system->Change([[
        "[Album.Description]" => $de,
        "[Album.Owner]" => $display,
-       "[Album.ULDT]" => ".$lpp;$lpg;".base64_encode("v=".base64_encode("File:Upload")."&AID=$aid&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg&lPP=$lpp"),
+       "[Album.ULDT]" => "$lpg;".base64_encode("v=".base64_encode("File:Upload")."&AID=$aid&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg"),
        "[Album.XFSstats]" => $uf
       ], $this->system->Page("b9e1459dc1c687cebdaa9aade72c50a9")]);
      } else {
@@ -436,7 +435,6 @@
    $na = "No Results";
    $st = $data["st"] ?? "";
    $lpg = $data["lPG"] ?? $st;
-   $lpp = $data["lPP"] ?? "OHCC";
    $query = $data["query"] ?? "";
    $query = (!empty($query)) ? base64_decode($query) : "";
    $na .= (!empty($data["query"])) ? " for $query" : "";
@@ -749,7 +747,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
          "Display" => 1,
          "HTMLDecode" => 1
         ])),
-        "[X.LI.DT]" => base64_encode(".$lpp;$lpg;".base64_encode("v=$home&b2=$b2&back=1&lPG=$lpg&ID=".$Page["ID"]))
+        "[X.LI.DT]" => base64_encode("$lpg;".base64_encode("v=$home&b2=$b2&back=1&lPG=$lpg&ID=".$Page["ID"]))
        ]);
       }
      }
@@ -1619,7 +1617,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
         "Display" => 1,
         "HTMLDecode" => 1
        ])),
-       "[Article.ViewPage]" => base64_encode(".$lpp;$lpg;".base64_encode("v=$home&b2=$b2&back=1&lPG=$lpg&lPP=$lpp&ID=".$Page["ID"]))
+       "[Article.ViewPage]" => base64_encode("$lpg;".base64_encode("v=$home&b2=$b2&back=1&lPG=$lpg&ID=".$Page["ID"]))
       ]);
      }
     }
@@ -1664,7 +1662,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
         "[X.LI.Delete]" => base64_encode("v=$delete&ID=$value"),
         "[X.LI.K]" => base64_encode($value),
         "[X.LI.C]" => base64_encode($Page["Category"]),
-        "[X.LI.DT]" => base64_encode(base64_encode("v=$edit&ID=$value&lPG=$lpg&lPP=$lpp&b2=$b2"))
+        "[X.LI.DT]" => base64_encode(base64_encode("v=$edit&ID=$value&lPG=$lpg&b2=$b2"))
        ]);
       }
      }
@@ -1772,7 +1770,7 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
       ]);
       $type = ($i % 2 == 0 || $i % 3 == 0) ? "Desktop66" : "Desktop33";
       array_push($msg, [
-       "[X.LI.DT]" => base64_encode(".$lpp;$lpg;".base64_encode("v=".base64_encode("File:Home")."&ID=".$value["ID"]."&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg&lPP=$lpp")),
+       "[X.LI.DT]" => base64_encode("$lpg;".base64_encode("v=".base64_encode("File:Home")."&ID=".$value["ID"]."&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg")),
        "[X.LI.Style]" => base64_encode("background:url('$src')"),
        "[X.LI.Title]" => base64_encode($value["Title"]),
        "[X.LI.Type]" => base64_encode($type)

@@ -288,13 +288,11 @@
   function Home(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["CARD", "UN", "b2", "lPG"]);
-   $lpg = $data["lPG"];
-   $lpp = $data["lPP"] ?? "OHCC";
    $b2 = $data["b2"];
    $back = $data["back"] ?? 0;
    $back = ($back == 1) ? $this->system->Element(["button", "Back to $b2", [
     "class" => "GoToParent LI head",
-    "data-type" => "$lpp;$lpg"
+    "data-type" => $data["lPG"]
    ]]) : "";
    $pub = $data["pub"] ?? 0;
    $t = $this->system->Member(base64_decode($data["UN"]));
@@ -313,7 +311,6 @@
     $_youBlockedThem = $this->system->CheckBlocked([$y, "Members", $id]);
     $b2 = ($id == $you) ? "Your Profile" : $t["Personal"]["DisplayName"]."'s Profile";
     $lpg = "Profile".md5($id);
-    $lpp = "Member".md5($id);
     $privacy = $t["Privacy"] ?? [];
     $ck = ($id == $you) ? 1 : 0;
     $ck2 = ($privacy["NSFW"] == 0 || ($y["Personal"]["Age"] >= $this->config["minAge"])) ? 1 : 0;
@@ -375,7 +372,6 @@
       "UN" => base64_encode($id),
       "b2" => $b2,
       "lPG" => $lpg,
-      "lPP" => $lpp,
       "st" => "MBR-CA"
      ]]) : $this->system->Change([[
       "[Error.Back]" => "",
@@ -394,7 +390,6 @@
       "UN" => base64_encode($id),
       "b2" => $b2,
       "lPG" => $lpg,
-      "lPP" => $lpp,
       "st" => "MBR-BLG"
      ]]) : $this->system->Change([[
       "[Error.Back]" => "",
@@ -406,7 +401,6 @@
       "UN" => base64_encode($id),
       "b2" => $b2,
       "lPG" => $lpg,
-      "lPP" => $lpp,
       "st" => "ContactsProfileList"
      ]]) : $this->system->Change([[
       "[Error.Back]" => "",
@@ -493,7 +487,6 @@
       "UN" => base64_encode($id),
       "b2" => $b2,
       "lPG" => $lpg,
-      "lPP" => $lpp,
       "st" => "MBR-JE"
      ]]) : $this->system->Change([[
       "[Error.Back]" => "",

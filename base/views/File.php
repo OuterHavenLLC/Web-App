@@ -74,13 +74,12 @@
     "ID",
     "UN",
     "back",
-    "lPG",
-    "lPP"
+    "lPG"
    ]);
    $back = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to Files", [
      "class" => "GoToParent LI",
-     "data-type" => ".".$data["lPP"].";".$data["lPG"]
+     "data-type" => $data["lPG"]
     ]
    ]) : "";
    $id = $data["ID"] ?? "";
@@ -672,13 +671,12 @@
    $data = $this->system->FixMissing($data, [
     "AID",
     "UN",
-    "lPG",
-    "lPP"
+    "lPG"
    ]);
    $back = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to Files", [
      "class" => "GoToParent LI",
-     "data-type" => ".".$data["lPP"].";".$data["lPG"]
+     "data-type" => $data["lPG"]
     ]
    ]) : "";
    $id = $data["AID"];
