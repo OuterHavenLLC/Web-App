@@ -319,11 +319,11 @@
     $newFiles = [];
     $points = $this->system->core["PTS"]["DeleteFile"];
     $r = "The File <strong>#$id</strong> could not be found.";
-    if(!empty($file)) {
-     $albumID = $file["AID"] ?? md5("unsorted");
+    if(!empty($file["AID"])) {
+     $albumID = $file["AID"];
      $albums = $fileSystem["Albums"] ?? [];
      foreach($files as $key => $value) {
-      if($key != $id) {
+      if($id != $value["ID"]) {
        $newFiles[$key] = $value;
       } else {
        $p2p = $this->system->core["EFS"] ?? [];
@@ -347,30 +347,30 @@
          if($albums[$albumID]["ICO"] == $value["Name"] && $username == $you) {
           $albums[$albumID]["ICO"] = "";
          }
-         #$this->view(base64_encode("Conversation:SaveDelete"), [
-         # "Data" => ["ID" => $key]
-         #]);
-         #$this->system->Data("Purge", ["react", $key]);
-         #ftp_delete($p2p_domain, $value["Name"]);
+         $this->view(base64_encode("Conversation:SaveDelete"), [
+          "Data" => ["ID" => $key]
+         ]);
+         $this->system->Data("Purge", ["react", $key]);
+         ftp_delete($p2p_domain, $value["Name"]);
         }
        }
        ftp_close($p2p_domain);
       }
      } if($this->system->ID == $username) {
-      #$this->system->Data("Save", ["x", "fs", $newFiles]);
+      $this->system->Data("Save", ["x", "fs", $newFiles]);
      } else {
       $fileSystem["Albums"] = $albums;
       $fileSystem["Files"] = $newFiles;
       $y["Points"] = $y["Points"] + $points;
-      #$this->system->Data("Save", ["fs", md5($you), $fileSystem]);
-      #$this->system->Data("Save", ["mbr", md5($you), $y]);
+      $this->system->Data("Save", ["fs", md5($you), $fileSystem]);
+      $this->system->Data("Save", ["mbr", md5($you), $y]);
      }
      $acknowledge = $this->system->Element(["button", "Okay", [
-      "class" => "BBB GoToParent dBC v2 v2w",
+      "class" => "GoToParent dBC v2 v2w",
       "data-type" => $parentView
      ]]);
      $r = ($accessCode == "Accepted") ? "The File was deleted." : $r;
-     $r.="<br/>".json_encode($fileSystem, true);//TEMP
+     $r.="<br/>Test Data: ".json_encode([$file, $fileSystem], true);//TEMP
     }
    }
    $header = ($accessCode == "Denied") ? "Error" : "Done";
