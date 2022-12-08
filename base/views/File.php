@@ -139,7 +139,7 @@
      $actions .= ($ck == 1 || $username == $you) ? $this->system->Element([
       "button", "Delete", [
        "class" => "Small dBO v2",
-       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($username)
+       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($username).""
       ]
      ]) : "";
      $actions .= $this->system->Element([
@@ -162,7 +162,6 @@
        $t["Login"]["Username"],
        $file
       ]);
-      $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
       list($height, $width) = getimagesize($_Source);
       $_Size = ($height <= ($width / 1.5) || $height == $width) ? 1 : 0;
       $cp = ($height <= ($width / 1.5)) ? "Cover Photo" : "Profile Picture";
@@ -175,6 +174,7 @@
        ]
       ]) : "";
      }
+     $nsfw = ($nsfw == 1) ? "Adults Only" : "Kid-Friendly";
      $r = $this->system->Change([[
       "[File.Actions]" => $actions,
       "[File.AddTo]" => $addTo,

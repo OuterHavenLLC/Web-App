@@ -17,7 +17,9 @@
    $y = $this->you;
    if($y["Login"]["Username"] == $this->system->ID) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
@@ -49,7 +51,9 @@
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($form) && !empty($id) && !empty($processor)) {
@@ -68,13 +72,17 @@
    $id = $data["ID"] ?? "";
    $mbr = $data["Member"] ?? "";
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Forum Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Forum Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
@@ -231,35 +239,37 @@
   function DeleteFile(array $a) {
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["AID", "ID", "UN"]);
-   $aid = $data["AID"] ?? md5("unsorted");
+   $albumID = $data["AID"] ?? md5("unsorted");
    $id = $data["ID"];
-   $un = $data["UN"];
-   $y = $this->you;
+   $username = $data["UN"];
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The File Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The File Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
-   if($this->system->ID == $y["Login"]["Username"]) {
+   $y = $this->you;
+   $you = $y["Login"]["Username"];
+   if($this->system->ID == $you) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
-   } elseif((!empty($id) && !empty($un))) {
+   } elseif((!empty($id) && !empty($username))) {
     $un = base64_decode($un);
-    $efs = $this->system->Data("Get", [
-     "fs",
-     md5($y["Login"]["Username"])
-    ]) ?? [];
-    $efs = ($un == $this->system->ID) ? $this->system->Data("Get", [
+    $files = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+    $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
-    ]) : $efs;
-    $dlc = $efs[$id];
+    ]) : $files;
+    $file = $files[$id] ?? [];
     $r = $this->system->Change([[
      "[Delete.Auth]" => $this->system->Page("92c7c84d33f9c3d8ccd6cc04dc228bf0"),
-     "[Delete.ID]" => base64_encode("$un-$aid-$id"),
+     "[Delete.ID]" => base64_encode("$username-$albumID-$id"),
      "[Delete.Processor]" => base64_encode("v=".base64_encode("File:SaveDelete")),
-     "[Delete.Title]" => $dlc["Title"]
+     "[Delete.Title]" => $file["Title"]
     ], $this->system->Page("fca4a243a55cc333f5fa35c8e32dd2a0")]);
    }
    return $r;
@@ -268,18 +278,24 @@
    $data = $a["Data"] ?? [];
    $id = $data["ID"] ?? "";
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Forum Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Forum Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif($id == "cb3e432f76b38eaa66c7269d658bd7ea") {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You cannot delete this forum."]),
+     "Body" => $this->system->Element([
+      "p", "You cannot delete this forum."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
@@ -302,13 +318,17 @@
    $fid = $data["FID"];
    $id = $data["ID"];
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Forum Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Forum Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif((!empty($fid) && !empty($id))) {
@@ -333,7 +353,9 @@
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($data["ID"])) {
@@ -361,7 +383,9 @@
    ]);
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($data["ID"])) {
@@ -387,7 +411,9 @@
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {
@@ -406,13 +432,17 @@
    $id = $data["ID"] ?? "";
    $mbr = $data["Member"] ?? "";
    $r = $this->system->Dialog([
-    "Body" => $this->system->Element(["p", "The Forum Identifier is missing."]),
+    "Body" => $this->system->Element([
+     "p", "The Forum Identifier is missing."
+    ]),
     "Header" => "Error"
    ]);
    $y = $this->you;
    if($this->system->ID == $y["Login"]["Username"]) {
     $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "You must sign in to continue."]),
+     "Body" => $this->system->Element([
+      "p", "You must sign in to continue."
+     ]),
      "Header" => "Forbidden"
     ]);
    } elseif(!empty($id)) {

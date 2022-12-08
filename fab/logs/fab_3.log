@@ -1,6 +1,7 @@
-2022-11-26 14:54:12	ERROR	[SRC 66.45.234.206:55572 sid=1] SHOUTcast 1 source connection denied for user (CONNECT google.com). Bad password: 443 HTTP/1.1
-2022-11-27 02:50:05	ERROR	[DST 184.105.247.247:51205 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36 OPR/90.0.4480.100'
-2022-11-27 05:39:04	ERROR	[DST 18.135.13.18:56408 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'Cloud mapping experiment. Contact research@pdrlabs.net''
-2022-11-27 05:39:06	ERROR	[DST 18.135.13.18:43320 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'Cloud mapping experiment. Contact research@pdrlabs.net''
-2022-11-27 05:39:10	ERROR	[DST 18.135.13.18:43338 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'Cloud mapping experiment. Contact research@pdrlabs.net''
-2022-11-27 09:31:40	ERROR	[SRC 192.241.212.238:45310 sid=1] SHOUTcast 1 source connection denied. Bad password: MGLNDD_174.138.58.184_8000
+2022-12-03 11:45:22	ERROR	[DST 184.105.139.98:64471 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0'
+2022-12-03 11:45:44	ERROR	[SRC 184.105.139.126:21547 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
+2022-12-03 12:39:50	ERROR	[SRC 167.248.133.47:34396 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-03 12:39:51	ERROR	[SRC 162.142.125.7:45822 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-03 12:39:54	ERROR	[SRC 167.94.138.44:48902 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-04 05:11:00	ERROR	[DST 167.248.133.117:40802 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-12-04 05:11:00	ERROR	[SRC 167.248.133.117:33676 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0

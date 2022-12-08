@@ -1,6 +1,17 @@
-2022-11-29 20:23:28	ERROR	[DST 94.102.61.48:35590 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `python-requests/2.26.0'
-2022-11-29 20:31:28	ERROR	[SRC 192.241.199.57:43480 sid=1] SHOUTcast 1 source connection denied. Bad password: MGLNDD_174.138.58.184_8000
-2022-11-29 22:52:50	ERROR	[DST 205.210.31.174:61124 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
-2022-11-30 01:56:03	ERROR	[DST 64.62.197.126:23249 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0'
-2022-11-30 01:56:07	ERROR	[SRC 64.62.197.125:14865 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
-2022-11-30 02:02:01	ERROR	[DST 198.235.24.178:61730 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
+2022-12-06 01:30:16	WARN	[CONFIG] Ignoring streampath_1=http://outerhaven.nyc:8000 as this will produce an invalid path.
+2022-12-06 01:30:16	WARN	[CONFIG] Ignoring streampath_2=http://outerhaven.nyc:8000 as this will produce an invalid path.
+2022-12-06 01:30:16	INFO	*********************************************************************
+2022-12-06 01:30:16	INFO	**        SHOUTcast Distributed Network Audio Server (DNAS)        **
+2022-12-06 01:30:16	INFO	**    Copyright (C) 2014-2017 Radionomy SA, All Rights Reserved    **
+2022-12-06 01:30:16	INFO	*********************************************************************
+2022-12-06 01:30:16	INFO	[MAIN] SHOUTcast DNAS/posix(linux x64) v2.5.5.733 (Oct  9 2017)
+2022-12-06 01:30:16	INFO	[MAIN] PID: 1008
+2022-12-06 01:30:16	INFO	[MAIN] Saving log output to `/var/www/html/fab/logs/fab.log'
+2022-12-06 01:30:16	INFO	[MAIN] Automatic log rotation interval: 1 day
+2022-12-06 01:30:16	INFO	[MAIN] Loaded config from `/var/www/html/fab/fab.conf'
+2022-12-06 01:30:16	INFO	[MAIN] Calculated CPU count is 1 -> 2 CPUs specified to be used
+2022-12-06 01:30:16	INFO	[MAIN] Limited to 1024 file descriptors [relates to ulimit -n]
+2022-12-06 01:30:16	INFO	[MAIN] Starting 2 network threads
+2022-12-06 01:30:16	INFO	[MICROSERVER] Listening for source and client connections on port 8000
+2022-12-06 01:30:16	INFO	[MICROSERVER] Listening for legacy source connections on port 8001
+2022-12-06 01:30:16	INFO	[MICROSERVER] Flash policy file server not enabled
