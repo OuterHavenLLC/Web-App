@@ -289,9 +289,13 @@
   }
   function SaveDelete(array $a) {
    $accessCode = "Denied";
+   $acknowledge = $this->Element(["button", "Okay", [
+    "class" => "dBC v2 v2w"
+   ]]);
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
    $id = $data["ID"] ?? "";
+   $parentView = $data["ParentView"] ?? "";
    $r = "The File Identifier is missing.";
    $y = $this->you;
    $you = $y["Login"]["Username"];
@@ -299,15 +303,14 @@
     $r = "The PINs do not match.";
    } elseif($this->system->ID == $you) {
     $r = "You must be signed in to continue.";
-   } elseif(!empty($id)) {
-    $_FileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+   } elseif(!empty($id) && !empty($parentView)) {
     $_ID = explode("-", $id);
     $accessCode = "Accepted";
-    $albums = $_FileSystem["Albums"] ?? [];
     $files = $_FileSystem["Files"] ?? [];
     $id = $_ID[1];
     $username = $_ID[0];
-    $files = $_FileSystem["Files"] ?? [];
+    $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+    $files = $fileSystem["Files"] ?? [];
     $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
@@ -318,6 +321,7 @@
     $r = "The File <strong>#$id</strong> could not be found.";
     if(!empty($file)) {
      $albumID = $file["AID"] ?? md5("unsorted");
+     $albums = $fileSystem["Albums"] ?? [];
      foreach($files as $key => $value) {
       if($key != $id) {
        $newFiles[$key] = $value;
@@ -355,20 +359,25 @@
      } if($this->system->ID == $username) {
       #$this->system->Data("Save", ["x", "fs", $newFiles]);
      } else {
-      $_FileSystem["Albums"] = $albums;
-      $_FileSystem["Files"] = $newFiles;
+      $fileSystem["Albums"] = $albums;
+      $fileSystem["Files"] = $newFiles;
       $y["Points"] = $y["Points"] + $points;
-      #$this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
+      #$this->system->Data("Save", ["fs", md5($you), $fileSystem]);
       #$this->system->Data("Save", ["mbr", md5($you), $y]);
      }
+     $acknowledge = $this->system->Element(["button", "Okay", [
+      "class" => "BBB GoToParent dBC v2 v2w",
+      "data-type" => $parentView
+     ]]);
      $r = ($accessCode == "Accepted") ? "The File was deleted." : $r;
-     $r.="<br/>".json_encode($_FileSystem, true);//TEMP
+     $r.="<br/>".json_encode($fileSystem, true);//TEMP
     }
    }
    $header = ($accessCode == "Denied") ? "Error" : "Done";
    $r = $this->system->Dialog([
     "Body" => $this->system->Element(["p", $r]),
-    "Header" => $header
+    "Header" => $header,
+    "Option2" => $acknowledge
    ]);
    return $this->system->JSONResponse([
     "AccessCode" => $accessCode,
