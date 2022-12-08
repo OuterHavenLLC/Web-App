@@ -370,7 +370,6 @@
       "data-type" => $parentView
      ]]);
      $r = ($accessCode == "Accepted") ? "The File was deleted." : $r;
-     $r.="<br/>Test Data: ".json_encode([$file, $fileSystem], true);//TEMP
     }
    }
    $header = ($accessCode == "Denied") ? "Error" : "Done";
@@ -734,8 +733,8 @@
       $opt = "<input name=\"UN\" type=\"hidden\" value=\"".$t["Login"]["Username"]."\"/>\r\n";
       if($ck == 1) {
        $opt .= "<input id=\"AID\" name=\"AID\" type=\"hidden\" value=\"".md5("unsorted")."\"/>\r\n";
+       $opt .= "<input id=\"Privacy\" name=\"pri\" type=\"hidden\" value=\"".md5("public")."\"/>\r\n";
        $opt .= "<input id=\"nsfw\" name=\"nsfw\" type=\"hidden\" value=\"0\"/>\r\n";
-       $opt .= "<input id=\"pri\" name=\"pri\" type=\"hidden\" value=\"".md5("public")."\"/>\r\n";
        $title = "System Library";
       } elseif($ck2 == 1) {
        $opt .= "<input name=\"AID\" type=\"hidden\" value=\"$id\"/>\r\n";
