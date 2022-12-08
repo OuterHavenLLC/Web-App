@@ -139,7 +139,10 @@
      $actions .= ($ck == 1 || $username == $you) ? $this->system->Element([
       "button", "Delete", [
        "class" => "Small dBO v2",
-       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&ID=$id&UN=".base64_encode($username).""
+       "data-type" => "v=".base64_encode("Authentication:DeleteFile")."&AID=".$file["AID"]."&ID=$id&ParentView=".$this->system->PlainText([
+        "Data" => $data["lPG"],
+        "Encode" => 1
+       ])."&UN=".base64_encode($username)
       ]
      ]) : "";
      $actions .= $this->system->Element([
@@ -289,88 +292,84 @@
    $data = $a["Data"] ?? [];
    $data = $this->system->DecodeBridgeData($data);
    $id = $data["ID"] ?? "";
-   $r = $this->system->Dialog([
-    "Body" => $this->system->Element([
-     "p", "The File Identifier is missing."
-    ]),
-    "Header" => "Error"
-   ]);
+   $r = "The File Identifier is missing.";
    $y = $this->you;
    $you = $y["Login"]["Username"];
-   $username = $data["UN"] ?? $you;
    if(md5($data["PIN"]) != $y["Login"]["PIN"]) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", "The PINs do not match."]),
-     "Header" => "Error"
-    ]);
+    $r = "The PINs do not match.";
    } elseif($this->system->ID == $you) {
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element([
-      "p", "You must be signed in to continue."
-     ]),
-     "Header" => "Forbidden"
-    ]);
+    $r = "You must be signed in to continue.";
    } elseif(!empty($id)) {
     $_FileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+    $_ID = explode("-", $id);
     $accessCode = "Accepted";
     $albums = $_FileSystem["Albums"] ?? [];
+    $files = $_FileSystem["Files"] ?? [];
+    $id = $_ID[1];
+    $username = $_ID[0];
     $files = $_FileSystem["Files"] ?? [];
     $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
     ]) : $files;
+    $file = $files[$id] ?? [];
     $newFiles = [];
     $points = $this->system->core["PTS"]["DeleteFile"];
-    foreach($files as $key => $value) {
-     if($key != $id && $value["AID"] != $id) {
-      $newFiles[$key] = $value;
-     } else {
-      $p2p = $this->system->core["EFS"] ?? [];
-      $p2p_domain = ftp_connect($this->system->p2p);
-      $p2p_password = base64_decode($p2p["Password"]);
-      $p2p_username = base64_decode($p2p["Username"]);
-      if(!ftp_login($p2p_domain, $p2p_username, $p2p_password)) {
-       $accessCode = "Denied";
-       $r = "Failed to connect to the Extended File System.";
+    $r = "The File <strong>#$id</strong> could not be found.";
+    if(!empty($file)) {
+     $albumID = $file["AID"] ?? md5("unsorted");
+     foreach($files as $key => $value) {
+      if($key != $id) {
+       $newFiles[$key] = $value;
       } else {
-       ftp_pasv($p2p_domain, true);
-       ftp_chmod($p2p_domain, 0777, "html");
-       ftp_chdir($p2p_domain, "html");
-       if(!in_array($mbr, ftp_nlist($p2p_domain, "."))) {
-        ftp_mkdir($p2p_domain, "$mbr");
-       }
-       ftp_chmod($p2p_domain, 0777, $mbr);
-       ftp_chdir($p2p_domain, $mbr);
-       $list = ftp_nlist($p2p_domain, ".");
-       if(in_array($value["Name"], $list)) {
-        if($albums[$id]["ICO"] == $value["Name"] && $username == $you) {
-         $albums[$id]["ICO"] = "";
+       $p2p = $this->system->core["EFS"] ?? [];
+       $p2p_domain = ftp_connect($this->system->p2p);
+       $p2p_password = base64_decode($p2p["Password"]);
+       $p2p_username = base64_decode($p2p["Username"]);
+       if(!ftp_login($p2p_domain, $p2p_username, $p2p_password)) {
+        $accessCode = "Denied";
+        $r = "Failed to connect to the Extended File System.";
+       } else {
+        ftp_pasv($p2p_domain, true);
+        ftp_chmod($p2p_domain, 0777, "html");
+        ftp_chdir($p2p_domain, "html");
+        if(!in_array($username, ftp_nlist($p2p_domain, "."))) {
+         ftp_mkdir($p2p_domain, $username);
         }
-        #$this->view(base64_encode("Conversation:SaveDelete"), [
-        # "Data" => ["ID" => $key]
-        #]);
-        #$this->system->Data("Purge", ["react", $key]);
-        #ftp_delete($p2p_domain, $value["Name"]);
+        ftp_chmod($p2p_domain, 0777, $username);
+        ftp_chdir($p2p_domain, $username);
+        $list = ftp_nlist($p2p_domain, ".");
+        if(in_array($value["Name"], $list)) {
+         if($albums[$albumID]["ICO"] == $value["Name"] && $username == $you) {
+          $albums[$albumID]["ICO"] = "";
+         }
+         #$this->view(base64_encode("Conversation:SaveDelete"), [
+         # "Data" => ["ID" => $key]
+         #]);
+         #$this->system->Data("Purge", ["react", $key]);
+         #ftp_delete($p2p_domain, $value["Name"]);
+        }
        }
+       ftp_close($p2p_domain);
       }
-      ftp_close($p2p_domain);
+     } if($this->system->ID == $username) {
+      #$this->system->Data("Save", ["x", "fs", $newFiles]);
+     } else {
+      $_FileSystem["Albums"] = $albums;
+      $_FileSystem["Files"] = $newFiles;
+      $y["Points"] = $y["Points"] + $points;
+      #$this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
+      #$this->system->Data("Save", ["mbr", md5($you), $y]);
      }
-    } if($this->system->ID == $username) {
-     #$this->system->Data("Save", ["x", "fs", $newFiles]);
-    } else {
-     $_FileSystem["Albums"] = $albums;
-     $_FileSystem["Files"] = $newFiles;
-     $y["Points"] = $y["Points"] + $points;
-     #$this->system->Data("Save", ["fs", md5($you), $_FileSystem]);
-     #$this->system->Data("Save", ["mbr", md5($you), $y]);
+     $r = ($accessCode == "Accepted") ? "The File was deleted." : $r;
+     $r.="<br/>".json_encode($_FileSystem, true);//TEMP
     }
-    $r = ($accessCode == "Accepted") ? "The File was deleted." : $r;
-    $r.="<br/>".json_encode($_FileSystem, true);//TEMP
-    $r = $this->system->Dialog([
-     "Body" => $this->system->Element(["p", $r]),
-     "Header" => "Done"
-    ]);
    }
+   $header = ($accessCode == "Denied") ? "Error" : "Done";
+   $r = $this->system->Dialog([
+    "Body" => $this->system->Element(["p", $r]),
+    "Header" => $header
+   ]);
    return $this->system->JSONResponse([
     "AccessCode" => $accessCode,
     "Response" => [

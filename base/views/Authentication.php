@@ -238,10 +238,8 @@
   }
   function DeleteFile(array $a) {
    $data = $a["Data"] ?? [];
-   $data = $this->system->FixMissing($data, ["AID", "ID", "UN"]);
-   $albumID = $data["AID"] ?? md5("unsorted");
-   $id = $data["ID"];
-   $username = $data["UN"];
+   $id = $data["ID"] ?? "";
+   $username = $data["UN"] ?? "";
    $r = $this->system->Dialog([
     "Body" => $this->system->Element([
      "p", "The File Identifier is missing."
@@ -257,9 +255,10 @@
      ]),
      "Header" => "Forbidden"
     ]);
-   } elseif((!empty($id) && !empty($username))) {
-    $un = base64_decode($un);
+   } elseif(!empty($id) && !empty($username)) {
+    $username = base64_decode($username);
     $files = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+    $files = $files["Files"] ?? [];
     $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
      "x",
      "fs"
@@ -267,8 +266,8 @@
     $file = $files[$id] ?? [];
     $r = $this->system->Change([[
      "[Delete.Auth]" => $this->system->Page("92c7c84d33f9c3d8ccd6cc04dc228bf0"),
-     "[Delete.ID]" => base64_encode("$username-$albumID-$id"),
-     "[Delete.Processor]" => base64_encode("v=".base64_encode("File:SaveDelete")),
+     "[Delete.ID]" => "$username-$id",
+     "[Delete.Processor]" => base64_encode("v=".base64_encode("File:SaveDelete")."&ParentView=".$data["ParentView"]),
      "[Delete.Title]" => $file["Title"]
     ], $this->system->Page("fca4a243a55cc333f5fa35c8e32dd2a0")]);
    }
