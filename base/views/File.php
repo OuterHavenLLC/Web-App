@@ -678,25 +678,28 @@
     "UN",
     "lPG"
    ]);
+   $albumID = $data["AID"];
    $back = ($data["back"] == 1) ? $this->system->Element([
     "button", "Back to Files", [
-     "class" => "GoToParent LI",
+     "class" => "GoToParent LI header",
      "data-type" => $data["lPG"]
     ]
    ]) : "";
-   $id = $data["AID"];
    $y = $this->you;
    $you = $y["Login"]["Username"];
    if($this->system->ID == $you) {
-    $fr = $this->system->Change([[
+    $r = $this->system->Change([[
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You must sign in to continue."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-   } elseif(!empty($id)) {
+   } elseif(!empty($albumID)) {
     $_HC = ($y["Rank"] == md5("High Command")) ? 1 : 0;
-    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
-    $id = $id ?? md5("unsorted");
-    $efs = $fs["Files"] ?? [];
+    $username = $data["UN"] ?? $you;
+    $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+    $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
+     "x",
+     "fs"
+    ]) : $fileSystem["Files"];
     $xfsLimit = $this->system->core["XFS"]["limits"]["Total"] ?? 0;
     $xfsLimit = $xfsLimit."MB";
     $xfsUsage = 0;
@@ -710,14 +713,10 @@
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage, and exceeded the limit of $xfsLimit."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
-    $username = $data["UN"] ?? $you;
     $uploadsAllowed = ($usage < $limit) ? 1 : 0;
     $uploadsAllowed = $y["Subscriptions"]["XFS"]["A"] ?? $uploadsAllowed;
-    #$uploadsAllowed = ($_HC == 1) ? 1 : $uploadsAllowed;
     if(!empty($id) && !empty($username) && $uploadsAllowed == 1) {
-     $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
-     $files = $fileSystem["Files"];
-     $ck = ($_HC == 1 && $username == $this->system->ID) ? 1 : 0;
+     $ck = ($_HC == 1 && $this->system->ID == $username) ? 1 : 0;
      $ck2 = ($username == $you) ? 1 : 0;
      $r = $this->system->Change([[
       "[Error.Header]" => "Forbidden",
@@ -740,7 +739,7 @@
         "div", $this->system->Select("nsfw", "req v2w", $y["Privacy"]["NSFW"]),
         ["class" => "Desktop50"]
        ]);
-       $title = $fileSystem["Albums"][$id]["Title"] ?? "Unsorted";
+       $title = $fileSystem["Albums"][$albumID]["Title"] ?? "Unsorted";
       }
       $r = $this->system->Change([[
        "[Upload.Back]" => $back,
