@@ -696,14 +696,11 @@
     $_HC = ($y["Rank"] == md5("High Command")) ? 1 : 0;
     $username = $data["UN"] ?? $you;
     $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
-    $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
-     "x",
-     "fs"
-    ]) : $fileSystem["Files"];
+    $files = $fileSystem["Files"] ?? [];
     $xfsLimit = $this->system->core["XFS"]["limits"]["Total"] ?? 0;
     $xfsLimit = $xfsLimit."MB";
     $xfsUsage = 0;
-    foreach($fs["Files"] as $key => $value) {
+    foreach($files as $key => $value) {
      $xfsUsage = $xfsUsage + $value["Size"];
     }
     $xfsUsage = $this->system->ByteNotation($xfsUsage)."MB";
@@ -711,13 +708,17 @@
     $usage = $this->system->Change([["MB" => "", "," => ""], $xfsUsage]);
     $r = $back.$this->system->Change([[
      "[Error.Header]" => "Forbidden",
-     "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage, and exceeded the limit of $xfsLimit."
+     "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage and exceeded the limit of $xfsLimit."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
     $uploadsAllowed = ($usage < $limit) ? 1 : 0;
     $uploadsAllowed = $y["Subscriptions"]["XFS"]["A"] ?? $uploadsAllowed;
-    if(!empty($id) && !empty($username) && $uploadsAllowed == 1) {
+    if(!empty($username) && $uploadsAllowed == 1) {
      $ck = ($_HC == 1 && $this->system->ID == $username) ? 1 : 0;
      $ck2 = ($username == $you) ? 1 : 0;
+     $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
+      "x",
+      "fs"
+     ]) : $files;
      $r = $this->system->Change([[
       "[Error.Header]" => "Forbidden",
       "[Error.Message]" => "You do not have permission to upload files to $username's Library."
@@ -731,7 +732,7 @@
        $options .= "<input id=\"nsfw\" name=\"nsfw\" type=\"hidden\" value=\"0\"/>\r\n";
        $title = "System Library";
       } elseif($ck2 == 1) {
-       $options .= "<input name=\"AID\" type=\"hidden\" value=\"$id\"/>\r\n";
+       $options .= "<input name=\"AID\" type=\"hidden\" value=\"$albumID\"/>\r\n";
        $options .= $this->system->Element([
         "div", $this->system->Select("Privacy", "req v2w", $y["Privacy"]["Posts"]),
         ["class" => "Desktop50"]
