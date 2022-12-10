@@ -473,14 +473,11 @@
    $_F = [];
    $_PS = [];
    $data = $a["Data"] ?? [];
-   $data = $this->system->FixMissing($data, ["AID", "UN", "ss"]);
    $err = "Internal Error";
-   $id = $data["AID"];
-   $username = $data["UN"];
+   $id = $data["AID"] ?? md5("unsorted");
+   $username = $data["UN"] ?? "";
    $y = $this->you;
-   $fs = $this->system->Data("Get", ["fs", md5($y["Login"]["Username"])]) ?? [];
-   $fa = $fs["Albums"] ?? [];
-   $fs = $fs["Files"] ?? [];
+   $you = $y["Login"]["Username"];
    if(empty($id) || empty($username)) {
     $r = [
      "F" => "Denied",
@@ -489,12 +486,15 @@
     ];
    } else {
     header("Content-Type: application/json");
+    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+    $fa = $fs["Albums"] ?? [];
+    $fs = $fs["Files"] ?? [];
     $username = base64_decode($username);
     $admin = ($username == $this->system->ID) ? 1 : 0;
     $admin = ($admin == 1 && $y["Rank"] == md5("High Command")) ? 1 : 0;
     $admin = ($admin == 1 || $username != $this->system->ID) ? 1 : 0;
     $f = $a["Files"] ?? [];
-    $fpri = $data["pri"] ?? base64_encode($y["Privacy"]["DLL"]);
+    $fpri = $data["Privacy"] ?? base64_encode($y["Privacy"]["DLL"]);
     $fpri = base64_decode($fpri);
     $id = base64_decode($id);
     $id = $id ?? md5("unsorted");
@@ -509,7 +509,7 @@
      $xfsUsage = $xfsUsage + $size;
     }
     $xfsUsage = str_replace(",", "", $this->system->ByteNotation($xfsUsage));
-    if($admin == 1 && $username == $this->system->ID) {
+    if($admin == 1 && $this->system->ID == $username) {
      $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
      $ck = 1;
     } else {
@@ -527,7 +527,7 @@
      $ck = ($admin == 1 || $ck == 1) ? 1 : 0;
      $ck2 = (in_array($ext, $allowed) && $f["error"][$k] == 0) ? 1 : 0;
      $mime = $f["type"][$k];
-     $fn = md5($y["Login"]["Username"]."-".$n."-".$this->system->timestamp);
+     $fn = md5("$you-$n-".$this->system->timestamp);
      $name = "$fn.$ext";
      $s = $this->system->ByteNotation($f["size"][$k]);
      $s2 = str_replace(",", "", $s);
@@ -639,9 +639,9 @@
          array_push($fck, "Failed to push $name to the Extended File System.");
          array_push($_F, [$f["name"][$k], $err, $fck]);
         } else {
-         if($admin == 1 && $username == $this->system->ID) {
-          $file["UN"] = $y["Login"]["Username"];
-          $this->system->Data("Save", ["x", "fs", $efs]);
+         if($admin == 1 && $this->system->ID == $username) {
+          $file["UN"] = $you;
+          #$this->system->Data("Save", ["x", "fs", $efs]);
          } else {
           $fs = [];
           $fs["Albums"] = $fa;
@@ -651,14 +651,8 @@
           }
           $fs["Albums"][$id]["Modified"] = $this->system->timestamp;
           $y["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
-          $this->system->Data("Save", [
-           "fs",
-           md5($y["Login"]["Username"]), $fs
-          ]);
-          $this->system->Data("Save", [
-           "mbr",
-           md5($y["Login"]["Username"]), $y
-          ]);
+          /*$this->system->Data("Save", ["fs", md5($you), $fs]);
+          $this->system->Data("Save", ["mbr", md5($you), $y]);*/
          }
          array_push($_PS, [$file, $fn, $fck]);
         }
@@ -668,8 +662,12 @@
       }
      }
     }
-    $r = ["D" => $data, "F" => $_F, "PS" => $_PS];
-    $this->system->Statistic("UL");
+    $r = [
+     "Data" => $data,
+     "Failed" => $_F,
+     "Passed" => $_PS
+    ];
+    #$this->system->Statistic("UL");
    }
    return $this->system->JSONResponse($r);
   }
@@ -717,40 +715,37 @@
     $uploadsAllowed = $y["Subscriptions"]["XFS"]["A"] ?? $uploadsAllowed;
     #$uploadsAllowed = ($_HC == 1) ? 1 : $uploadsAllowed;
     if(!empty($id) && !empty($username) && $uploadsAllowed == 1) {
-     $t = ($username != $you) ? $this->system->Member($username) : $y;
-     $fs = $this->system->Data("Get", [
-      "fs",
-      md5($t["Login"]["Username"])
-     ]) ?? [];
-     $ck = ($_HC == 1 && $t["Login"]["Username"] == $this->system->ID) ? 1 : 0;
-     $ck2 = ($t["Login"]["Username"] == $you) ? 1 : 0;
+     $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+     $files = $fileSystem["Files"];
+     $ck = ($_HC == 1 && $username == $this->system->ID) ? 1 : 0;
+     $ck2 = ($username == $you) ? 1 : 0;
      $r = $this->system->Change([[
       "[Error.Header]" => "Forbidden",
-      "[Error.Message]" => "You do not have permission to upload files to ".$t["Personal"]["DisplayName"]."'s Library."
+      "[Error.Message]" => "You do not have permission to upload files to $username's Library."
      ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
      if($ck == 1 || $ck2 == 1) {
       $limit = ($ck == 1 || $y["Subscriptions"]["Artist"]["A"] == 1) ? "You do not have a cumulative upload limit" : "Your cumulative file upload limit is $xfsLimit";
-      $opt = "<input name=\"UN\" type=\"hidden\" value=\"".$t["Login"]["Username"]."\"/>\r\n";
+      $options = "<input name=\"UN\" type=\"hidden\" value=\"$username\"/>\r\n";
       if($ck == 1) {
-       $opt .= "<input id=\"AID\" name=\"AID\" type=\"hidden\" value=\"".md5("unsorted")."\"/>\r\n";
-       $opt .= "<input id=\"Privacy\" name=\"pri\" type=\"hidden\" value=\"".md5("public")."\"/>\r\n";
-       $opt .= "<input id=\"nsfw\" name=\"nsfw\" type=\"hidden\" value=\"0\"/>\r\n";
+       $options .= "<input id=\"AID\" name=\"AID\" type=\"hidden\" value=\"".md5("unsorted")."\"/>\r\n";
+       $options .= "<input id=\"Privacy\" name=\"pri\" type=\"hidden\" value=\"".md5("public")."\"/>\r\n";
+       $options .= "<input id=\"nsfw\" name=\"nsfw\" type=\"hidden\" value=\"0\"/>\r\n";
        $title = "System Library";
       } elseif($ck2 == 1) {
-       $opt .= "<input name=\"AID\" type=\"hidden\" value=\"$id\"/>\r\n";
-       $opt .= $this->system->Element([
+       $options .= "<input name=\"AID\" type=\"hidden\" value=\"$id\"/>\r\n";
+       $options .= $this->system->Element([
         "div", $this->system->Select("Privacy", "req v2w", $y["Privacy"]["Posts"]),
         ["class" => "Desktop50"]
        ]).$this->system->Element([
         "div", $this->system->Select("nsfw", "req v2w", $y["Privacy"]["NSFW"]),
         ["class" => "Desktop50"]
        ]);
-       $title = $fs["Albums"][$id]["Title"] ?? "Unsorted";
+       $title = $fileSystem["Albums"][$id]["Title"] ?? "Unsorted";
       }
       $r = $this->system->Change([[
        "[Upload.Back]" => $back,
        "[Upload.Limit]" => $limit,
-       "[Upload.Options]" => $opt,
+       "[Upload.Options]" => $options,
        "[Upload.Title]" => $title,
        "[Upload.Upload]" => base64_encode("v=".base64_encode("File:SaveUpload"))
       ], $this->system->Page("bf6bb3ddf61497a81485d5eded18e5f8")]);

@@ -41,7 +41,7 @@
   if($view == base64_encode("File:SaveUpload")) {
    $r = $gw->view($view, [
     "Data" => $data,
-    "Files" => $_FILES["file"]
+    "Files" => $_FILES["Uploads"]
    ]);
   } elseif($view == "MD5") {
    $r = md5(base64_decode($data["MD5"]));
