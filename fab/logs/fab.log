@@ -1,17 +1,9 @@
-2022-12-06 01:30:16	WARN	[CONFIG] Ignoring streampath_1=http://outerhaven.nyc:8000 as this will produce an invalid path.
-2022-12-06 01:30:16	WARN	[CONFIG] Ignoring streampath_2=http://outerhaven.nyc:8000 as this will produce an invalid path.
-2022-12-06 01:30:16	INFO	*********************************************************************
-2022-12-06 01:30:16	INFO	**        SHOUTcast Distributed Network Audio Server (DNAS)        **
-2022-12-06 01:30:16	INFO	**    Copyright (C) 2014-2017 Radionomy SA, All Rights Reserved    **
-2022-12-06 01:30:16	INFO	*********************************************************************
-2022-12-06 01:30:16	INFO	[MAIN] SHOUTcast DNAS/posix(linux x64) v2.5.5.733 (Oct  9 2017)
-2022-12-06 01:30:16	INFO	[MAIN] PID: 1008
-2022-12-06 01:30:16	INFO	[MAIN] Saving log output to `/var/www/html/fab/logs/fab.log'
-2022-12-06 01:30:16	INFO	[MAIN] Automatic log rotation interval: 1 day
-2022-12-06 01:30:16	INFO	[MAIN] Loaded config from `/var/www/html/fab/fab.conf'
-2022-12-06 01:30:16	INFO	[MAIN] Calculated CPU count is 1 -> 2 CPUs specified to be used
-2022-12-06 01:30:16	INFO	[MAIN] Limited to 1024 file descriptors [relates to ulimit -n]
-2022-12-06 01:30:16	INFO	[MAIN] Starting 2 network threads
-2022-12-06 01:30:16	INFO	[MICROSERVER] Listening for source and client connections on port 8000
-2022-12-06 01:30:16	INFO	[MICROSERVER] Listening for legacy source connections on port 8001
-2022-12-06 01:30:16	INFO	[MICROSERVER] Flash policy file server not enabled
+2022-12-08 07:57:27	ERROR	[DST 64.62.197.16:5153 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15'
+2022-12-08 07:57:31	ERROR	[SRC 64.62.197.12:22797 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
+2022-12-08 15:50:56	ERROR	[SRC 162.142.125.220:55784 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-08 15:50:57	ERROR	[SRC 167.94.138.62:54024 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-08 15:50:57	ERROR	[SRC 167.248.133.118:56998 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-08 17:18:37	ERROR	[DST 23.90.160.130:54584 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'
+2022-12-08 17:55:19	ERROR	[DST 167.248.133.119:34392 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-12-08 17:55:19	ERROR	[SRC 167.248.133.119:37296 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-08 21:10:28	ERROR	[SRC 38.96.139.33:40628 sid=1] SHOUTcast 1 source connection denied. Empty password not allowed.

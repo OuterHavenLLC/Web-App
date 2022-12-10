@@ -1,7 +1,13 @@
-2022-12-03 11:45:22	ERROR	[DST 184.105.139.98:64471 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0'
-2022-12-03 11:45:44	ERROR	[SRC 184.105.139.126:21547 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
-2022-12-03 12:39:50	ERROR	[SRC 167.248.133.47:34396 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-12-03 12:39:51	ERROR	[SRC 162.142.125.7:45822 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-12-03 12:39:54	ERROR	[SRC 167.94.138.44:48902 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-12-04 05:11:00	ERROR	[DST 167.248.133.117:40802 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-12-04 05:11:00	ERROR	[SRC 167.248.133.117:33676 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-05 17:15:01	ERROR	[DST 205.210.31.13:63580 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
+2022-12-05 17:24:33	ERROR	[SRC 167.94.138.45:41882 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-05 17:24:34	ERROR	[SRC 162.142.125.10:53220 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-05 17:24:34	ERROR	[SRC 167.248.133.45:53996 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-05 21:43:21	ERROR	[DST 137.184.127.21:61953 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-12-05 22:46:29	ERROR	[DST 162.142.125.211:36246 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-12-05 22:46:29	ERROR	[SRC 162.142.125.211:42620 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-06 00:06:42	ERROR	[SRC 157.245.160.53:47188 sid=1] SHOUTcast 1 source connection denied. Empty password not allowed.
+2022-12-06 00:44:39	ERROR	[SRC 80.66.75.77:64811 sid=1] SHOUTcast 1 source connection denied. Bad password: æ
+2022-12-06 01:29:17	INFO	[MAIN] Exiting threads...
+2022-12-06 01:29:17	INFO	[BANDWIDTH] Total: 150946, Sent: 150946, Recv: 0
+2022-12-06 01:29:17	INFO	[MAIN] Shutdown after 18 days 3 hours 25 minutes 13 seconds running
+

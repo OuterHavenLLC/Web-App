@@ -708,7 +708,7 @@
     $xfsUsage = $this->system->ByteNotation($xfsUsage)."MB";
     $limit = $this->system->Change([["MB" => "", "," => ""], $xfsLimit]);
     $usage = $this->system->Change([["MB" => "", "," => ""], $xfsUsage]);
-    $r = $this->system->Change([[
+    $r = $back.$this->system->Change([[
      "[Error.Header]" => "Forbidden",
      "[Error.Message]" => "You may have reached your upload limit. You have used $xfsUsage, and exceeded the limit of $xfsLimit."
     ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
@@ -748,6 +748,7 @@
        $title = $fs["Albums"][$id]["Title"] ?? "Unsorted";
       }
       $r = $this->system->Change([[
+       "[Upload.Back]" => $back,
        "[Upload.Limit]" => $limit,
        "[Upload.Options]" => $opt,
        "[Upload.Title]" => $title,
@@ -756,7 +757,7 @@
      }
     }
    }
-   return $back.$r;
+   return $r;
   }
   function __destruct() {
    // DESTROYS THIS CLASS
