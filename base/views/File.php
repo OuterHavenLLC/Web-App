@@ -440,16 +440,17 @@
     "[Error.Message]" => "The Share Sheet Identifier is missing."
    ], $this->system->Page("eac72ccb1b600e0ccd3dc62d26fa5464")]);
    $y = $this->you;
+   $you = $y["Login"]["Username"];
    if(!empty($id) && !empty($username)) {
     $id = base64_decode($id);
     $username = base64_decode($username);
     $code = base64_encode("$username;$id");
     $t = ($username == $y["Login"]["Username"]) ? $y : $this->system->Member($username);
-    $fs = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
-    $fs = $fs["Files"][$id] ?? [];
+    $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
+    $file = $fileSystem["Files"][$id] ?? [];
     $body = $this->system->PlainText([
      "Data" => $this->system->Element([
-      "p", "Check out the ".$fs["Type"]." ".$t["Personal"]["DisplayName"]." uploaded!"
+      "p", "Check out the ".$file["Type"]." ".$t["Personal"]["DisplayName"]." uploaded!"
      ]).$this->system->Element([
       "div", "[ATT:$code]", ["class" => "NONAME"]
      ]),
@@ -458,20 +459,20 @@
     $body = base64_encode($body);
     $r = $this->system->Change([[
      "[Share.Code]" => "v=".base64_encode("LiveView:GetCode")."&Code=$code&Type=ATT",
-     "[Share.ContentID]" => $fs["Type"],
+     "[Share.ContentID]" => $file["Type"],
      "[Share.GroupMessage]" => base64_encode("v=".base64_encode("Chat:ShareGroup")."&ID=$body"),
      "[Share.ID]" => $id,
      "[Share.Link]" => "",
      "[Share.Message]" => base64_encode("v=".base64_encode("Chat:Share")."&ID=$body"),
-     "[Share.StatusUpdate]" => base64_encode("v=".base64_encode("StatusUpdate:Edit")."&body=$body&new=1&UN=".base64_encode($y["Login"]["Username"])),
-     "[Share.Title]" => $fs["Title"]
+     "[Share.StatusUpdate]" => base64_encode("v=".base64_encode("StatusUpdate:Edit")."&body=$body&new=1&UN=".base64_encode($you)),
+     "[Share.Title]" => $file["Title"]
     ], $this->system->Page("de66bd3907c83f8c350a74d9bbfb96f6")]);
    }
    return $this->system->Card(["Front" => $r]);
   }
   function SaveUpload(array $a) {
-   $_F = [];
-   $_PS = [];
+   $_Failed = [];
+   $_Passed = [];
    $data = $a["Data"] ?? [];
    $err = "Internal Error";
    $id = $data["AID"] ?? md5("unsorted");
@@ -480,58 +481,53 @@
    $you = $y["Login"]["Username"];
    if(empty($id) || empty($username)) {
     $r = [
-     "F" => "Denied",
+     "Failed" => $_Failed,
      "MSG" => "You don't have permission to access this view.",
-     "PS" => $_PS
+     "Passed" => $_Passed
     ];
    } else {
     header("Content-Type: application/json");
-    $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
-    $fa = $fs["Albums"] ?? [];
-    $fs = $fs["Files"] ?? [];
-    $username = base64_decode($username);
+    $_FileSystem = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+    $albums = $_FileSystem["Albums"] ?? [];
     $admin = ($username == $this->system->ID) ? 1 : 0;
     $admin = ($admin == 1 && $y["Rank"] == md5("High Command")) ? 1 : 0;
     $admin = ($admin == 1 || $username != $this->system->ID) ? 1 : 0;
-    $f = $a["Files"] ?? [];
-    $fpri = $data["Privacy"] ?? base64_encode($y["Privacy"]["DLL"]);
-    $fpri = base64_decode($fpri);
-    $id = base64_decode($id);
-    $id = $id ?? md5("unsorted");
+    $albumID = $data["AID"] ?? base64_encode("");
+    $albumID = $albumID ?? md5("unsorted");
+    $files = $_FileSystem["Files"] ?? [];
+    $files = $this->system->Data("Get", ["x", "fs"]) ?? $files;
     $nsfw = $data["nsfw"] ?? base64_encode($y["Privacy"]["NSFW"]);
     $nsfw = base64_decode($nsfw);
+    $privacy = $data["Privacy"] ?? base64_encode($y["Privacy"]["DLL"]);
+    $privacy = base64_decode($privacy);
     $root = $_SERVER["DOCUMENT_ROOT"]."/transit/";
+    $uploads = $a["Files"] ?? [];
+    $username = base64_decode($username);
     $xfsLimits = $this->system->core["XFS"]["limits"] ?? [];
     $xfsLimit = str_replace(",", "", $xfsLimits["Total"]);
     $xfsUsage = 0;
-    foreach($fs as $key => $file) {
-     $size = $file["Size"] ?? 0;
+    foreach($files as $key => $info) {
+     $size = $info["Size"] ?? 0;
      $xfsUsage = $xfsUsage + $size;
     }
     $xfsUsage = str_replace(",", "", $this->system->ByteNotation($xfsUsage));
-    if($admin == 1 && $this->system->ID == $username) {
-     $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
-     $ck = 1;
-    } else {
-     $efs = $fs ?? [];
-     $ck = $y["Subscriptions"]["XFS"]["A"] ?? 0;
-     $ck = ($ck == 1 || $xfsUsage < $xfsLimit) ? 1 : 0;
-    }
+    $ck = $y["Subscriptions"]["XFS"]["A"] ?? 0;
+    $ck = ($_HC == 1 || $ck == 1 || $xfsUsage < $xfsLimit) ? 1 : 0;
     $_DLC = $this->system->core["XFS"]["FT"] ?? [];
     $allowed = array_merge($_DLC["A"], $_DLC["D"], $_DLC["P"], $_DLC["V"]);
     $src = $this->system->efs;
-    foreach($f["name"] as $k => $v) {
-     $n = $f["name"][$k];
+    foreach($uploads["name"] as $key => $value) {
+     $n = $uploads["name"][$key];
      $ext = explode(".", $n);
      $ext = strtolower(end($ext));
      $ck = ($admin == 1 || $ck == 1) ? 1 : 0;
-     $ck2 = (in_array($ext, $allowed) && $f["error"][$k] == 0) ? 1 : 0;
-     $mime = $f["type"][$k];
-     $fn = md5("$you-$n-".$this->system->timestamp);
-     $name = "$fn.$ext";
-     $s = $this->system->ByteNotation($f["size"][$k]);
+     $ck2 = (in_array($ext, $allowed) && $uploads["error"][$key] == 0) ? 1 : 0;
+     $id = md5("$you-$n-".$this->system->timestamp);
+     $mime = $uploads["type"][$key];
+     $name = "$id.$ext";
+     $s = $this->system->ByteNotation($uploads["size"][$key]);
      $s2 = str_replace(",", "", $s);
-     $tmp = $f["tmp_name"][$k];
+     $tmp = $uploads["tmp_name"][$key];
      if(in_array($ext, $_DLC["A"])) {
       $src = $src."A.jpg";
       $ck3 = ($s2 < $xfsLimits["Audio"]) ? 1 : 0;
@@ -553,13 +549,13 @@
       $ck3 = ($s2 < $xfsLimits["Documents"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][1];
      }
-     $fck = [
+     $fileCheck = [
       "Checks" => [
        "AdministratorClearance" => $admin,
        "Album" => $id,
        "File" => [
         "Clearance" => $ck2,
-        "Data" => $f,
+        "Data" => $file,
         "Name" => $name,
         "Limits" => [
          "Categories" => [
@@ -578,8 +574,8 @@
        "MemberClearance" => $ck,
        "Subscription" => $y["Subscriptions"]["XFS"]["A"]
       ],
-      "UploadErrorStatus" => $f["error"][$k],
-      "TemporaryName" => $f["tmp_name"][$k]
+      "UploadErrorStatus" => $uploads["error"][$key],
+      "TemporaryName" => $uploads["tmp_name"][$key]
      ];
      if($ck == 0 || $ck2 == 0 || $ck3 == 0) {
       if(!in_array($ext, $allowed)) {
@@ -593,17 +589,17 @@
       } elseif($xfsUsage > $xfsLimit) {
        $err = "Total storage limit exceeded";
       }
-      array_push($_F, [$f["name"][$k], $err, $fck]);
+      array_push($_Failed, [$uploads["name"][$key], $err, $fileCheck]);
      } else {
       if(!move_uploaded_file($tmp, $root.basename($name))) {
-       array_push($fck, "Failed to move $name to the transit camp.");
-       array_push($_F, [$f["name"][$k], $err, $fck]);
+       array_push($fileCheck, "Failed to move $name to the transit camp.");
+       array_push($_Failed, [$uploads["name"][$key], $err, $fileCheck]);
       } else {
        $file = [
-        "AID" => $id,
+        "AID" => $albumID,
         "Description" => "",
         "EXT" => $ext,
-        "ID" => $fn,
+        "ID" => $id,
         "MIME" => $mime,
         "Modified" => $this->system->timestamp,
         "Name" => $name,
@@ -614,14 +610,14 @@
         "Timestamp" => $this->system->timestamp,
         "Type" => $type
        ];
-       $efs[$fn] = $file;
+       $files[$id] = $file;
        $p2p = $this->system->core["EFS"] ?? [];
        $p2p_domain = ftp_connect($this->system->p2p);
        $p2p_password = base64_decode($p2p["Password"]);
        $p2p_username = base64_decode($p2p["Username"]);
        if(!ftp_login($p2p_domain, $p2p_username, $p2p_password)) {
-        array_push($fck, "Failed to connect to the Extended File System.");
-        array_push($_F, [$f["name"][$k], $err, $fck]);
+        array_push($fileCheck, "Failed to connect to the Extended File System.");
+        array_push($_Failed, [$uploads["name"][$key], $err, $fileCheck]);
        } else {
         ftp_pasv($p2p_domain, true);
         ftp_chmod($p2p_domain, 0777, "html");
@@ -633,28 +629,28 @@
         ftp_chdir($p2p_domain, $username);
         $local = $root.basename($name);
         if(in_array($name, ftp_nlist($p2p_domain, "."))) {
-         array_push($fck, "Duplicate file.");
-         array_push($_F, [$f["name"][$k], $err, $fck]);
+         array_push($fileCheck, "Duplicate file.");
+         array_push($_Failed, [$uploads["name"][$key], $err, $fileCheck]);
         } elseif(!ftp_put($p2p_domain, basename($name), $local, FTP_BINARY)) {
-         array_push($fck, "Failed to push $name to the Extended File System.");
-         array_push($_F, [$f["name"][$k], $err, $fck]);
+         array_push($fileCheck, "Failed to push $name to the Extended File System.");
+         array_push($_Failed, [$uploads["name"][$key], $err, $fileCheck]);
         } else {
          if($admin == 1 && $this->system->ID == $username) {
           $file["UN"] = $you;
-          #$this->system->Data("Save", ["x", "fs", $efs]);
+          #$this->system->Data("Save", ["x", "fs", $files]);
          } else {
-          $fs = [];
-          $fs["Albums"] = $fa;
-          $fs["Files"] = $efs;
+          $_FileSystem = [];
+          $_FileSystem["Albums"] = $albums;
+          $_FileSystem["Files"] = $files;
           if(in_array($ext, $this->system->core["XFS"]["FT"]["P"])) {
-           $fs["Albums"][$id]["ICO"] = $file["Name"];
+           $_FileSystem["Albums"][$albumID]["ICO"] = $file["Name"];
           }
-          $fs["Albums"][$id]["Modified"] = $this->system->timestamp;
+          $_FileSystem["Albums"][$albumID]["Modified"] = $this->system->timestamp;
           $y["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];
           /*$this->system->Data("Save", ["fs", md5($you), $fs]);
           $this->system->Data("Save", ["mbr", md5($you), $y]);*/
          }
-         array_push($_PS, [$file, $fn, $fck]);
+         array_push($_Passed, [$file, $id, $fileCheck]);
         }
         ftp_close($p2p_domain);
        }
@@ -664,12 +660,18 @@
     }
     $r = [
      "Data" => $data,
-     "Failed" => $_F,
-     "Passed" => $_PS
+     "Failed" => $_Failed,
+     "Passed" => $_Passed
     ];
     #$this->system->Statistic("UL");
    }
-   return $this->system->JSONResponse($r);
+   return $this->system->JSONResponse([
+    "AccessCode" => $accessCode,
+    "Response" => [
+     "JSON" => $r
+    ],
+    "ResponseType" => "N/A"
+   ]);
   }
   function Upload(array $a) {
    $data = $a["Data"] ?? [];
