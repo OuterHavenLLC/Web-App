@@ -495,8 +495,8 @@
     $admin = ($username == $this->system->ID) ? 1 : 0;
     $admin = ($_HC == 1 && $admin == 1) ? 1 : 0;
     $admin = ($admin == 1 || $username != $this->system->ID) ? 1 : 0;
-    $albumID = $data["AID"] ?? base64_encode("");
-    $albumID = $albumID ?? md5("unsorted");
+    $albumID = $data["AID"] ?? base64_encode(md5("unsorted"));
+    $albumID = base64_decode($albumID);
     $files = $_FileSystem["Files"] ?? [];
     $files = $this->system->Data("Get", ["x", "fs"]) ?? $files;
     $now = $this->system->timestamp;
@@ -640,10 +640,10 @@
         } else {
          $accessCode = "Accepted";
          if($admin == 1 && $this->system->ID == $username) {
-          $file["UN"] = $you;
+          $files[$id]["UN"] = $you;
           $this->system->Data("Save", ["x", "fs", $files]);
          } else {
-          $_FileSystem = [];
+          $_FileSystem = $_FileSystem ?? [];
           $_FileSystem["Albums"] = $albums;
           $_FileSystem["Files"] = $files;
           if(in_array($ext, $this->system->core["XFS"]["FT"]["P"])) {
