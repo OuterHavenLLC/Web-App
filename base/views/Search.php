@@ -284,7 +284,7 @@
      $tpl = "8568ac7727dae51ee4d96334fa891395";
     } elseif($st == "MBR-XFS") {
      $aid = $data["AID"] ?? md5("unsorted");
-     $fs = $this->system->Data("Get", ["fs", md5($you)]);
+     $fs = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
      $xfsLimit = $this->system->core["XFS"]["limits"]["Total"] ?? 0;
      $xfsLimit = $xfsLimit."MB";
      $xfsUsage = 0;
@@ -394,8 +394,11 @@
      $lis = "Search Products";
      $tpl = "e3de2c4c383d11d97d62a198f15ee885";
     } elseif($st == "XFS") {
+     $_AddTo = $data["AddTo"] ?? "";
+     $_Added = $data["Added"] ?? "";
      $h = "Files";
-     $li .= "&AddTo=".$data["AddTo"]."&Added=".$data["Added"]."&UN=".$data["UN"];
+     $lPG = $data["lPG"] ?? $st;
+     $li .= "&AddTo=".$_AddTo."&Added=".$_Added."&UN=".$data["UN"]."&lPG=$lpg";
      $li .= (isset($data["ftype"])) ? "&ftype=".$data["ftype"] : "";
      $lis = "Search Files";
     }
@@ -1745,39 +1748,37 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
     }
    } elseif($st == "MBR-XFS") {
     $ec = "Accepted";
-    $tpl = $this->system->Page("e15a0735c2cb8fa2d508ee1e8a6d658d");
-    $aid = $data["AID"] ?? md5("unsorted");
+    $albumID = $data["AID"] ?? md5("unsorted");
     $t = $data["UN"] ?? "";
-    $t = (!empty($t)) ? base64_decode($t) : $y["Login"]["Username"];
-    $t = ($t == $y["Login"]["Username"]) ? $y : $this->system->Member($t);
-    $fs = $this->system->Data("Get", [
+    $t = (!empty($t)) ? base64_decode($t) : $you;
+    $t = ($t == $you) ? $y : $this->system->Member($t);
+    $tpl = $this->system->Page("e15a0735c2cb8fa2d508ee1e8a6d658d");
+    $fileSystem = $this->system->Data("Get", [
      "fs",
      md5($t["Login"]["Username"])
     ]) ?? [];
     if($t["Login"]["Username"] == $this->system->ID) {
-     $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
+     $files = $this->system->Data("Get", ["x", "fs"]) ?? [];
     } else {
-     $efs = $fs["Files"] ?? [];
-    } foreach($efs as $key => $value) {
+     $files = $fileSystem["Files"] ?? [];
+    } foreach($files as $key => $value) {
      $bl = $this->system->CheckBlocked([$y, "Files", $value["ID"]]);
      $illegal = $value["Illegal"] ?? 0;
      $illegal = ($illegal >= $this->illegal) ? 1 : 0;
-     if($aid == $value["AID"] && $bl == 0 && $illegal == 0) {
-      $src = $value ?? "";
-      $src = $this->system->GetSourceFromExtension([
+     if($albumID == $value["AID"] && $bl == 0 && $illegal == 0) {
+      $source = $this->system->GetSourceFromExtension([
        $t["Login"]["Username"],
-       $src
+       $value
       ]);
-      $type = ($i % 2 == 0 || $i % 3 == 0) ? "Desktop66" : "Desktop33";
       array_push($msg, [
        "[X.LI.DT]" => base64_encode("$lpg;".base64_encode("v=".base64_encode("File:Home")."&ID=".$value["ID"]."&UN=".$t["Login"]["Username"]."&back=1&lPG=$lpg")),
-       "[X.LI.Style]" => base64_encode("background:url('$src')"),
+       "[X.LI.Style]" => base64_encode("$source"),
        "[X.LI.Title]" => base64_encode($value["Title"]),
-       "[X.LI.Type]" => base64_encode($type)
+       "[X.LI.Type]" => base64_encode("Desktop33")
       ]);
-      $i++;
      }
     }
+    $na.=json_encode($files, true);//TEMP
    } elseif($st == "MiNY") {
     $ec = "Accepted";
     $home = base64_encode("Product:Home");
@@ -2072,29 +2073,26 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
    } elseif($st == "XFS") {
     $ec = "Accepted";
     $tpl = $this->system->Page("e15a0735c2cb8fa2d508ee1e8a6d658d");
-    if($data["UN"] == $this->system->ID) {
-     $efs = $this->system->Data("Get", ["x", "fs"]) ?? [];
+    $username = base64_decode($data["UN"]);
+    if($this->system->ID == $username) {
+     $files = $this->system->Data("Get", ["x", "fs"]) ?? [];
     } else {
-     $efs = $this->system->Data("Get", [
-      "fs",
-      md5($y["Login"]["Username"])
-     ]) ?? [];
-     $efs = $efs["Files"] ?? [];
-    } foreach($efs as $k => $v) {
+     $files = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+     $files = $files["Files"] ?? [];
+    } foreach($files as $k => $v) {
      $bl = $this->system->CheckBlocked([$y, "Files", $v["ID"]]);
      $illegal = $v["Illegal"] ?? 0;
      $illegal = ($illegal >= $this->illegal) ? 1 : 0;
-     $fv = base64_encode("File:Home");
-     $fv = "v=$fv&AddTo=".$data["AddTo"]."&Added=".$data["Added"]."&ID=".$v["ID"]."&&UN=".$y["Login"]["Username"];
-     $src = $v ?? "";
-     $src = $this->system->GetSourceFromExtension([$data["UN"], $v]);
-     $type = ($i % 2 == 0 || $i % 3 == 0) ? "Desktop33" : "Desktop66";
-     $dlcu = "$fv&ID=".$v["ID"]."&UN=".$data["UN"];
+     $view = "v=".base64_encode("File:Home")."&AddTo=".$data["AddTo"]."&Added=".$data["Added"]."&ID=".$v["ID"]."&UN=$username";
+     $src = $this->system->GetSourceFromExtension([
+      $username,
+      $v
+     ]);
      $dlc = [
-      "[X.LI.DT]" => base64_encode(base64_encode($fv)),
-      "[X.LI.Style]" => base64_encode("background:url('$src')"),
+      "[X.LI.DT]" => base64_encode("$lpg;".base64_encode($view)),
+      "[X.LI.Style]" => base64_encode("$src"),
       "[X.LI.Title]" => base64_encode($v["Title"]),
-      "[X.LI.Type]" => base64_encode($type)
+      "[X.LI.Type]" => base64_encode("Desktop33")
      ];
      if($bl == 0 && $illegal == 0) {
       if(!isset($data["ftype"]) && $bl == 0) {

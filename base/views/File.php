@@ -647,7 +647,11 @@
           $_FileSystem["Albums"] = $albums;
           $_FileSystem["Files"] = $files;
           if(in_array($ext, $this->system->core["XFS"]["FT"]["P"])) {
-           $_FileSystem["Albums"][$albumID]["ICO"] = $file["Name"];
+           $thumbnail = $this->system->Thumbnail([
+            "File" => $name,
+            "Username" => $you
+           ])["AlbumCover"] ?? $name;
+           $_FileSystem["Albums"][$albumID]["ICO"] = $thumbnail;
           }
           $_FileSystem["Albums"][$albumID]["Modified"] = $now;
           $y["Points"] = $y["Points"] + $this->system->core["PTS"]["NewContent"];

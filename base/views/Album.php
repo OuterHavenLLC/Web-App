@@ -71,7 +71,7 @@
     "lPP"
    ]);
    $y = $this->you;
-   $id = $data["AID"];
+   $id = $data["AID"] ?? "";
    $b2 = $data["b2"] ?? "Albums";
    $bck = $data["back"] ?? 0;
    $un = $data["UN"] ?? $y["Login"]["Username"];

@@ -527,30 +527,35 @@
   }
   function GetSourceFromExtension(array $a) {
    $_ALL = $this->core["XFS"]["FT"] ?? [];
-   $a[1] = $a[1] ?? "";
-   $src = "D.jpg";
-   if(!empty($a[1])) {
-    if(!is_array($a[1])) {
-     $ex = explode(".", $a[1])[1] ?? "";
-     $nm = $a[1];
-     $src = "$ex/$nm";
+   $file = $a[1] ?? "";
+   $source = "D.jpg";
+   if(!empty($a[0]) && !empty($file)) {
+    if(!is_array($file)) {
+     $extension = explode(".", $file)[1] ?? "";
+     $name = $file;
     } else {
-     $ex = $a[1]["EXT"];
-     $nm = $a[1]["Name"];
-     $src = "$ex/$nm";
-    } if(in_array($ex, $_ALL["A"])) {
-     $src = "A.jpg";
-    } elseif(in_array($ex, $_ALL["D"])) {
-     $src = "D.jpg";
-    } elseif(in_array($ex, $_ALL["P"])) {
-     $src = $a[0]."/$nm";
-    } elseif(in_array($ex, $_ALL["V"])) {
-     $src = "V.jpg";
+     $extension = $file["EXT"];
+     $name = $file["Name"];
+    } if(in_array($extension, $_ALL["A"])) {
+     $source = "A.jpg";
+    } elseif(in_array($extension, $_ALL["D"])) {
+     $source = "D.jpg";
+    } elseif(in_array($extension, $_ALL["P"])) {
+     $source = $this->Thumbnail([
+      "File" => $name,
+      "Username" => $a[0]
+     ])["FullPath"];
+    } elseif(in_array($extension, $_ALL["V"])) {
+     $source = "V.jpg";
     } else {
-     $src = "D.jpg";
+     $source = "D.jpg";
     }
+   } if(in_array($extension, $_ALL["P"])) {
+    $r = $source;
+   } else {
+    $r = $this->efs.$source;
    }
-   return $this->efs."/$src";
+   return $r;
   }
   function JSONResponse(array $a) {
    return json_encode($a, true);
@@ -1501,6 +1506,79 @@
   }
   function TimePlus($a, $b, $c) {
    return strtotime("+$b $c", strtotime($a));
+  }
+  function Thumbnail(array $a) {
+   $_EFS = $this->efs;
+   $file = $a["File"] ?? "";
+   $r = [];
+   $username = $a["Username"] ?? "";
+   if(empty($file) || empty($username)) {
+    $r = [
+     "AlbumCover" => "D.jpg",
+     "FullPath" => $this->efs."D.jpg"
+    ];
+   } else {
+    $_JPG = "thumbnail.".explode(".", $file)[0].".jpg";
+    $thumbnail = $_EFS."$username/".$_JPG;
+    $readEFS = curl_init($thumbnail);
+    curl_setopt($readEFS, CURLOPT_NOBODY, true);
+    curl_exec($readEFS);
+    $efsResponse = curl_getinfo($readEFS, CURLINFO_HTTP_CODE);
+    curl_close($readEFS);
+    if($efsResponse == 200) {
+     $r = [
+      "AlbumCover" => $_JPG,
+      "FullPath" => $thumbnail
+     ];
+    } else {
+     $r = [
+      "AlbumCover" => $file,
+      "FullPath" => $_EFS."$username/$file"
+     ];
+     $readEFS = curl_init($r["FullPath"]);
+     curl_setopt($readEFS, CURLOPT_NOBODY, true);
+     curl_exec($readEFS);
+     $efsResponse = curl_getinfo($readEFS, CURLINFO_HTTP_CODE);
+     curl_close($readEFS);
+     if($efsResponse == 200) {
+      $source = ImageCreateFromString(file_get_contents($r["FullPath"]));
+      $height = imagesy($source);
+      $newWidth = 100;
+      $width = imagesx($source);
+      $newHeight = floor($height * ($newWidth / $width));
+      $newImage = imagecreatetruecolor($newWidth, $newHeight);
+      $p2p = $this->core["EFS"] ?? [];
+      $p2p_domain = ftp_connect($this->p2p);
+      $p2p_password = base64_decode($p2p["Password"]);
+      $p2p_username = base64_decode($p2p["Username"]);
+      $local = $_SERVER["DOCUMENT_ROOT"]."/transit/".$_JPG;
+      imagecopyresampled($newImage, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+      imagejpeg($newImage, $local);
+      $r = [
+       "AlbumCover" => $_JPG,
+       "FullPath" => $this->base."/transit/".$_JPG
+      ];
+      if(ftp_login($p2p_domain, $p2p_username, $p2p_password)) {
+       ftp_pasv($p2p_domain, true);
+       ftp_chmod($p2p_domain, 0777, "html");
+       ftp_chdir($p2p_domain, "html");
+       if(!in_array($username, ftp_nlist($p2p_domain, "."))) {
+        ftp_mkdir($p2p_domain, $username);
+       }
+       ftp_chmod($p2p_domain, 0777, $username);
+       ftp_chdir($p2p_domain, $username);
+       if(!in_array($_JPG, ftp_nlist($p2p_domain, ".")) && ftp_put($p2p_domain, $_JPG, $local, FTP_BINARY)) {
+        $r = [
+         "AlbumCover" => $_JPG,
+         "FullPath" => $thumbnail
+        ];
+        unlink($local);
+       }
+      }
+     }
+    }
+   }
+   return $r;
   }
   function Username() {
    $sk = $_COOKIE["SK"] ?? "";

@@ -83,6 +83,7 @@
      "[Menu.Member.BulletinCenter]" => "v=".base64_encode("Profile:BulletinCenter"),
      "[Menu.Member.Contacts]" => "v=$search&st=Contacts",
      "[Menu.Member.DisplayName]" => $y["Personal"]["DisplayName"],
+     "[Menu.Member.Files]" => "v=$search&UN=".base64_encode($you)."&lPG=Files&st=XFS",
      "[Menu.Member.Forums]" => "v=$search&lPG=MBR-Forums&st=MBR-Forums",
      "[Menu.Member.Shop]" => $shop,
      "[Menu.Member.Library]" => "v=$search&UN=".base64_encode($you)."&lPG=MediaLib&st=MBR-ALB",
