@@ -1,7 +1,7 @@
-2022-12-03 11:45:22	ERROR	[DST 184.105.139.98:64471 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0'
-2022-12-03 11:45:44	ERROR	[SRC 184.105.139.126:21547 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
-2022-12-03 12:39:50	ERROR	[SRC 167.248.133.47:34396 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-12-03 12:39:51	ERROR	[SRC 162.142.125.7:45822 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-12-03 12:39:54	ERROR	[SRC 167.94.138.44:48902 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
-2022-12-04 05:11:00	ERROR	[DST 167.248.133.117:40802 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
-2022-12-04 05:11:00	ERROR	[SRC 167.248.133.117:33676 sid=1] SHOUTcast 1 source connection denied. Bad password: PRI * HTTP/2.0
+2022-12-22 10:51:23	ERROR	[DST 64.62.197.53:20009 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
+2022-12-22 10:51:26	ERROR	[SRC 64.62.197.54:19825 sid=1] SHOUTcast 1 source connection denied for user (CONNECT www.shadowserver.org). Bad password: 443 HTTP/1.1
+2022-12-22 12:16:31	ERROR	[DST 94.102.61.48:33782 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `python-requests/2.26.0'
+2022-12-22 20:02:04	ERROR	[DST 154.89.5.215:50228 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `'
+2022-12-22 21:33:18	ERROR	[DST 198.235.24.134:58142 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Expanse, a Palo Alto Networks company, searches across the global IPv4 space multiple times per day to identify customers&#39; presences on the Internet. If you would like to be excluded from our scans, please send IP addresses/domains to: scaninfo@paloaltonetworks.com'
+2022-12-22 22:17:52	ERROR	[SRC 192.241.223.28:42730 sid=1] SHOUTcast 1 source connection denied. Bad password: MGLNDD_174.138.58.184_8000
+2022-12-22 22:58:41	ERROR	[DST 172.105.161.142:50636 sid=1] HTTP client connection rejected. Stream not available as there is no source connected. Agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'
