@@ -44,9 +44,15 @@
      "fs"
     ]) : $fileSystem["Files"];
     $file = $files[$id] ?? [];
+    $album = $this->system->Element(["p", "System Library`"]);
+    if($this->system->ID != $username) {
+     $album = $file["AID"] ?? md5("unsorted");
+     $album = $this->system->Select("Album", "req v2w", $album);
+    }
     $nsfw = $file["NSFW"] ?? $y["Privacy"]["NSFW"];
     $privacy = $file["Privacy"];
     $r = $this->system->Change([[
+     "[File.Album]" => $album,
      "[File.Description]" => $file["Description"],
      "[File.ID]" => $id,
      "[File.NSFW]" => $this->system->Select("nsfw", "req v2w", $nsfw),
@@ -255,6 +261,7 @@
     ]);
    } elseif(!empty($id)) {
     $accessCode = "Accepted";
+    $album = $data["Album"] ?? md5("unsorted");
     $username = $data["UN"] ?? $you;
     $fileSystem = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
     $files = ($this->system->ID == $username) ? $this->system->Data("Get", [
@@ -263,6 +270,7 @@
     ]) : $fileSystem["Files"];
     $now = $this->system->timestamp;
     $file = $files[$id] ?? [];
+    $file["AID"] = $album ?? $files[$id]["Created"];
     $file["Created"] = $files[$id]["Created"] ?? $now;
     $file["Description"] = $data["Description"];
     $file["Illegal"] = $files[$id]["Illegal"] ?? 0;

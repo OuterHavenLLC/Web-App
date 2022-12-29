@@ -921,6 +921,19 @@
       "optgroup", $r, ["label" => "Privacy"]
      ]), ["class" => $cl, "name" => $a]
     ]);
+   } elseif($a == "Album") {
+    $fileSystem = $this->Data("Get", [
+     "fs",
+     md5($y["Login"]["Username"])
+    ]) ?? [];
+    foreach($fileSystem["Albums"] as $k => $v) {
+     $r .= "<option value=\"$k\">".$v["Title"]."</option>\r\n";
+    }
+    $r = $this->Element([
+     "select", $this->Element([
+      "optgroup", $r, ["label" => "Album"]
+     ]), ["class" => $cl, "name" => $a]
+    ]);
    } elseif($a == "BirthMonth") {
     for($i = 1; $i < 12; $i++) {
      $s = ((empty($c) && $i == date("m")) || $i == $c) ? " selected=\"selected\"" : "";
@@ -1362,19 +1375,6 @@
     $r = $this->Element([
      "select", $this->Element([
       "optgroup", $r, ["label" => "Product Permissions"]
-     ]), ["class" => $cl, "name" => $a]
-    ]);
-   } elseif($a == "rAlb") {
-    $fs = $this->Data("Get", [
-     "fs",
-     md5($y["Login"]["Username"])
-    ]) ?? [];
-    foreach($fs["Albums"] as $k => $v) {
-     $r .= "<option value=\"$k\">".$v["Title"]."</option>\r\n";
-    }
-    $r = $this->Element([
-     "select", $this->Element([
-      "optgroup", $r, ["label" => "Album"]
      ]), ["class" => $cl, "name" => $a]
     ]);
    }

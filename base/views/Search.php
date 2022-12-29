@@ -294,7 +294,6 @@
      $xfsUsage = $this->system->ByteNotation($xfsUsage)."MB";
      $limit = $this->system->Change([["MB" => "", "," => ""], $xfsLimit]);
      $usage = $this->system->Change([["MB" => "", "," => ""], $xfsUsage]);
-     $aid = $data["AID"] ?? md5("unsorted");
      $un = $data["UN"] ?? base64_encode($you);
      $un = base64_decode($un);
      $t = ($un == $you) ? $y : $this->system->Member($un);
@@ -309,7 +308,7 @@
      $de = $alb["Description"] ?? "";
      $display = ($t["Personal"]["DisplayName"] == $this->system->ID) ? "Anonymous" : $t["Personal"]["DisplayName"];
      $h = $alb["Title"] ?? "Unsorted";
-     $li .= "&AID=$aid&UN=".base64_encode($t["Login"]["Username"])."&lPG=$lpg";
+     $li .= "&AID=$aid&UN=".$data["UN"]."&lPG=$lpg";
      $lis = "Search $h";
      $uf = ($ck == 1) ? "You have unlimited storage." : "You used $xfsUsage out of $xfsLimit.";
      $ck = ($ck == 1 || $usage < $limit) ? 1 : 0;
@@ -1750,8 +1749,8 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
    } elseif($st == "MBR-XFS") {
     $ec = "Accepted";
     $albumID = $data["AID"] ?? md5("unsorted");
-    $t = $data["UN"] ?? "";
-    $t = (!empty($t)) ? base64_decode($t) : $you;
+    $t = $data["UN"] ?? base64_encode($you);
+    $t = base64_decode($t);
     $t = ($t == $you) ? $y : $this->system->Member($t);
     $tpl = $this->system->Page("e15a0735c2cb8fa2d508ee1e8a6d658d");
     $fileSystem = $this->system->Data("Get", [
@@ -1779,7 +1778,6 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
       ]);
      }
     }
-    $na.=json_encode($files, true);//TEMP
    } elseif($st == "MiNY") {
     $ec = "Accepted";
     $home = base64_encode("Product:Home");
