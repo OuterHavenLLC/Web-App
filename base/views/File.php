@@ -352,7 +352,7 @@
         ftp_chdir($p2p_domain, $username);
         $list = ftp_nlist($p2p_domain, ".");
         if(in_array($value["Name"], $list)) {
-         $baseName = explode($value["Name"])[0];
+         $baseName = explode(".", $value["Name"])[0];
          if($albums[$albumID]["ICO"] == $value["Name"] && $username == $you) {
           $albums[$albumID]["ICO"] = "";
          }

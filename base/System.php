@@ -398,6 +398,8 @@
       $a = "c.oh.blg.";
      } elseif($a == "BlogPosts") {
       $a = "c.oh.bp.";
+     } elseif($a == "Files") {
+      $a = "c.oh.fs.";
      } elseif($a == "KB") {
       $a = "c.oh.kb.";
      } elseif($a == "MBR") {
@@ -1512,6 +1514,7 @@
   function Thumbnail(array $a) {
    $_EFS = $this->efs;
    $file = $a["File"] ?? "";
+   $isCronJob = $a["CronJob"] ?? 0;
    $r = [];
    $username = $a["Username"] ?? "";
    if(empty($file) || empty($username)) {
@@ -1521,7 +1524,7 @@
     ];
    } else {
     $_Image = "thumbnail.".explode(".", $file)[0].".png";
-    $thumbnail = $_EFS."$username/".$_Image;
+    $thumbnail = $_EFS."$username/$_Image";
     $readEFS = curl_init($thumbnail);
     curl_setopt($readEFS, CURLOPT_NOBODY, true);
     curl_exec($readEFS);
@@ -1553,7 +1556,11 @@
       $p2p_domain = ftp_connect($this->p2p);
       $p2p_password = base64_decode($p2p["Password"]);
       $p2p_username = base64_decode($p2p["Username"]);
-      $local = $_SERVER["DOCUMENT_ROOT"]."/transit/".$_Image;
+      if($isCronJob == 1) {
+       $local = "/var/www/html/transit/$_Image";
+      } else {
+       $local = $_SERVER["DOCUMENT_ROOT"]."/transit/$_Image";
+      }
       imagecopyresampled($newImage, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
       imagepng($newImage, $local);
       $r = [

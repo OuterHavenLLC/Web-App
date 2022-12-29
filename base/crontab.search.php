@@ -4,6 +4,7 @@
  $gw = New GW();
  $key = $gw->system->core["SQL"]["Key"];
  echo "Initializing Outer Haven Re:Search Index...\r\n";
+ sleep(3);
  echo "Restoring Re:Search Database if down...";
  $gw->system->SQL("CREATE DATABASE IF NOT EXISTS ReSearch ENCRYPTION='y'", [], "Create");
  echo "OK!\r\n";
