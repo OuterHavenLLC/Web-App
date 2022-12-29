@@ -34,32 +34,6 @@
     "[Admin.Server]" => "W('https://www.digitalocean.com/', '_blank');",
    ], $this->Page("5c1ce5c08e2add4d1487bcd2193315a7")]);
   }
-  function AttachmentPreview(array $a) {
-   $s = $this->efs."/".$a["T"]."/".$a["DLL"]["Name"];
-   $t = $a["DLL"]["Type"] ?? "";
-   $r = "";
-   if($t == "Audio") {
-    $cover = $this->efs."/A.jpg";
-    $r = $this->Element([
-     "source", NULL, ["src" => $s, "type" => $a["DLL"]["MIME"]]
-    ]);
-    $r = "<audio class=\"PreviewAudio\" controls>$r</audio>\r\n";
-    // F.A.B. Source: $this->Element(["source", NULL, ["src" => "[base]:8000/listen.pls?sid=1", "type" => "audio/aac"]])
-   } elseif($t == "Document") {
-    $cover = $this->efs."/D.jpg";
-    $r = $this->Element([
-     "h3", $a["DLL"]["Title"], ["class" => "CenterText PreviewDocument"]
-    ]);
-   } elseif($t == "Photo") {
-    $s = $this->GetSourceFromExtension([$a["T"], $a["DLL"]]);
-    $r = "<img src=\"$s\" style=\"width:100%\"/>\r\n";
-   } elseif($t == "Video") {
-    $r = $this->eElement(["video", $this->Element([
-     "source", NULL, ["src" => $s, "type" => $a["DLL"]["MIME"]]
-    ])]);
-   }
-   return $r;
-  }
   function ByteNotation(int $a, $b = "MB") {
    $units = [
     "GB" => number_format($a / 1073741824, 2),
@@ -511,6 +485,34 @@
     $r = "he;him;his";
    }
    return explode(";", $r);
+  }
+  function GetAttachmentPreview(array $a) {
+   $s = $this->efs.$a["T"]."/".$a["DLL"]["Name"];
+   $t = $a["DLL"]["Type"] ?? "";
+   $r = "";
+   if($t == "Audio") {
+    $cover = $this->efs."A.jpg";
+    $r = $this->Element(["source", NULL, [
+     "src" => $s,
+     "type" => $a["DLL"]["MIME"]
+    ]]);
+    $r = "<audio class=\"PreviewAudio\" controls>$r</audio>\r\n";
+    // F.A.B. Source: $this->Element(["source", NULL, ["src" => "[base]:8000/listen.pls?sid=1", "type" => "audio/aac"]])
+   } elseif($t == "Document") {
+    $cover = $this->efs."D.jpg";
+    $r = $this->Element(["h3", $a["DLL"]["Title"], [
+     "class" => "CenterText PreviewDocument"
+    ]]);
+   } elseif($t == "Photo") {
+    $s = $this->GetSourceFromExtension([$a["T"], $a["DLL"]]);
+    $r = "<img src=\"$s\" style=\"width:100%\"/>\r\n";
+   } elseif($t == "Video") {
+    $r = $this->eElement(["video", $this->Element(["source", NULL, [
+     "src" => $s,
+     "type" => $a["DLL"]["MIME"]
+    ]])]);
+   }
+   return $r;
   }
   function GetCopyrightInformation() {
    $ttl = $this->core["SYS"]["Title"];
@@ -1518,8 +1520,8 @@
      "FullPath" => $this->efs."D.jpg"
     ];
    } else {
-    $_JPG = "thumbnail.".explode(".", $file)[0].".jpg";
-    $thumbnail = $_EFS."$username/".$_JPG;
+    $_Image = "thumbnail.".explode(".", $file)[0].".png";
+    $thumbnail = $_EFS."$username/".$_Image;
     $readEFS = curl_init($thumbnail);
     curl_setopt($readEFS, CURLOPT_NOBODY, true);
     curl_exec($readEFS);
@@ -1527,7 +1529,7 @@
     curl_close($readEFS);
     if($efsResponse == 200) {
      $r = [
-      "AlbumCover" => $_JPG,
+      "AlbumCover" => $_Image,
       "FullPath" => $thumbnail
      ];
     } else {
@@ -1551,12 +1553,12 @@
       $p2p_domain = ftp_connect($this->p2p);
       $p2p_password = base64_decode($p2p["Password"]);
       $p2p_username = base64_decode($p2p["Username"]);
-      $local = $_SERVER["DOCUMENT_ROOT"]."/transit/".$_JPG;
+      $local = $_SERVER["DOCUMENT_ROOT"]."/transit/".$_Image;
       imagecopyresampled($newImage, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-      imagejpeg($newImage, $local);
+      imagepng($newImage, $local);
       $r = [
-       "AlbumCover" => $_JPG,
-       "FullPath" => $this->base."/transit/".$_JPG
+       "AlbumCover" => $_Image,
+       "FullPath" => $this->base."/transit/".$_Image
       ];
       if(ftp_login($p2p_domain, $p2p_username, $p2p_password)) {
        ftp_pasv($p2p_domain, true);
@@ -1567,9 +1569,9 @@
        }
        ftp_chmod($p2p_domain, 0777, $username);
        ftp_chdir($p2p_domain, $username);
-       if(!in_array($_JPG, ftp_nlist($p2p_domain, ".")) && ftp_put($p2p_domain, $_JPG, $local, FTP_BINARY)) {
+       if(!in_array($_Image, ftp_nlist($p2p_domain, ".")) && ftp_put($p2p_domain, $_Image, $local, FTP_BINARY)) {
         $r = [
-         "AlbumCover" => $_JPG,
+         "AlbumCover" => $_Image,
          "FullPath" => $thumbnail
         ];
         unlink($local);

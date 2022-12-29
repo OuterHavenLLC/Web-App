@@ -102,7 +102,7 @@
      } elseif($id[0] == "File" && !empty($id[2])) {
       $x = $this->system->Data("Get", ["fs", md5($id[1])]) ?? [];
       $x = $x["Files"][$id[2]] ?? [];
-      $att = $this->system->AttachmentPreview([
+      $att = $this->system->GetAttachmentPreview([
        "DLL" => $x,
        "T" => $id[1],
        "Y" => $y["Login"]["Username"]

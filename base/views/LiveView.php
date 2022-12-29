@@ -49,7 +49,7 @@
         "[Attachment.CodeProcessor]" => "v=".base64_encode("LiveView:GetCode")."&Code=$dlc&Type=ATT",
         "[Attachment.ID]" => $f[1],
         "[Attachment.Input]" => $data["AddTo"],
-        "[Attachment.Preview]" => $this->system->AttachmentPreview([
+        "[Attachment.Preview]" => $this->system->GetAttachmentPreview([
          "DLL" => $efs[$f[1]],
          "T" => $f[0],
          "Y" => $you
@@ -85,7 +85,7 @@
        "[Attachment.DN]" => $t["Personal"]["DisplayName"],
        "[Attachment.ID]" => $attachments[$i],
        "[Attachment.Input]" => $data["AddTo"],
-       "[Attachment.Preview]" => $this->system->AttachmentPreview([
+       "[Attachment.Preview]" => $this->system->GetAttachmentPreview([
         "DLL" => $efs[$f[1]],
         "T" => $f[0],
         "Y" => $you
@@ -175,7 +175,7 @@
        if(!empty($f[0]) && !empty($f[1])) {
         $efs = $this->system->Data("Get", ["fs", md5($f[0])])["Files"] ?? [];
         $r .= $this->system->Element([
-         "button", $this->system->AttachmentPreview([
+         "button", $this->system->GetAttachmentPreview([
           "DLL" => $efs[$f[1]],
           "T" => $f[0],
           "Y" => $you

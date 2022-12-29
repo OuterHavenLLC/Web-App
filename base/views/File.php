@@ -195,7 +195,7 @@
       "[File.Modified]" => $this->system->TimeAgo($file["Modified"]),
       "[File.Name]" => $file["Name"],
       "[File.NSFW]" => $nsfw,
-      "[File.Preview]" => $this->system->AttachmentPreview([
+      "[File.Preview]" => $this->system->GetAttachmentPreview([
        "DLL" => $file,
        "T" => $username,
        "Y" => $you
@@ -518,7 +518,6 @@
     $ck = $y["Subscriptions"]["XFS"]["A"] ?? 0;
     $ck = ($_HC == 1 || $ck == 1 || $xfsUsage < $xfsLimit) ? 1 : 0;
     $allowed = array_merge($_DLC["A"], $_DLC["D"], $_DLC["P"], $_DLC["V"]);
-    $src = $this->system->efs;
     foreach($uploads["name"] as $key => $value) {
      $n = $uploads["name"][$key];
      $ext = explode(".", $n);
@@ -532,23 +531,18 @@
      $size2 = str_replace(",", "", $size);
      $tmp = $uploads["tmp_name"][$key];
      if(in_array($ext, $_DLC["A"])) {
-      $src = $src."A.jpg";
       $ck3 = ($size2 < $xfsLimits["Audio"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][0];
      } elseif(in_array($ext, $_DLC["P"])) {
-      $src = $src."$username/$name";
       $ck3 = ($size2 < $xfsLimits["Images"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][2];
      } elseif(in_array($ext, $_DLC["D"])) {
-      $src = $src."D.jpg";
       $ck3 = ($size2 < $xfsLimits["Documents"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][1];
      } elseif(in_array($ext, $_DLC["V"])) {
-      $src = $src."V.jpg";
       $ck3 = ($size2 < $xfsLimits["Videos"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][3];
      } else {
-      $src = $src."D.jpg";
       $ck3 = ($size2 < $xfsLimits["Documents"]) ? 1 : 0;
       $type = $this->system->core["XFS"]["FT"]["_FT"][1];
      }
@@ -660,7 +654,7 @@
          }
          array_push($_Passed, [
           "HTML" => $this->system->Element([
-           "div", $this->system->AttachmentPreview([
+           "div", $this->system->GetAttachmentPreview([
             "DLL" => $file,
             "T" => $username,
             "Y" => $you
