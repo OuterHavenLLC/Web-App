@@ -401,6 +401,7 @@
      $li .= "&AddTo=".$_AddTo."&Added=".$_Added."&UN=".$data["UN"]."&lPG=$lpg";
      $li .= (isset($data["ftype"])) ? "&ftype=".$data["ftype"] : "";
      $lis = "Search Files";
+     $tpl = "e3de2c4c383d11d97d62a198f15ee885";
     }
     $li = base64_encode($li);
     $r = $this->system->Change([[
@@ -2077,20 +2078,20 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
     if($this->system->ID == $username) {
      $files = $this->system->Data("Get", ["x", "fs"]) ?? [];
     } else {
-     $files = $this->system->Data("Get", ["fs", md5($you)]) ?? [];
+     $files = $this->system->Data("Get", ["fs", md5($username)]) ?? [];
      $files = $files["Files"] ?? [];
     } foreach($files as $k => $v) {
      $bl = $this->system->CheckBlocked([$y, "Files", $v["ID"]]);
      $illegal = $v["Illegal"] ?? 0;
      $illegal = ($illegal >= $this->illegal) ? 1 : 0;
-     $view = "v=".base64_encode("File:Home")."&AddTo=".$data["AddTo"]."&Added=".$data["Added"]."&ID=".$v["ID"]."&UN=$username";
-     $src = $this->system->GetSourceFromExtension([
+     $source = $this->system->GetSourceFromExtension([
       $username,
       $v
      ]);
+     $view = "v=".base64_encode("File:Home")."&AddTo=".$data["AddTo"]."&Added=".$data["Added"]."&ID=".$v["ID"]."&UN=$username&back=1&b2=Files&lPG=$st";
      $dlc = [
-      "[X.LI.DT]" => base64_encode("$lpg;".base64_encode($view)),
-      "[X.LI.Style]" => base64_encode("$src"),
+      "[X.LI.DT]" => base64_encode("$st;".base64_encode($view)),
+      "[X.LI.Style]" => base64_encode("$source"),
       "[X.LI.Title]" => base64_encode($v["Title"]),
       "[X.LI.Type]" => base64_encode("Desktop33")
      ];

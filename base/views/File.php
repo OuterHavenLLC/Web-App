@@ -165,6 +165,14 @@
        $t["Login"]["Username"],
        $file
       ]);
+      $readEFS = curl_init($_Source);
+      curl_setopt($readEFS, CURLOPT_NOBODY, true);
+      curl_exec($readEFS);
+      $efsResponse = curl_getinfo($readEFS, CURLINFO_HTTP_CODE);
+      curl_close($readEFS);
+      if($efsResponse != 200) {
+       $_Source = $this->system->efs."D.jpg";
+      }
       list($height, $width) = getimagesize($_Source);
       $_Size = ($height <= ($width / 1.5) || $height == $width) ? 1 : 0;
       $cp = ($height <= ($width / 1.5)) ? "Cover Photo" : "Profile Picture";
@@ -344,6 +352,7 @@
         ftp_chdir($p2p_domain, $username);
         $list = ftp_nlist($p2p_domain, ".");
         if(in_array($value["Name"], $list)) {
+         $baseName = explode($value["Name"])[0];
          if($albums[$albumID]["ICO"] == $value["Name"] && $username == $you) {
           $albums[$albumID]["ICO"] = "";
          }
@@ -351,6 +360,7 @@
           "Data" => ["ID" => $key]
          ]);
          $this->system->Data("Purge", ["react", $key]);
+         ftp_delete($p2p_domain, "thumbnail.$baseName.png");
          ftp_delete($p2p_domain, $value["Name"]);
         }
        }
