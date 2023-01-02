@@ -489,30 +489,44 @@
    return explode(";", $r);
   }
   function GetAttachmentPreview(array $a) {
-   $s = $this->efs.$a["T"]."/".$a["DLL"]["Name"];
-   $t = $a["DLL"]["Type"] ?? "";
-   $r = "";
-   if($t == "Audio") {
-    $cover = $this->efs."A.jpg";
-    $r = $this->Element(["source", NULL, [
-     "src" => $s,
-     "type" => $a["DLL"]["MIME"]
-    ]]);
-    $r = "<audio class=\"PreviewAudio\" controls>$r</audio>\r\n";
-    // F.A.B. Source: $this->Element(["source", NULL, ["src" => "[base]:8000/listen.pls?sid=1", "type" => "audio/aac"]])
-   } elseif($t == "Document") {
-    $cover = $this->efs."D.jpg";
-    $r = $this->Element(["h3", $a["DLL"]["Title"], [
-     "class" => "CenterText PreviewDocument"
-    ]]);
-   } elseif($t == "Photo") {
-    $s = $this->GetSourceFromExtension([$a["T"], $a["DLL"]]);
-    $r = "<img src=\"$s\" style=\"width:100%\"/>\r\n";
-   } elseif($t == "Video") {
-    $r = $this->eElement(["video", $this->Element(["source", NULL, [
-     "src" => $s,
-     "type" => $a["DLL"]["MIME"]
-    ]])]);
+   $type = $a["DLL"]["Type"] ?? "";
+   $r = $this->Element(["div", $this->Element([
+    "h4", "No Preview Available"
+   ]).$this->Element([
+    "p", "It may have been removed or its visibility reduced by the owner."
+   ]), [
+    "class" => "K4i"
+   ]]);
+   $source = $this->efs.$a["T"]."/".$a["DLL"]["Name"];
+   $readEFS = curl_init($source);
+   curl_setopt($readEFS, CURLOPT_NOBODY, true);
+   curl_exec($readEFS);
+   $efsResponse = curl_getinfo($readEFS, CURLINFO_HTTP_CODE);
+   curl_close($readEFS);
+   if($efsResponse == 200) {
+    if($type == "Audio") {
+     $cover = $this->efs."A.jpg";
+     $r = $this->Element(["source", NULL, [
+      "src" => $s,
+      "type" => $a["DLL"]["MIME"]
+     ]]);
+     $r = "<audio class=\"PreviewAudio\" controls>$r</audio>\r\n";
+     // F.A.B. Source: $this->Element(["source", NULL, ["src" => "[base]:8000/listen.pls?sid=1", "type" => "audio/aac"]])
+    } elseif($type == "Document") {
+     $source = $this->efs."D.jpg";
+     $r = $this->Element(["h3", $a["DLL"]["Title"], [
+      "class" => "CenterText CoverPhotoCard PreviewDocument",
+      "style" => "background:url('$source')"
+     ]]);
+    } elseif($type == "Photo") {
+     // MAKE NoPreview.jpg TO REPLACE D.jpg IN THIS CASE
+     $r = "<img src=\"$source\" style=\"width:100%\"/>\r\n";
+    } elseif($type == "Video") {
+     $r = $this->eElement(["video", $this->Element(["source", NULL, [
+      "src" => $source,
+      "type" => $a["DLL"]["MIME"]
+     ]])]);
+    }
    }
    return $r;
   }
@@ -1655,13 +1669,15 @@
     $lt = $x->Data("Get", ["local", $l[0]]) ?? [];
     $r = $lt[$l[1]]["en_US"] ?? "";
     $r = $lt[$l[1]][$x->region] ?? $r;
-    return (!empty($r)) ? $x-PlainText([
+    $r = (!empty($r)) ? $x-PlainText([
      "BBCodes" => 1,
      "Data" => $r,
      "Decode" => 1,
      "Display" => 1,
      "HTMLDecode" => 1
     ]) : $x->Element(["p", "No Translations Found"]);
+    $x->__destruct();
+    return $r;
    }
   }
   public static function SystemImage($a = NULL) {

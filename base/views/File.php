@@ -677,7 +677,7 @@
             "T" => $username,
             "Y" => $you
            ]), [
-            "class" => "K4i Small"
+            "class" => "InnerMargin Medium"
            ]
           ]),
           "Raw" => $file

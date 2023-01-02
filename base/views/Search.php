@@ -1538,12 +1538,15 @@ HAVING CONVERT(AES_DECRYPT(Body, :key) USING utf8mb4) LIKE :search OR
       $illegal = $v["Illegal"] ?? 0;
       $illegal = ($illegal >= $this->illegal) ? 1 : 0;
       if($bl == 0 && ($ck == 1 && $ck2 == 1) && $illegal == 0) {
-       $ico = $v["ICO"] ?? "";
-       $src = $this->system->GetSourceFromExtension([$t["Login"]["Username"], $ico]);
-       $type = ($i == 0 || $i % 3 == 0 || $i % 4 == 0) ? "Desktop33" : "Desktop66";
+       $coverPhoto = $v["ICO"] ?? "";
+       $coverPhoto = $this->system->GetSourceFromExtension([
+        $t["Login"]["Username"],
+        $coverPhoto
+       ]);
+       $type = ($i % 2 == 0) ? "Desktop33" : "Desktop66";
        array_push($msg, [
         "[Album.CRID]" => base64_encode($k),
-        "[Album.CSS.Style]" => base64_encode("background:url('$src')"),
+        "[Album.CoverPhoto]" => base64_encode($coverPhoto),
         "[Album.CSS.Class]" => base64_encode($type),
         "[Album.Lobby]" => base64_encode(base64_encode("v=".base64_encode("Album:Lobby")."&AID=$k&UN=".$data["UN"])),
         "[Album.Title]" => base64_encode($v["Title"])

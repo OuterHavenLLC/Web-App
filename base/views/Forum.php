@@ -227,7 +227,7 @@
        "onclick" => "FST('N/A', 'v=".base64_encode("Chat:Home")."&GroupChat=1&to=".base64_encode($id)."', '".md5("Chat$id")."');"
       ]
      ]) : "";
-     $actions .= ($blog["UN"] == $you && $pub == 0) ? $this->system->Element([
+     $actions .= ($forum["UN"] == $you && $pub == 0) ? $this->system->Element([
       "button", "Delete", [
        "class" => "Small dBO dB2C v2",
        "data-type" => "v=".base64_encode("Authentication:DeleteForum")."&ID=".base64_encode($id)
