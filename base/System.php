@@ -55,12 +55,15 @@
    ], htmlentities($a)]);
   }
   function Card(array $a) {
-   $ack = ["Back", "Front", "FrontButton"];
+   $ack = [
+    "Back",
+    "Front",
+    "FrontButton"
+   ];
    for($i = 0; $i < count($ack); $i++) {
     $a[$ack[$i]] = $a[$ack[$i]] ?? "";
    } if(!empty($a["Front"])) {
     return $this->Change([[
-     "[Card.Back]" => $a["Back"],
      "[Card.Front]" => $a["Front"],
      "[Card.Front.Button]" => $a["FrontButton"]
     ], $this->Page("50adcf59f82d808c78d94f5aa640b69d")]);

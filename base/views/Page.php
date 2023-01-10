@@ -110,7 +110,6 @@
    ]);
   }
   function Edit(array $a) {
-   $bck = "";
    $data = $a["Data"] ?? [];
    $data = $this->system->FixMissing($data, ["ID", "new"]);
    $frbtn = "";
@@ -174,7 +173,7 @@
     } else {
      $opt .= "<input class=\"HC\" name=\"HC\" type=\"hidden\" value=\"0\"/>\r\n";
     }
-    $bck = $this->system->Change([
+    $additionalContent = $this->system->Change([
      [
       "[CP.ContentType]" => "Page",
       "[CP.Files]" => base64_encode("v=$sc&st=XFS&AddTo=$at&Added=$at2&ftype=".base64_encode(json_encode(["Photo"]))."&UN=".$y["Login"]["Username"]),
@@ -196,6 +195,7 @@
     ]);
     $fr = $this->system->Change([[
      "[Article.Action]" => $action,
+     "[Article.AdditionalContent]" => $additionalContent,
      "[Article.Attachments]" => $attf,
      "[Article.Attachments.LiveView]" => base64_encode("v=$em&AddTo=$at3input&ID="),
      "[Article.Body]" => $this->system->WYSIWYG([
@@ -219,9 +219,9 @@
      "[Article.ID]" => $id,
      "[Article.Illegal]" => base64_encode("v=".base64_encode("Common:Illegal")."&ID=".base64_encode("Page;$id")),
      "[Article.New]" => $new,
-     "[Article.Opt]" => $opt,
-     "[Article.Opt.NSFW]" => $this->system->Select("nsfw", "LI v2w", $nsfw),
-     "[Article.Opt.Privacy]" => $this->system->Select("Privacy", "LI v2w", $privacy),
+     "[Article.Options]" => $opt,
+     "[Article.Options.NSFW]" => $this->system->Select("nsfw", "LI v2w", $nsfw),
+     "[Article.Options.Privacy]" => $this->system->Select("Privacy", "LI v2w", $privacy),
      "[Article.Products]" => $products,
      "[Article.Products.LiveView]" => base64_encode("v=$ep&AddTo=$at4input&BNDL="),
      "[Article.Title]" => $Page["Title"],
@@ -234,7 +234,6 @@
     ]]);
    }
    return $this->system->Card([
-    "Back" => $bck,
     "Front" => $fr,
     "FrontButton" => $frbtn
    ]);
@@ -546,6 +545,7 @@
       }
      }
      $att = array_unique($att);
+     $highCommand = ($y["Rank"] == md5("High Command")) ? 1 : 0;
      $this->system->Data("Save", ["pg", $id, [
       "Attachments" => $att,
       "Body" => $this->system->PlainText([
@@ -557,7 +557,7 @@
       "Contributors" => $contributors,
       "Created" => $created,
       "Description" => htmlentities($data["Description"]),
-      "High Command" => $data["HC"],
+      "High Command" => $highCommand,
       "ICO" => $coverPhoto,
       "ICO-SRC" => base64_encode($coverPhotoSource),
       "ID" => $id,
